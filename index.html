@@ -220,28 +220,45 @@
         .add-item-modal-content .input-group { display: flex; flex-direction: column; gap: 15px; } 
         .add-item-modal-content .input-row { display: flex; gap: 12px; flex-wrap: wrap; }
         
-        /* Improved Input Field Styles for Modal and General Use */
-        .input-field, #categorySelectInputModal, .category-name-input-inline, #newManagedCategoryInput, #todoInput, #newExtensionInput, #newExtensionCategoryNameInput {
-            flex: 1; padding: 12px 15px; /* Consistent padding */
-            border: 1px solid rgba(255, 255, 255, 0.2); /* Visible border */
-            border-radius: 8px; /* Consistent radius */
-            font-size: 0.9rem; /* Consistent font size */
+        /* Input Field Styles for Modal and General Use (Corrected) */
+        .input-field, 
+        #categorySelectInputModal, 
+        .category-name-input-inline, 
+        #newManagedCategoryInput, 
+        #todoInput, 
+        #newExtensionInput, 
+        #newExtensionCategoryNameInput {
+            flex: 1; 
+            padding: 12px 15px; 
+            border: 1px solid rgba(255, 255, 255, 0.25); /* Slightly more visible border */
+            border-radius: 8px; 
+            font-size: 0.9rem; 
             min-width: 150px; 
-            background-color: rgba(20, 22, 38, 0.7); /* Darker, less transparent background */
-            color: #e0e0e0; /* Lighter text color for better contrast */
+            background-color: rgba(30, 35, 55, 0.7); /* Darker, consistent background */
+            color: #e0e0e0; 
             transition: all 0.25s ease;
-            outline: none; /* Remove default outline */
+            outline: none; 
         }
-        .input-field::placeholder, #todoInput::placeholder, #newExtensionInput::placeholder, #newExtensionCategoryNameInput::placeholder { 
-            color: #788aa0; /* Softer placeholder color */
+        .input-field::placeholder, 
+        #todoInput::placeholder, 
+        #newExtensionInput::placeholder, 
+        #newExtensionCategoryNameInput::placeholder { 
+            color: #8a9bb8; /* Adjusted placeholder color for better readability */
             opacity: 0.8; 
         }
-        .input-field:focus, #categorySelectInputModal:focus, .category-name-input-inline:focus, #newManagedCategoryInput:focus, #todoInput:focus, #newExtensionInput:focus, #newExtensionCategoryNameInput:focus {
-            border-color: #2196f3; /* Accent color on focus */
-            background-color: rgba(30, 32, 50, 0.8); /* Slightly lighter on focus */
-            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.25); /* Focus ring */
+        .input-field:focus, 
+        #categorySelectInputModal:focus, 
+        .category-name-input-inline:focus, 
+        #newManagedCategoryInput:focus, 
+        #todoInput:focus, 
+        #newExtensionInput:focus, 
+        #newExtensionCategoryNameInput:focus {
+            border-color: #2196f3; 
+            background-color: rgba(40, 45, 65, 0.8); /* Slightly lighter on focus */
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.3); /* More prominent focus ring */
         }
-        #categorySelectInputModal { /* Specific styling for select in modal */
+
+        #categorySelectInputModal { 
             appearance: none; -webkit-appearance: none; -moz-appearance: none;
             background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2364b5f6%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
             background-repeat: no-repeat; background-size: 11px; 
@@ -822,7 +839,6 @@
 
     const DOM = {
         sidebar: document.getElementById('sidebar'), mainContent: document.getElementById('mainContent'),
-        // Add Item Modal elements
         addItemFab: document.getElementById('addItemFab'),
         addItemModal: document.getElementById('addItemModal'),
         closeAddItemModalBtn: document.getElementById('closeAddItemModalBtn'),
@@ -836,29 +852,23 @@
         categorySelectInputModal: document.getElementById('categorySelectInputModal'),
         addItemsButtonModal: document.getElementById('addItemsButtonModal'),
         selectedFilesDisplayModal: document.getElementById('selectedFilesDisplayModal'),
-        // Original Path Manager elements (will be used by modal's functions)
         filesDisplayContainer: document.getElementById('itemsDisplayArea'),
         fileCountDisplay: document.getElementById('fileCount'),
         openAllBtn: document.getElementById('openAllBtn'),
-        // General Modals & Notifications
         loadingOverlay: document.getElementById('loadingOverlay'), notification: document.getElementById('notificationToast'),
         confirmModal: document.getElementById('confirmModalBackdrop'), confirmModalMessage: document.getElementById('confirmModalMessage'),
         confirmModalYesBtn: document.getElementById('confirmModalYesBtn'), confirmModalNoBtn: document.getElementById('confirmModalNoBtn'),
-        // Category Manager
         manageCategoriesBtn: document.getElementById('manageCategoriesBtn'), 
         categoryManagerModal: document.getElementById('categoryManagerModal'), categoryListContainer: document.getElementById('categoryListContainer'),
         newManagedCategoryInput: document.getElementById('newManagedCategoryInput'), addManagedCategoryBtn: document.getElementById('addManagedCategoryBtn'),
         closeCategoryManagerBtn: document.getElementById('closeCategoryManagerBtn'),
-        // To-Do List
         todoInput: document.getElementById('todoInput'), addTodoBtn: document.getElementById('addTodoBtn'),
         todosContainer: document.getElementById('todosContainer'),
-        // Options Page
         clearAllDataBtnOptionsPage: document.getElementById('clearAllDataBtnOptionsPage'),
         newExtensionInput: document.getElementById('newExtensionInput'),
         newExtensionCategoryNameInput: document.getElementById('newExtensionCategoryNameInput'),
         addExtensionMappingBtn: document.getElementById('addExtensionMappingBtn'),
         extensionMappingsContainer: document.getElementById('extensionMappingsContainer'),
-        // File Operations Page
         saveProjectAsBtn: document.getElementById('saveProjectAsBtn'),
         importProjectBtn: document.getElementById('importProjectBtn'),
         saveActiveProjectBtn: document.getElementById('saveActiveProjectBtn'),
@@ -911,14 +921,14 @@
         DOM.confirmModalNoBtn.onclick = () => { DOM.confirmModal.classList.remove('show'); callback(false); };
     }
     function clearStagedFilesDisplayModal() { stagedFilePaths = []; DOM.selectedFilesDisplayModal.textContent = ''; }
-    function updateStagedPathsModal(paths, entryType, prefix) { // Renamed for modal context
+    function updateStagedPathsModal(paths, entryType, prefix) { 
         if (paths && Array.isArray(paths) && paths.length > 0) {
             stagedFilePaths = paths.map(p => ({ path: p, name: pathModule ? pathModule.basename(p) : p.substring(p.lastIndexOf(/[/\\]/) + 1), entryType }));
             DOM.selectedFilesDisplayModal.textContent = `${prefix} ${stagedFilePaths.map(f => f.name).join(', ')}`; 
             DOM.pathInputModal.value = ''; 
         } else if (!DOM.pathInputModal.value.trim()) { clearStagedFilesDisplayModal(); }
     }
-    function populateCategoryDropdown(selectElement = DOM.categorySelectInputModal) { // Parameterize select element
+    function populateCategoryDropdown(selectElement = DOM.categorySelectInputModal) { 
         if (!selectElement) return;
         selectElement.innerHTML = '';
         const sortedForDropdown = [...appCategories].sort((a,b) => (a.order ?? Infinity) - (b.order ?? Infinity));
@@ -927,17 +937,35 @@
     
     function getFileType(pathOrName, entryType = 'file') {
         const lowerPathOrName = typeof pathOrName === 'string' ? pathOrName.toLowerCase() : '';
+        
+        // 1. Check for website link first, as it doesn't have a typical extension
+        if (lowerPathOrName.startsWith('https://') || lowerPathOrName.startsWith('http://')) {
+            return 'websiteLink';
+        }
+
+        // 2. Check custom extension mappings
         const fileExtension = lowerPathOrName.startsWith('.') ? lowerPathOrName : (pathModule ? pathModule.extname(lowerPathOrName) : '.' + lowerPathOrName.split('.').pop());
-        const customMapping = customExtensionMappings.find(m => m.extension.toLowerCase() === fileExtension.toLowerCase());
-        if (customMapping) return customMapping.categoryKey;
-        if (lowerPathOrName.startsWith('https://') || lowerPathOrName.startsWith('http://')) return 'websiteLink';
+        if (fileExtension) { // Ensure there's an extension to check
+            const customMapping = customExtensionMappings.find(m => m.extension.toLowerCase() === fileExtension.toLowerCase());
+            if (customMapping) {
+                return customMapping.categoryKey; // Return the category key directly
+            }
+        }
+        
+        // 3. Check for entry type (folderLink)
         if (entryType === 'folderLink') return 'folderLink';
+
+        // 4. Check for hardcoded app extensions
         if (!pathOrName || typeof pathOrName !== 'string') return 'unknown';
         const name = pathModule ? pathModule.basename(pathOrName) : pathOrName.substring(pathOrName.lastIndexOf(/[/\\]/) + 1);
         const ext = name.split('.').pop().toLowerCase();
-        if (ext === 'psd') return 'photoshop'; if (ext === 'aep') return 'aftereffects'; if (ext === 'prproj') return 'premiere';
-        return 'unknown';
+        if (ext === 'psd') return 'photoshop';
+        if (ext === 'aep') return 'aftereffects';
+        if (ext === 'prproj') return 'premiere';
+        
+        return 'unknown'; // Default
     }
+
     function determineItemCategoryKey(fileTypeOrCatKeyFromGetType, chosenCatKey) {
         if (chosenCatKey && chosenCatKey !== 'auto_detect') return chosenCatKey;
         if (appCategories.some(cat => cat.key === fileTypeOrCatKeyFromGetType)) return fileTypeOrCatKeyFromGetType;
@@ -1032,7 +1060,7 @@
             if (isFromModal) { renderCategoryManagerList(); }
         }
     }
-    function handleProcessStagedItemsFromModal() { // Renamed for modal context
+    function handleProcessStagedItemsFromModal() { 
         if (!stagedFilePaths || stagedFilePaths.length === 0) { showAppNotification('Please select or paste items first.', 'warning'); return; }
         const groupName = DOM.projectNameInputModal.value.trim(); let addedCount = 0;
         stagedFilePaths.forEach(itemInfo => {
@@ -1048,12 +1076,12 @@
         if (addedCount > 0) {
             saveItemsToStorage(); renderProjectFilesUI();
             showAppNotification(`✨ Added ${addedCount} item(s)!`, 'success');
-            if (activeFilePath) { handleSaveActiveProject(false); } // Auto-save to active file if one is open
+            if (activeFilePath) { handleSaveActiveProject(false); } 
         }
         DOM.projectNameInputModal.value = ''; clearStagedFilesDisplayModal();
         DOM.categorySelectInputModal.value = 'auto_detect'; 
         if (addedCount > 0) DOM.projectNameInputModal.focus(); 
-        closeAddItemModal(); // Close modal after adding
+        closeAddItemModal(); 
     }
     function renderProjectFilesUI() {
         DOM.fileCountDisplay.textContent = projectFiles.length; DOM.openAllBtn.disabled = projectFiles.length === 0; DOM.filesDisplayContainer.innerHTML = '';
@@ -1196,116 +1224,57 @@
     function handleDeleteCustomExtensionMapping(index) { if (index >= 0 && index < customExtensionMappings.length) { const mapping = customExtensionMappings[index]; showAppCustomConfirm(`Are you sure you want to delete the mapping for "${mapping.extension}"?`, (confirmed) => { if (confirmed) { customExtensionMappings.splice(index, 1); saveCustomExtensionMappings(); renderCustomExtensionMappingsUI(); showAppNotification(`Mapping for "${mapping.extension}" deleted.`, 'success'); } }); } }
 
     // --- Project File Operations & History ---
-    const MAX_HISTORY_ITEMS_COUNT = 10; // Define max history items
+    const MAX_HISTORY_ITEMS_COUNT = 10; 
 
     function loadProjectHistory() {
-        try {
-            const storedHistory = localStorage.getItem(STORAGE_PROJECT_HISTORY_KEY);
-            projectHistory = storedHistory ? JSON.parse(storedHistory) : [];
-        } catch (e) {
-            projectHistory = [];
-            console.error("[Renderer] Error parsing project history from LS", e);
-            localStorage.removeItem(STORAGE_PROJECT_HISTORY_KEY);
-        }
+        try { const storedHistory = localStorage.getItem(STORAGE_PROJECT_HISTORY_KEY); projectHistory = storedHistory ? JSON.parse(storedHistory) : []; } 
+        catch (e) { projectHistory = []; console.error("[Renderer] Error parsing project history from LS", e); localStorage.removeItem(STORAGE_PROJECT_HISTORY_KEY); }
         renderProjectHistoryUI();
     }
-    function saveProjectHistory() {
-        try { localStorage.setItem(STORAGE_PROJECT_HISTORY_KEY, JSON.stringify(projectHistory)); }
-        catch (e) { console.error('[Renderer] Error saving project history:', e); }
-    }
+    function saveProjectHistory() { try { localStorage.setItem(STORAGE_PROJECT_HISTORY_KEY, JSON.stringify(projectHistory)); } catch (e) { console.error('[Renderer] Error saving project history:', e); } }
     function addToProjectHistory(filePath, projectName = null) {
         const now = new Date();
-        const entry = {
-            path: filePath,
-            name: projectName || (pathModule ? pathModule.basename(filePath) : filePath.split(/[/\\]/).pop()),
-            timestamp: now.toISOString(),
-            displayDate: now.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })
-        };
-        projectHistory = projectHistory.filter(item => item.path !== filePath); // Remove duplicates
-        projectHistory.unshift(entry); // Add to the beginning
-        if (projectHistory.length > MAX_HISTORY_ITEMS_COUNT) {
-            projectHistory.length = MAX_HISTORY_ITEMS_COUNT; // Limit history size
-        }
-        saveProjectHistory();
-        renderProjectHistoryUI();
+        const entry = { path: filePath, name: projectName || (pathModule ? pathModule.basename(filePath) : filePath.split(/[/\\]/).pop()), timestamp: now.toISOString(), displayDate: now.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }) };
+        projectHistory = projectHistory.filter(item => item.path !== filePath); projectHistory.unshift(entry); 
+        if (projectHistory.length > MAX_HISTORY_ITEMS_COUNT) { projectHistory.length = MAX_HISTORY_ITEMS_COUNT; }
+        saveProjectHistory(); renderProjectHistoryUI();
     }
     function renderProjectHistoryUI() {
-        if (!DOM.projectHistoryContainer) return;
-        DOM.projectHistoryContainer.innerHTML = '';
-        if (projectHistory.length === 0) {
-            DOM.projectHistoryContainer.innerHTML = `<p style="font-size:0.85rem; color:#90a4ae; text-align:center;">No recent projects.</p>`;
-            return;
-        }
+        if (!DOM.projectHistoryContainer) return; DOM.projectHistoryContainer.innerHTML = '';
+        if (projectHistory.length === 0) { DOM.projectHistoryContainer.innerHTML = `<p style="font-size:0.85rem; color:#90a4ae; text-align:center;">No recent projects.</p>`; return; }
         projectHistory.forEach(item => {
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'extension-mapping-item'; // Re-use style for now
-            itemDiv.style.cursor = 'pointer';
-            itemDiv.title = `Open: ${item.path}`;
-            itemDiv.innerHTML = `
-                <span style="flex-grow:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
-                    <strong>${escapeHTML(item.name)}</strong>
-                    <br><small style="color:#78828c;">${item.displayDate}</small>
-                </span>
-                <button class="btn-icon" onclick="event.stopPropagation(); handleLoadProjectFromPath('${item.path.replace(/\\/g, '\\\\')}')"> <svg viewBox="0 0 24 24"><use xlink:href="#icon-open"></use></svg>
-                </button>
-            `;
+            const itemDiv = document.createElement('div'); itemDiv.className = 'extension-mapping-item'; itemDiv.style.cursor = 'pointer'; itemDiv.title = `Open: ${item.path}`;
+            itemDiv.innerHTML = `<span style="flex-grow:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"><strong>${escapeHTML(item.name)}</strong><br><small style="color:#78828c;">${item.displayDate}</small></span><button class="btn-icon" onclick="event.stopPropagation(); handleLoadProjectFromPath('${item.path.replace(/\\/g, '\\\\')}')"> <svg viewBox="0 0 24 24"><use xlink:href="#icon-open"></use></svg></button>`;
             itemDiv.addEventListener('click', () => handleLoadProjectFromPath(item.path));
             DOM.projectHistoryContainer.appendChild(itemDiv);
         });
     }
     function updateActiveProjectInfo() {
         if (DOM.activeProjectInfo) {
-            if (activeFilePath) {
-                const fileName = pathModule ? pathModule.basename(activeFilePath) : activeFilePath.split(/[/\\]/).pop();
-                DOM.activeProjectInfo.textContent = `Active Project: ${fileName}`;
-                DOM.saveActiveProjectBtn.disabled = false;
-            } else {
-                DOM.activeProjectInfo.textContent = 'No active project file.';
-                DOM.saveActiveProjectBtn.disabled = true;
-            }
+            if (activeFilePath) { const fileName = pathModule ? pathModule.basename(activeFilePath) : activeFilePath.split(/[/\\]/).pop(); DOM.activeProjectInfo.textContent = `Active Project: ${fileName}`; DOM.saveActiveProjectBtn.disabled = false; } 
+            else { DOM.activeProjectInfo.textContent = 'No active project file.'; DOM.saveActiveProjectBtn.disabled = true; }
         }
     }
 
     async function handleSaveProjectAs() {
         if (!ipcRenderer) { showAppNotification('File operations are available in the desktop app only.', 'warning'); return; }
-        const projectData = {
-            projectFiles,
-            appCategories,
-            todos,
-            customExtensionMappings,
-            version: "1.0" // Versioning for future compatibility
-        };
+        const projectData = { projectFiles, appCategories, todos, customExtensionMappings, version: "1.0" };
         try {
             const filePath = await ipcRenderer.invoke('save-dialog', JSON.stringify(projectData));
-            if (filePath) {
-                activeFilePath = filePath;
-                addToProjectHistory(filePath);
-                updateActiveProjectInfo();
-                showAppNotification(`Project saved to: ${pathModule ? pathModule.basename(filePath) : filePath}`, 'success');
-            }
-        } catch (error) {
-            console.error('Error saving project:', error);
-            showAppNotification(`Error saving project: ${error.message}`, 'error');
-        }
+            if (filePath) { activeFilePath = filePath; addToProjectHistory(filePath); updateActiveProjectInfo(); showAppNotification(`Project saved to: ${pathModule ? pathModule.basename(filePath) : filePath}`, 'success'); }
+        } catch (error) { console.error('Error saving project:', error); showAppNotification(`Error saving project: ${error.message}`, 'error'); }
     }
 
     async function handleSaveActiveProject(showNotification = true) {
-        if (!activeFilePath) {
-            if (showNotification) showAppNotification('No active project to save. Use "Save Project As..." first.', 'warning');
-            return;
-        }
+        if (!activeFilePath) { if (showNotification) showAppNotification('No active project to save. Use "Save Project As..." first.', 'warning'); return; }
         if (!ipcRenderer) { showAppNotification('File operations are available in the desktop app only.', 'warning'); return; }
         const projectData = { projectFiles, appCategories, todos, customExtensionMappings, version: "1.0" };
         try {
             await ipcRenderer.invoke('save-file', {filePath: activeFilePath, data: JSON.stringify(projectData) });
             if (showNotification) showAppNotification(`Project "${pathModule ? pathModule.basename(activeFilePath) : activeFilePath}" saved.`, 'success');
             addToProjectHistory(activeFilePath); 
-        } catch (error) {
-            console.error('Error saving active project:', error);
-            if (showNotification) showAppNotification(`Error saving project: ${error.message}`, 'error');
-        }
+        } catch (error) { console.error('Error saving active project:', error); if (showNotification) showAppNotification(`Error saving project: ${error.message}`, 'error'); }
     }
-
 
     async function handleImportProject() {
         if (!ipcRenderer) { showAppNotification('File operations are available in the desktop app only.', 'warning'); return; }
@@ -1313,15 +1282,10 @@
             const result = await ipcRenderer.invoke('open-dialog-for-hpmt');
             if (result && result.filePath && result.content) {
                 loadProjectData(JSON.parse(result.content));
-                activeFilePath = result.filePath;
-                addToProjectHistory(result.filePath);
-                updateActiveProjectInfo();
+                activeFilePath = result.filePath; addToProjectHistory(result.filePath); updateActiveProjectInfo();
                 showAppNotification(`Project "${pathModule ? pathModule.basename(result.filePath) : result.filePath}" imported successfully!`, 'success');
             }
-        } catch (error) {
-            console.error('Error importing project:', error);
-            showAppNotification(`Error importing project: ${error.message}`, 'error');
-        }
+        } catch (error) { console.error('Error importing project:', error); showAppNotification(`Error importing project: ${error.message}`, 'error'); }
     }
     
     async function handleLoadProjectFromPath(filePath) {
@@ -1329,22 +1293,16 @@
         try {
             const content = await ipcRenderer.invoke('read-file', filePath);
             if (content) {
-                loadProjectData(JSON.parse(content));
-                activeFilePath = filePath;
-                addToProjectHistory(filePath); 
-                updateActiveProjectInfo();
-                showAppNotification(`Project "${pathModule ? pathModule.basename(filePath) : filePath}" loaded.`, 'success');
+                loadProjectData(JSON.parse(content)); activeFilePath = filePath; addToProjectHistory(filePath); 
+                updateActiveProjectInfo(); showAppNotification(`Project "${pathModule ? pathModule.basename(filePath) : filePath}" loaded.`, 'success');
                 showPage('pathsPage'); 
             }
         } catch (error) {
             console.error(`Error loading project from path "${filePath}":`, error);
             showAppNotification(`Error loading project: ${error.message}`, 'error');
-            projectHistory = projectHistory.filter(item => item.path !== filePath);
-            saveProjectHistory();
-            renderProjectHistoryUI();
+            projectHistory = projectHistory.filter(item => item.path !== filePath); saveProjectHistory(); renderProjectHistoryUI();
         }
     }
-
 
     function loadProjectData(data) {
         if (!data || typeof data !== 'object') { showAppNotification('Invalid project file format.', 'error'); return; }
@@ -1361,7 +1319,6 @@
         renderProjectFilesUI(); renderTodos(); renderCustomExtensionMappingsUI();
         if (document.getElementById('categoryManagerModal').classList.contains('show')) { renderCategoryManagerList(); }
     }
-
 
     function saveItemsToStorage() { try { localStorage.setItem(STORAGE_ITEMS_KEY, JSON.stringify(projectFiles)); } catch (e) { console.error('[Renderer] Error saving items:', e); showAppNotification('Error saving items!', 'error');} if (activeFilePath) { handleSaveActiveProject(false); }}
     function saveCategoriesToStorage() { try { localStorage.setItem(STORAGE_CATEGORIES_KEY, JSON.stringify(appCategories)); } catch (e) { console.error('[Renderer] Error saving categories:', e); showAppNotification('Error saving categories!', 'error');} if (activeFilePath) { handleSaveActiveProject(false); }}
@@ -1395,7 +1352,21 @@
         ipcRenderer.on('selected-files-for-files', (event, paths) => updateStagedPathsModal(paths, 'file', 'Files ready: '));
         ipcRenderer.on('selected-folder-for-link', (event, paths) => updateStagedPathsModal(paths, 'folderLink', 'Folder links ready: '));
         ipcRenderer.on('selected-folder-for-import', (event, contents) => { if (contents && Array.isArray(contents) && contents.length > 0) { stagedFilePaths = contents.map(item => ({ ...item, entryType: 'file' })); let baseName = "Selected folder"; if (pathModule && contents[0].path) { const parentDir = pathModule.dirname(contents[0].path); baseName = pathModule.basename(parentDir); if (!baseName && parentDir) baseName = parentDir; } DOM.selectedFilesDisplayModal.textContent = `Files to import from "${baseName}" (${stagedFilePaths.length})`; DOM.pathInputModal.value = ''; } else if (!DOM.pathInputModal.value.trim()) clearStagedFilesDisplayModal(); });
-        ipcRenderer.on('pasted-path-processed', (event, { items, originalPath }) => { if (items && Array.isArray(items) && items.length > 0) { stagedFilePaths = items; DOM.selectedFilesDisplayModal.textContent = `Processed path. Ready to add: ${items.map(f => f.name).join(', ')}`; } else { clearStagedFilesDisplayModal(); const name = (pathModule && originalPath) ? pathModule.basename(originalPath) : "Pasted path"; showAppNotification(`Path "${name}" is invalid, empty, or inaccessible.`, 'error'); } });
+        ipcRenderer.on('pasted-path-processed', (event, { items, originalPath }) => { 
+            if (items && Array.isArray(items) && items.length > 0) {
+                 // If the main process determined it's a website, use that entryType
+                if (items[0].entryType === 'websiteLink') {
+                     updateStagedPathsModal(items.map(i => i.path), 'websiteLink', 'Website link ready: ');
+                } else {
+                    stagedFilePaths = items; 
+                    DOM.selectedFilesDisplayModal.textContent = `Processed path. Ready to add: ${items.map(f => f.name).join(', ')}`;
+                }
+            } else { 
+                clearStagedFilesDisplayModal(); 
+                const name = (pathModule && originalPath) ? pathModule.basename(originalPath) : "Pasted path"; 
+                showAppNotification(`Path "${name}" is invalid, empty, or inaccessible.`, 'error'); 
+            } 
+        });
         ipcRenderer.on('pasted-path-error', (event, { message, originalPath }) => { const name = (pathModule && originalPath) ? pathModule.basename(originalPath) : "Pasted path"; showAppNotification(`Error processing "${name}": ${message}`, 'error'); clearStagedFilesDisplayModal(); });
     }
     
@@ -1424,8 +1395,15 @@
     });
     if(DOM.addPastedPathButtonModal) DOM.addPastedPathButtonModal.addEventListener('click', () => {
         const pathValue = DOM.pathInputModal.value.trim(); if (!pathValue) { showAppNotification('Please enter or paste a path first.', 'warning'); return; }
-        if (ipcRenderer) { stagedFilePaths = []; DOM.selectedFilesDisplayModal.textContent = `Processing: ${pathValue.substring(pathValue.lastIndexOf(/[/\\]/) + 1)}`; ipcRenderer.send('process-pasted-path', pathValue); } 
-        else { if (pathValue.toLowerCase().startsWith('https://') || pathValue.toLowerCase().startsWith('http://')) { updateStagedPathsModal([pathValue], 'websiteLink', 'Website link ready: '); } else { showAppNotification('This feature (for local paths) is available in the desktop app only.', 'warning'); } }
+        // Check if it's a URL first (client-side for immediate feedback if not Electron)
+        if (pathValue.toLowerCase().startsWith('http://') || pathValue.toLowerCase().startsWith('https://')) {
+            updateStagedPathsModal([pathValue], 'websiteLink', 'Website link ready: ');
+        } else if (ipcRenderer) { // If it's not a URL and Electron is available, let main process handle it
+            stagedFilePaths = []; DOM.selectedFilesDisplayModal.textContent = `Processing: ${pathValue.substring(pathValue.lastIndexOf(/[/\\]/) + 1)}`; 
+            ipcRenderer.send('process-pasted-path', pathValue); 
+        } else { // Not a URL and not Electron -> local path, show warning
+            showAppNotification('Adding local paths is available in the desktop app only.', 'warning'); 
+        }
     });
     if(DOM.addItemsButtonModal) DOM.addItemsButtonModal.addEventListener('click', handleProcessStagedItemsFromModal);
     if(DOM.projectNameInputModal) DOM.projectNameInputModal.addEventListener('keydown', e => { if (e.key === 'Enter' && stagedFilePaths.length > 0) handleProcessStagedItemsFromModal(); });
@@ -1471,4 +1449,3 @@
     </script>
 </body>
 </html>
-
