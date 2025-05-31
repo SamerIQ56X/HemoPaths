@@ -25,14 +25,14 @@
         .custom-title-bar {
             position: fixed; top: 0; left: 0; width: 100%; height: 38px;
             background-color: rgba(10, 10, 20, 0.85); backdrop-filter: blur(12px);
-            -webkit-app-region: drag; /* Makes the entire bar draggable */
+            -webkit-app-region: drag; 
             z-index: 100000; display: flex; align-items: center;
             justify-content: space-between; padding: 0 10px 0 15px;
             user-select: none; border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
         .window-app-title { color: #b0bec5; font-size: 0.85em; font-weight: 500; -webkit-app-region: no-drag; }
 
-        /* --- Window Controls (Positioned within custom-title-bar) --- */
+        /* --- Window Controls --- */
         .window-controls {
             position: static; -webkit-app-region: no-drag;
             display: flex; gap: 8px; margin-left: auto;
@@ -123,7 +123,7 @@
         }
         .page-header-container .page-subtitle { color: #64b5f6; font-size: 0.9rem; }
 
-        .container {
+        .container { /* For Path Manager content */
             max-width: 100%; margin: 0 auto; background: rgba(10, 10, 30, 0.45); 
             backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 12px; box-shadow: 0 6px 25px 0 rgba(0, 0, 0, 0.3); overflow: hidden;
@@ -186,29 +186,73 @@
         .btn-icon:disabled { color: #5f6770 !important; background-color: transparent !important; cursor: not-allowed;}
         .btn-icon:disabled svg { fill: #5f6770 !important; }
 
-        .add-item-section { padding: 18px; border-bottom: 1px solid rgba(255, 255, 255, 0.07); background: rgba(10, 10, 25, 0.35); }
-        .input-group { display: flex; flex-direction: column; gap: 12px; } 
-        .input-row { display: flex; gap: 12px; flex-wrap: wrap; }
-        .input-field, #categorySelectInput, .category-name-input-inline {
+        /* Add Item Button (Replaces .add-item-section) */
+        .add-item-fab {
+            position: fixed;
+            bottom: 25px;
+            right: 25px; /* LTR */
+            background: linear-gradient(45deg, #1e88e5, #2196f3, #42a5f5);
+            color: white;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.4);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 9990;
+        }
+        html[dir="rtl"] .add-item-fab { left: 25px; right: auto; }
+        .add-item-fab:hover { transform: scale(1.05) translateY(-2px); box-shadow: 0 6px 20px rgba(33, 150, 243, 0.5); }
+        .add-item-fab svg { width: 24px; height: 24px; }
+
+
+        /* Add Item Modal (Replaces .add-item-section content) */
+        #addItemModal { z-index: 100000; } /* Ensure it's above other modals */
+        .add-item-modal-content {
+            background: rgba(15, 15, 35, 0.95); backdrop-filter: blur(25px);
+            padding: 25px; border-radius: 16px; width: 90%; max-width: 650px; /* Wider for more inputs */
+            border: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            transform: scale(0.95) translateY(10px);
+            transition: transform 0.3s ease-out, opacity 0.3s ease-out; opacity: 0;
+        }
+        .modal-backdrop.show .add-item-modal-content { transform: scale(1) translateY(0); opacity: 1; }
+        .add-item-modal-content h2 {
+            text-align: center; font-size: 1.7rem; font-weight: 700; margin-bottom: 22px;
+            background: linear-gradient(45deg, #4fc3f7, #29b6f6, #03a9f4); 
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; text-fill-color: transparent;
+        }
+        .add-item-modal-content .input-group { display: flex; flex-direction: column; gap: 15px; } 
+        .add-item-modal-content .input-row { display: flex; gap: 12px; flex-wrap: wrap; }
+        .add-item-modal-content .input-field, 
+        .add-item-modal-content #categorySelectInputModal { /* Specific ID for modal select */
             flex: 1; padding: 10px 14px; border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 7px; font-size: 0.85rem; min-width: 140px; 
             background-color: rgba(255, 255, 255, 0.04); color: white; transition: all 0.25s ease;
         }
-        .input-field::placeholder { color: #64b5f6; opacity: 0.7; }
-        .input-field:focus, #categorySelectInput:focus, .category-name-input-inline:focus {
+        .add-item-modal-content .input-field::placeholder { color: #64b5f6; opacity: 0.7; }
+        .add-item-modal-content .input-field:focus, 
+        .add-item-modal-content #categorySelectInputModal:focus {
             outline: none; border-color: #2196f3; background-color: rgba(255, 255, 255, 0.08);
             box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.15);
         }
-        #categorySelectInput {
+        .add-item-modal-content #categorySelectInputModal {
             appearance: none; -webkit-appearance: none; -moz-appearance: none;
             background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2364b5f6%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
             background-repeat: no-repeat; background-size: 11px; 
         }
-        html[dir="ltr"] #categorySelectInput { background-position: right 12px center; padding-right: 35px; }
-        html[dir="rtl"] #categorySelectInput { background-position: left 12px center; padding-left: 35px; }
-        #categorySelectInput option { background: #1a1a2e; color: white; }
+        html[dir="ltr"] .add-item-modal-content #categorySelectInputModal { background-position: right 12px center; padding-right: 35px; }
+        html[dir="rtl"] .add-item-modal-content #categorySelectInputModal { background-position: left 12px center; padding-left: 35px; }
+        .add-item-modal-content #categorySelectInputModal option { background: #1a1a2e; color: white; }
+        .add-item-modal-actions { text-align: right; margin-top:20px; display:flex; justify-content: flex-end; gap: 10px;} /* RTL: text-align: left */
+        html[dir="rtl"] .add-item-modal-actions { text-align: left; justify-content: flex-start;}
 
-        #selectedFilesDisplay { margin-top: 10px; font-size: 0.75rem; color: #90a4ae; }
+
+        #selectedFilesDisplayModal { margin-top: 10px; font-size: 0.75rem; color: #90a4ae; max-height: 50px; overflow-y: auto;}
         #itemsDisplayArea { padding: 18px; }
 
         .category-section {
@@ -328,7 +372,7 @@
             z-index: 99998; opacity: 0; visibility: hidden;
             transition: opacity 0.25s ease-out, visibility 0s 0.25s linear;
         }
-        #confirmModalBackdrop { z-index: 100001; } 
+        #confirmModalBackdrop, #addItemModal { z-index: 100001; } /* Ensure modals are on top */
         .loading-indicator.show, .modal-backdrop.show { opacity: 1; visibility: visible; transition-delay: 0s; }
         .spinner {
             width: 32px; height: 32px; border: 3.5px solid rgba(255, 255, 255, 0.18); 
@@ -461,14 +505,14 @@
             .sidebar.show { transform: translateX(0); }
             .container { margin: 8px; width:auto; }
             .header { padding: 18px 12px; } .header h1 { font-size: 1.7rem; }
-            .top-actions-bar, .add-item-section, #itemsDisplayArea { padding: 12px; }
+            .top-actions-bar, #addItemModal .add-item-section { padding: 12px; } /* Adjusted for modal */
             .top-actions-bar { flex-direction: column; align-items: stretch; }
             .top-actions-bar .btn { width: 100%; margin-bottom: 8px; }
             .input-row { flex-direction: column; gap: 12px; }
             .items-grid { grid-template-columns: 1fr; gap: 12px;} 
             .item-card { min-height: auto; padding: 12px; } 
             .notification-toast { max-width: calc(100% - 20px); bottom: 8px; left:10px; right:10px;}
-            .category-manager-content { max-width: 96%; padding: 18px;}
+            .category-manager-content, .add-item-modal-content { max-width: 96%; padding: 18px;}
             .modal-dialog { max-width: 92%; padding: 18px; }
         }
         @media (max-width: 480px) {
@@ -522,6 +566,10 @@
                     <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><use xlink:href="#icon-check"></use></svg> <span class="nav-text">To-Do List</span>
                 </a>
             </li>
+             <li class="nav-item"> <a href="#" class="nav-link" onclick="showPage('fileOperationsPage')">
+                     <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><use xlink:href="#icon-save"></use></svg> <span class="nav-text">File</span>
+                </a>
+            </li>
             <li class="nav-item">
                 <a href="#" class="nav-link" onclick="showPage('optionsPage')"> <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><use xlink:href="#icon-settings"></use></svg>
                     <span class="nav-text">Options</span>
@@ -537,6 +585,10 @@
     </nav>
 
     <main class="main-content" id="mainContent">
+        <button class="add-item-fab" id="addItemFab" title="Add New Item">
+            <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>
+        </button>
+
         <div id="pathsPage" class="page active">
             <div class="container">
                 <div class="header">
@@ -552,32 +604,6 @@
                             Open All </button>
                         </div>
                 </div>
-
-                <div class="add-item-section">
-                    <div class="input-group">
-                        <div class="input-row">
-                            <button id="selectFilesButton" class="btn btn-secondary">
-                                <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>Add Files </button>
-                            <button id="addFolderLinkButton" class="btn btn-secondary">
-                                <svg viewBox="0 0 24 24"><use xlink:href="#icon-folder"></use></svg>Add Folder Link </button>
-                            <button id="importFromFolderButton" class="btn btn-secondary">
-                                <svg viewBox="0 0 24 24"><use xlink:href="#icon-folder"></use></svg>Import From Folder </button>
-                        </div>
-                        <div class="input-row paste-path-group">
-                            <input type="text" id="pathInput" class="input-field" placeholder="Or paste a file/folder/website path here"> <button id="pastePathButton" class="btn btn-secondary" style="flex-shrink: 0;">
-                                <svg viewBox="0 0 24 24"><use xlink:href="#icon-paste"></use></svg>Paste </button>
-                            <button id="addPastedPathButton" class="btn btn-primary" style="flex-shrink: 0;">
-                                <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>Add Path </button>
-                        </div>
-                        <div class="input-row">
-                            <input type="text" id="projectNameInput" class="input-field" placeholder="Descriptive name for the item(s) (optional)"> <select id="categorySelectInput" class="input-field"></select>
-                        </div>
-                        <button id="addItemsButton" class="btn btn-success" style="align-self: flex-start;">
-                            <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>Add to List </button>
-                    </div>
-                    <div id="selectedFilesDisplay"></div>
-                </div>
-
                 <div id="itemsDisplayArea"></div>
             </div>
         </div>
@@ -599,10 +625,42 @@
                         Add Task
                     </button>
                 </div>
-                <div id="todosContainer">
-                    </div>
+                <div id="todosContainer"></div>
             </div>
         </div>
+        
+        <div id="fileOperationsPage" class="page">
+            <div class="page-header-container">
+                <div>
+                    <h1 class="page-title">File Operations</h1>
+                    <p class="page-subtitle">Manage your project data files</p>
+                </div>
+            </div>
+            <div class="glass-card">
+                <div class="options-group">
+                    <h3>Project File</h3>
+                    <p>Save all current paths, categories, and tasks to a file, or load them from a previously saved file.</p>
+                    <div style="display: flex; gap: 10px; margin-top:10px; flex-wrap:wrap;">
+                        <button id="saveProjectAsBtn" class="btn btn-primary">
+                            <svg viewBox="0 0 24 24"><use xlink:href="#icon-save"></use></svg> Save Project As...
+                        </button>
+                        <button id="importProjectBtn" class="btn btn-secondary">
+                            <svg viewBox="0 0 24 24"><use xlink:href="#icon-open"></use></svg> Import Project...
+                        </button>
+                         <button id="saveActiveProjectBtn" class="btn btn-success" disabled> <svg viewBox="0 0 24 24"><use xlink:href="#icon-save"></use></svg> Save Current Project
+                        </button>
+                    </div>
+                     <p id="activeProjectInfo" style="font-size: 0.8rem; color: #90a4ae; margin-top: 10px;">No active project file.</p>
+                </div>
+                <div class="options-group">
+                    <h3>History</h3>
+                    <p>Recently opened or saved project files.</p>
+                    <div id="projectHistoryContainer" style="max-height: 200px; overflow-y: auto; padding: 5px; background: rgba(255,255,255,0.03); border-radius: 6px;">
+                        </div>
+                </div>
+            </div>
+        </div>
+
 
         <div id="optionsPage" class="page">
             <div class="page-header-container">
@@ -632,8 +690,7 @@
                         <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>
                         Add Extension Mapping
                     </button>
-                    <div id="extensionMappingsContainer" style="margin-top: 15px;">
-                        </div>
+                    <div id="extensionMappingsContainer" style="margin-top: 15px;"></div>
                 </div>
 
                 <div class="options-group">
@@ -656,15 +713,17 @@
             </div>
             <div class="glass-card">
                 <h3>Hemo Paths Manager</h3>
-                <p>Version: 1.5 (Frameless & Enhanced Options)</p>
+                <p>Version: 1.6 (File Operations & UI Enhancements)</p>
                 <p>Developed to streamline the management of your project file paths, website links, and tasks.</p>
                 <br>
                 <h4>Key Features:</h4>
                 <ul>
-                    <li>Easily add and categorize file paths, folder links, and website URLs.</li>
+                    <li>Easily add and categorize file paths, folder links, and website URLs via a unified popup.</li>
                     <li>Directly open files, folders, and websites from the application.</li>
                     <li>Manage custom categories and file extension mappings for better organization.</li>
                     <li>Integrated To-Do list to track your tasks.</li>
+                    <li>Save and load entire project setups as `.hpmt` files.</li>
+                    <li>History of recently used project files.</li>
                     <li>Modern and attractive user interface with frameless window.</li>
                 </ul>
             </div>
@@ -697,7 +756,48 @@
         <symbol id="icon-settings" viewBox="0 0 24 24"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17-.59-1.69-.98l-2.49-1c-.23-.08-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12-.64l2 3.46c.12.22.39.3.61-.22l2.49-1c.52.4 1.08.73 1.69-.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l-.38-2.65c.61-.25 1.17-.59-1.69-.98l2.49 1c.23.08.49 0 .61.22l2-3.46c.12-.22-.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></symbol>
         <symbol id="icon-close" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></symbol>
         <symbol id="icon-check" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></symbol>
+        <symbol id="icon-history" viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7v2c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.25 2.52.77-1.28-3.52-2.09V8H12z"/></symbol>
     </svg>
+
+    <div id="addItemModal" class="modal-backdrop">
+        <div class="add-item-modal-content">
+            <h2>Add New Item(s)</h2>
+            <div class="input-group">
+                <div class="input-row">
+                    <button id="selectFilesButtonModal" class="btn btn-secondary">
+                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>Add Files
+                    </button>
+                    <button id="addFolderLinkButtonModal" class="btn btn-secondary">
+                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-folder"></use></svg>Add Folder Link
+                    </button>
+                    <button id="importFromFolderButtonModal" class="btn btn-secondary">
+                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-folder"></use></svg>Import From Folder
+                    </button>
+                </div>
+                <div class="input-row paste-path-group">
+                    <input type="text" id="pathInputModal" class="input-field" placeholder="Or paste a file/folder/website path here">
+                    <button id="pastePathButtonModal" class="btn btn-secondary" style="flex-shrink: 0;">
+                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-paste"></use></svg>Paste
+                    </button>
+                    <button id="addPastedPathButtonModal" class="btn btn-primary" style="flex-shrink: 0;">
+                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>Add Path
+                    </button>
+                </div>
+                <div class="input-row">
+                    <input type="text" id="projectNameInputModal" class="input-field" placeholder="Descriptive name for the item(s) (optional)">
+                    <select id="categorySelectInputModal" class="input-field"></select>
+                </div>
+                <div id="selectedFilesDisplayModal"></div>
+            </div>
+            <div class="add-item-modal-actions">
+                <button id="addItemsButtonModal" class="btn btn-success">
+                    <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>Add to List
+                </button>
+                <button id="closeAddItemModalBtn" class="btn btn-secondary">Close</button>
+            </div>
+        </div>
+    </div>
+
 
     <div id="notificationToast" class="notification-toast"></div>
     <div id="confirmModalBackdrop" class="modal-backdrop"> <div class="modal-dialog"> <p id="confirmModalMessage"></p> <div class="modal-dialog-actions"> <button id="confirmModalYesBtn" class="btn btn-danger">Yes</button> <button id="confirmModalNoBtn" class="btn btn-primary">No</button> </div> </div> </div>
@@ -715,39 +815,62 @@
     } catch (e) { console.warn("[Renderer] Error loading Electron modules.", e); }
 
     let projectFiles = []; let stagedFilePaths = []; let appCategories = []; let todos = [];
-    let customExtensionMappings = []; // To store { extension: '.ext', categoryKey: 'cat_key' }
+    let customExtensionMappings = []; 
+    let projectHistory = [];
+    let activeFilePath = null; // Path to the currently open/saved .hpmt file
 
     const DOM = {
         sidebar: document.getElementById('sidebar'), mainContent: document.getElementById('mainContent'),
-        selectedFilesDisplay: document.getElementById('selectedFilesDisplay'), projectNameInput: document.getElementById('projectNameInput'),
-        categorySelectInput: document.getElementById('categorySelectInput'), filesDisplayContainer: document.getElementById('itemsDisplayArea'),
-        fileCountDisplay: document.getElementById('fileCount'), openAllBtn: document.getElementById('openAllBtn'),
-        selectFilesBtn: document.getElementById('selectFilesButton'), addFolderLinkBtn: document.getElementById('addFolderLinkButton'),
-        importFromFolderBtn: document.getElementById('importFromFolderButton'), pathInput: document.getElementById('pathInput'),
-        pastePathBtn: document.getElementById('pastePathButton'), addPastedPathBtn: document.getElementById('addPastedPathButton'),
-        addItemsBtn: document.getElementById('addItemsButton'),
-        // clearAllDataBtn: document.getElementById('clearAllDataBtn'), // Removed from top bar
+        // Add Item Modal elements
+        addItemFab: document.getElementById('addItemFab'),
+        addItemModal: document.getElementById('addItemModal'),
+        closeAddItemModalBtn: document.getElementById('closeAddItemModalBtn'),
+        selectFilesButtonModal: document.getElementById('selectFilesButtonModal'),
+        addFolderLinkButtonModal: document.getElementById('addFolderLinkButtonModal'),
+        importFromFolderButtonModal: document.getElementById('importFromFolderButtonModal'),
+        pathInputModal: document.getElementById('pathInputModal'),
+        pastePathButtonModal: document.getElementById('pastePathButtonModal'),
+        addPastedPathButtonModal: document.getElementById('addPastedPathButtonModal'),
+        projectNameInputModal: document.getElementById('projectNameInputModal'),
+        categorySelectInputModal: document.getElementById('categorySelectInputModal'),
+        addItemsButtonModal: document.getElementById('addItemsButtonModal'),
+        selectedFilesDisplayModal: document.getElementById('selectedFilesDisplayModal'),
+        // Original Path Manager elements (will be used by modal's functions)
+        filesDisplayContainer: document.getElementById('itemsDisplayArea'),
+        fileCountDisplay: document.getElementById('fileCount'),
+        openAllBtn: document.getElementById('openAllBtn'),
+        // General Modals & Notifications
         loadingOverlay: document.getElementById('loadingOverlay'), notification: document.getElementById('notificationToast'),
         confirmModal: document.getElementById('confirmModalBackdrop'), confirmModalMessage: document.getElementById('confirmModalMessage'),
         confirmModalYesBtn: document.getElementById('confirmModalYesBtn'), confirmModalNoBtn: document.getElementById('confirmModalNoBtn'),
+        // Category Manager
         manageCategoriesBtn: document.getElementById('manageCategoriesBtn'), 
         categoryManagerModal: document.getElementById('categoryManagerModal'), categoryListContainer: document.getElementById('categoryListContainer'),
         newManagedCategoryInput: document.getElementById('newManagedCategoryInput'), addManagedCategoryBtn: document.getElementById('addManagedCategoryBtn'),
         closeCategoryManagerBtn: document.getElementById('closeCategoryManagerBtn'),
+        // To-Do List
         todoInput: document.getElementById('todoInput'), addTodoBtn: document.getElementById('addTodoBtn'),
         todosContainer: document.getElementById('todosContainer'),
+        // Options Page
         clearAllDataBtnOptionsPage: document.getElementById('clearAllDataBtnOptionsPage'),
-        // New DOM elements for extension mapping
         newExtensionInput: document.getElementById('newExtensionInput'),
         newExtensionCategoryNameInput: document.getElementById('newExtensionCategoryNameInput'),
         addExtensionMappingBtn: document.getElementById('addExtensionMappingBtn'),
-        extensionMappingsContainer: document.getElementById('extensionMappingsContainer')
+        extensionMappingsContainer: document.getElementById('extensionMappingsContainer'),
+        // File Operations Page
+        saveProjectAsBtn: document.getElementById('saveProjectAsBtn'),
+        importProjectBtn: document.getElementById('importProjectBtn'),
+        saveActiveProjectBtn: document.getElementById('saveActiveProjectBtn'),
+        projectHistoryContainer: document.getElementById('projectHistoryContainer'),
+        activeProjectInfo: document.getElementById('activeProjectInfo')
     };
 
-    const STORAGE_ITEMS_KEY = 'projectFileManagerData_v1.5_Frameless'; 
-    const STORAGE_CATEGORIES_KEY = 'projectFileManagerCategories_v1.5_Frameless';
-    const STORAGE_TODOS_KEY = 'projectFileManagerTodos_v1.5_Frameless';
-    const STORAGE_EXTENSION_MAPPINGS_KEY = 'projectFileManagerExtMappings_v1.0';
+    const STORAGE_ITEMS_KEY = 'projectFileManagerData_v1.6_FileOps'; 
+    const STORAGE_CATEGORIES_KEY = 'projectFileManagerCategories_v1.6_FileOps';
+    const STORAGE_TODOS_KEY = 'projectFileManagerTodos_v1.6_FileOps';
+    const STORAGE_EXTENSION_MAPPINGS_KEY = 'projectFileManagerExtMappings_v1.1';
+    const STORAGE_PROJECT_HISTORY_KEY = 'projectFileManagerHistory_v1.0';
+    const MAX_HISTORY_ITEMS = 10;
 
 
     const DEFAULT_CATEGORIES_STRUCTURE = [
@@ -786,58 +909,40 @@
         DOM.confirmModalYesBtn.onclick = () => { DOM.confirmModal.classList.remove('show'); callback(true); };
         DOM.confirmModalNoBtn.onclick = () => { DOM.confirmModal.classList.remove('show'); callback(false); };
     }
-    function clearStagedFilesDisplay() { stagedFilePaths = []; DOM.selectedFilesDisplay.textContent = ''; }
-    function updateStagedPaths(paths, entryType, prefix) {
+    function clearStagedFilesDisplayModal() { stagedFilePaths = []; DOM.selectedFilesDisplayModal.textContent = ''; }
+    function updateStagedPathsModal(paths, entryType, prefix) { // Renamed for modal context
         if (paths && Array.isArray(paths) && paths.length > 0) {
             stagedFilePaths = paths.map(p => ({ path: p, name: pathModule ? pathModule.basename(p) : p.substring(p.lastIndexOf(/[/\\]/) + 1), entryType }));
-            DOM.selectedFilesDisplay.textContent = `${prefix} ${stagedFilePaths.map(f => f.name).join(', ')}`; DOM.pathInput.value = ''; 
-        } else if (!DOM.pathInput.value.trim()) { clearStagedFilesDisplay(); }
+            DOM.selectedFilesDisplayModal.textContent = `${prefix} ${stagedFilePaths.map(f => f.name).join(', ')}`; 
+            DOM.pathInputModal.value = ''; 
+        } else if (!DOM.pathInputModal.value.trim()) { clearStagedFilesDisplayModal(); }
     }
-    function populateCategoryDropdown() {
-        DOM.categorySelectInput.innerHTML = '';
+    function populateCategoryDropdown(selectElement = DOM.categorySelectInputModal) { // Parameterize select element
+        if (!selectElement) return;
+        selectElement.innerHTML = '';
         const sortedForDropdown = [...appCategories].sort((a,b) => (a.order ?? Infinity) - (b.order ?? Infinity));
-        sortedForDropdown.forEach(cat => { const option = document.createElement('option'); option.value = cat.key; option.textContent = cat.display; if (cat.isDefaultOption) option.selected = true; DOM.categorySelectInput.appendChild(option); });
+        sortedForDropdown.forEach(cat => { const option = document.createElement('option'); option.value = cat.key; option.textContent = cat.display; if (cat.isDefaultOption) option.selected = true; selectElement.appendChild(option); });
     }
     
     function getFileType(pathOrName, entryType = 'file') {
         const lowerPathOrName = typeof pathOrName === 'string' ? pathOrName.toLowerCase() : '';
-        // 1. Check custom extension mappings
         const fileExtension = lowerPathOrName.startsWith('.') ? lowerPathOrName : (pathModule ? pathModule.extname(lowerPathOrName) : '.' + lowerPathOrName.split('.').pop());
         const customMapping = customExtensionMappings.find(m => m.extension.toLowerCase() === fileExtension.toLowerCase());
-        if (customMapping) {
-            return customMapping.categoryKey; // Return the category key directly
-        }
-        // 2. Check for website link
-        if (lowerPathOrName.startsWith('https://') || lowerPathOrName.startsWith('http://')) {
-            return 'websiteLink';
-        }
-        // 3. Check for entry type (folderLink)
+        if (customMapping) return customMapping.categoryKey;
+        if (lowerPathOrName.startsWith('https://') || lowerPathOrName.startsWith('http://')) return 'websiteLink';
         if (entryType === 'folderLink') return 'folderLink';
-        // 4. Check for hardcoded app extensions
         if (!pathOrName || typeof pathOrName !== 'string') return 'unknown';
         const name = pathModule ? pathModule.basename(pathOrName) : pathOrName.substring(pathOrName.lastIndexOf(/[/\\]/) + 1);
         const ext = name.split('.').pop().toLowerCase();
-        if (ext === 'psd') return 'photoshop';
-        if (ext === 'aep') return 'aftereffects';
-        if (ext === 'prproj') return 'premiere';
-        
-        return 'unknown'; // Default
+        if (ext === 'psd') return 'photoshop'; if (ext === 'aep') return 'aftereffects'; if (ext === 'prproj') return 'premiere';
+        return 'unknown';
     }
-
     function determineItemCategoryKey(fileTypeOrCatKeyFromGetType, chosenCatKey) {
         if (chosenCatKey && chosenCatKey !== 'auto_detect') return chosenCatKey;
-        
-        // If getFileType returned a direct categoryKey (from custom mapping)
-        if (appCategories.some(cat => cat.key === fileTypeOrCatKeyFromGetType)) {
-            return fileTypeOrCatKeyFromGetType;
-        }
-        // If getFileType returned a type like 'websiteLink', 'photoshop', etc.
-        if (FILE_TYPE_TO_DEFAULT_CAT_KEY[fileTypeOrCatKeyFromGetType]) {
-            return FILE_TYPE_TO_DEFAULT_CAT_KEY[fileTypeOrCatKeyFromGetType];
-        }
-        return 'general'; // Fallback
+        if (appCategories.some(cat => cat.key === fileTypeOrCatKeyFromGetType)) return fileTypeOrCatKeyFromGetType;
+        if (FILE_TYPE_TO_DEFAULT_CAT_KEY[fileTypeOrCatKeyFromGetType]) return FILE_TYPE_TO_DEFAULT_CAT_KEY[fileTypeOrCatKeyFromGetType];
+        return 'general';
     }
-
     function getCategoryDisplay(key) { const cat = appCategories.find(c => c.key === key); return cat ? cat.display : (key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ')); }
     function openCategoryManagerModal() { renderCategoryManagerList(); DOM.categoryManagerModal.classList.add('show'); DOM.newManagedCategoryInput.value = ''; DOM.newManagedCategoryInput.focus(); }
     function closeCategoryManagerModal() { const activeEditInput = DOM.categoryListContainer.querySelector('.category-name-input-inline'); if (activeEditInput) { cancelInlineEdit(activeEditInput.dataset.key, activeEditInput.closest('.category-manager-item')); } DOM.categoryManagerModal.classList.remove('show'); }
@@ -878,7 +983,7 @@
         if (!inputField || !category) return; const newDisplayName = inputField.value.trim(); const originalName = inputField.dataset.originalName;
         if (!newDisplayName) { showAppNotification("Category name cannot be empty.", "warning"); inputField.focus(); return; }
         if (newDisplayName !== originalName && appCategories.some(cat => cat.key !== categoryKey && cat.display.toLowerCase() === newDisplayName.toLowerCase())) { showAppNotification(`Category name "${newDisplayName}" already exists.`, 'warning'); inputField.focus(); return; }
-        category.display = newDisplayName; saveCategoriesToStorage(); renderCategoryManagerList(); populateCategoryDropdown(); renderProjectFilesUI(); showAppNotification("Category name updated.", "success");
+        category.display = newDisplayName; saveCategoriesToStorage(); renderCategoryManagerList(); populateCategoryDropdown(DOM.categorySelectInputModal); renderProjectFilesUI(); showAppNotification("Category name updated.", "success");
     }
     function cancelInlineEdit(categoryKey, itemDiv) {
         const category = appCategories.find(c => c.key === categoryKey); if (!category || !itemDiv) return; 
@@ -897,7 +1002,7 @@
         const maxOrder = orders.length > 0 ? Math.max(0, ...orders) : -1; 
         const newKey = `custom_${displayName.toLowerCase().replace(/\s+/g, '_')}_${Date.now().toString().slice(-5)}`;
         appCategories.push({ key: newKey, display: displayName, isCustom: true, order: maxOrder + 1, isEditable: true, isDeletable: true });
-        saveCategoriesToStorage(); renderCategoryManagerList(); populateCategoryDropdown(); 
+        saveCategoriesToStorage(); renderCategoryManagerList(); populateCategoryDropdown(DOM.categorySelectInputModal); 
         DOM.newManagedCategoryInput.value = ''; DOM.newManagedCategoryInput.focus(); showAppNotification(`Category "${displayName}" added.`, 'success');
     }
     function handleDeleteManagedCategory(categoryKey) {
@@ -908,7 +1013,7 @@
                 projectFiles.forEach(item => { if (item.category === categoryKey) item.category = 'general'; });
                 appCategories = appCategories.filter(cat => cat.key !== categoryKey);
                 let currentOrder = 0; appCategories.filter(c => c.key !== 'auto_detect').sort((a,b) => (a.order || 0) - (b.order || 0)).forEach(c => c.order = currentOrder++);
-                saveItemsToStorage(); saveCategoriesToStorage(); renderCategoryManagerList(); populateCategoryDropdown(); renderProjectFilesUI();
+                saveItemsToStorage(); saveCategoriesToStorage(); renderCategoryManagerList(); populateCategoryDropdown(DOM.categorySelectInputModal); renderProjectFilesUI();
                 showAppNotification(`Category "${category.display}" deleted.`, "success");
             }
         });
@@ -922,26 +1027,32 @@
         if (appCatToMove && appCatToSwapWith) {
             const tempOrder = appCatToMove.order; appCatToMove.order = appCatToSwapWith.order; appCatToSwapWith.order = tempOrder;
             appCategories.sort((a,b) => (a.order ?? Infinity) - (b.order ?? Infinity));
-            saveCategoriesToStorage(); populateCategoryDropdown(); renderProjectFilesUI();
+            saveCategoriesToStorage(); populateCategoryDropdown(DOM.categorySelectInputModal); renderProjectFilesUI();
             if (isFromModal) { renderCategoryManagerList(); }
         }
     }
-    function handleProcessStagedItems() {
+    function handleProcessStagedItemsFromModal() { // Renamed for modal context
         if (!stagedFilePaths || stagedFilePaths.length === 0) { showAppNotification('Please select or paste items first.', 'warning'); return; }
-        const groupName = DOM.projectNameInput.value.trim(); let addedCount = 0;
+        const groupName = DOM.projectNameInputModal.value.trim(); let addedCount = 0;
         stagedFilePaths.forEach(itemInfo => {
             const { path, name, entryType = 'file' } = itemInfo; 
             if (!path || typeof path !== 'string' || projectFiles.some(pf => pf.location.toLowerCase() === path.toLowerCase())) {
                 if (projectFiles.some(pf => pf.location.toLowerCase() === path.toLowerCase())) { showAppNotification(`Item "${name}" already exists.`, 'warning'); } return; 
             }
             const itemType = getFileType(path, entryType); 
-            const catKey = determineItemCategoryKey(itemType, DOM.categorySelectInput.value); 
+            const catKey = determineItemCategoryKey(itemType, DOM.categorySelectInputModal.value); 
             projectFiles.push({ id: Date.now() + Math.random(), name: groupName ? `${groupName} - ${name}` : name, actualName: name, location: path, type: itemType, category: catKey, entryType, dateAdded: new Date().toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' }) });
             addedCount++;
         });
-        if (addedCount > 0) { saveItemsToStorage(); renderProjectFilesUI(); showAppNotification(`✨ Added ${addedCount} item(s)!`, 'success'); }
-        DOM.projectNameInput.value = ''; clearStagedFilesDisplay(); DOM.categorySelectInput.value = 'auto_detect'; 
-        if (addedCount > 0) DOM.projectNameInput.focus(); 
+        if (addedCount > 0) {
+            saveItemsToStorage(); renderProjectFilesUI();
+            showAppNotification(`✨ Added ${addedCount} item(s)!`, 'success');
+            if (activeFilePath) { handleSaveActiveProject(false); } // Auto-save to active file if one is open
+        }
+        DOM.projectNameInputModal.value = ''; clearStagedFilesDisplayModal();
+        DOM.categorySelectInputModal.value = 'auto_detect'; 
+        if (addedCount > 0) DOM.projectNameInputModal.focus(); 
+        closeAddItemModal(); // Close modal after adding
     }
     function renderProjectFilesUI() {
         DOM.fileCountDisplay.textContent = projectFiles.length; DOM.openAllBtn.disabled = projectFiles.length === 0; DOM.filesDisplayContainer.innerHTML = '';
@@ -1010,8 +1121,8 @@
         showAppLoading(true);
         setTimeout(() => { try { if (entryType === 'folderLink') { shell.openPath(itemPath).then(errMessage => { if (errMessage) showAppNotification('❌ Error opening folder location: ' + errMessage.split('\n')[0], 'error'); else showAppNotification('✅ Opened folder location.', 'success'); }).catch(e => showAppNotification('❌ Exception opening folder location: ' + e.message, 'error')); } else { shell.showItemInFolder(itemPath); showAppNotification('✅ Shown file in folder.', 'success'); } } catch (e) { try { shell.openPath(pathModule.dirname(itemPath)).then(errMessage => { if (errMessage) showAppNotification('❌ Error opening containing folder: ' + errMessage.split('\n')[0], 'error'); else showAppNotification('✅ Opened containing folder.', 'success'); }).catch(e2 => showAppNotification('❌ Exception opening containing folder: ' + e2.message, 'error')); } catch (e2) { showAppNotification('❌ Critical error opening location.', 'error');} } showAppLoading(false); }, 100);
     }
-    function deleteItemEntry(id) { showAppCustomConfirm('Are you sure you want to remove this entry from the list? (The actual file/folder/website will NOT be deleted).', conf => { if (conf) { projectFiles = projectFiles.filter(i => i.id !== id); saveItemsToStorage(); renderProjectFilesUI(); showAppNotification('🗑️ Entry removed from list.', 'success');} }); }
-    function clearAllData() { showAppCustomConfirm('Are you sure you want to delete all data (all listed items, custom categories, and tasks)? This action cannot be undone.', conf => { if (conf) { projectFiles = []; appCategories = DEFAULT_CATEGORIES_STRUCTURE.map(cat => ({...cat})); todos = []; customExtensionMappings = []; saveItemsToStorage(); saveCategoriesToStorage(); saveTodos(); saveCustomExtensionMappings(); populateCategoryDropdown(); renderProjectFilesUI(); renderTodos(); renderCustomExtensionMappingsUI(); clearStagedFilesDisplay(); DOM.pathInput.value = ''; showAppNotification('🗑️ All data has been cleared.', 'success'); } }); }
+    function deleteItemEntry(id) { showAppCustomConfirm('Are you sure you want to remove this entry from the list? (The actual file/folder/website will NOT be deleted).', conf => { if (conf) { projectFiles = projectFiles.filter(i => i.id !== id); saveItemsToStorage(); renderProjectFilesUI(); showAppNotification('🗑️ Entry removed from list.', 'success'); if (activeFilePath) { handleSaveActiveProject(false); } } }); }
+    function clearAllData() { showAppCustomConfirm('Are you sure you want to delete all data (all listed items, custom categories, tasks and history)? This action cannot be undone.', conf => { if (conf) { projectFiles = []; appCategories = DEFAULT_CATEGORIES_STRUCTURE.map(cat => ({...cat})); todos = []; customExtensionMappings = []; projectHistory = []; activeFilePath = null; updateActiveProjectInfo(); saveItemsToStorage(); saveCategoriesToStorage(); saveTodos(); saveCustomExtensionMappings(); saveProjectHistory(); populateCategoryDropdown(DOM.categorySelectInputModal); renderProjectFilesUI(); renderTodos(); renderCustomExtensionMappingsUI(); renderProjectHistoryUI(); clearStagedFilesDisplayModal(); DOM.pathInputModal.value = ''; showAppNotification('🗑️ All data has been cleared.', 'success'); } }); }
     function openMultiple(itemsToOpen, itemEntryType, context) {
         if (!shell && itemEntryType !== 'websiteLink') { showAppNotification('This feature is available in the desktop app only.', 'warning'); return; }
         const validItems = itemsToOpen.filter(i => { if (i.entryType === 'websiteLink') return i.location && typeof i.location === 'string' && (i.location.startsWith('https://') || i.location.startsWith('http://')); return i.entryType === itemEntryType && i.location && typeof i.location === 'string'; });
@@ -1038,7 +1149,7 @@
         setTimeout(() => { openMultiple(itemsInCategory.filter(i => i.entryType === 'websiteLink'), 'websiteLink', categoryDisplay); }, delay);
     }
     function loadTodos() { try { const storedTodos = localStorage.getItem(STORAGE_TODOS_KEY); todos = storedTodos ? JSON.parse(storedTodos) : []; } catch (e) { todos = []; console.error("[Renderer] Error parsing todos from LS", e); localStorage.removeItem(STORAGE_TODOS_KEY); } renderTodos(); }
-    function saveTodos() { try { localStorage.setItem(STORAGE_TODOS_KEY, JSON.stringify(todos)); } catch (e) { console.error('[Renderer] Error saving todos:', e); showAppNotification('Error saving to-do list!', 'error');} }
+    function saveTodos() { try { localStorage.setItem(STORAGE_TODOS_KEY, JSON.stringify(todos)); } catch (e) { console.error('[Renderer] Error saving todos:', e); showAppNotification('Error saving to-do list!', 'error');} if (activeFilePath) { handleSaveActiveProject(false); } }
     function renderTodos() {
         if (!DOM.todosContainer) return; DOM.todosContainer.innerHTML = '';
         if (todos.length === 0) { DOM.todosContainer.innerHTML = `<p style="text-align:center; color: #90a4ae;">No tasks yet. Add one above!</p>`; return; }
@@ -1057,98 +1168,225 @@
     function toggleTodoComplete(id) { const todo = todos.find(t => t.id === id); if (todo) { todo.completed = !todo.completed; saveTodos(); renderTodos(); } }
     function deleteTodo(id) { showAppCustomConfirm('Are you sure you want to delete this task?', (confirmed) => { if (confirmed) { todos = todos.filter(t => t.id !== id); saveTodos(); renderTodos(); showAppNotification('Task deleted.', 'success'); } }); }
     
-    // --- Custom Extension Mapping Functions ---
-    function loadCustomExtensionMappings() {
-        try {
-            const storedMappings = localStorage.getItem(STORAGE_EXTENSION_MAPPINGS_KEY);
-            customExtensionMappings = storedMappings ? JSON.parse(storedMappings) : [];
-        } catch (e) {
-            customExtensionMappings = [];
-            console.error("[Renderer] Error parsing custom extension mappings from LS", e);
-            localStorage.removeItem(STORAGE_EXTENSION_MAPPINGS_KEY);
-        }
-        renderCustomExtensionMappingsUI();
-    }
-    function saveCustomExtensionMappings() {
-        try { localStorage.setItem(STORAGE_EXTENSION_MAPPINGS_KEY, JSON.stringify(customExtensionMappings)); }
-        catch (e) { console.error('[Renderer] Error saving custom extension mappings:', e); showAppNotification('Error saving extension mappings!', 'error');}
-    }
+    function loadCustomExtensionMappings() { try { const storedMappings = localStorage.getItem(STORAGE_EXTENSION_MAPPINGS_KEY); customExtensionMappings = storedMappings ? JSON.parse(storedMappings) : []; } catch (e) { customExtensionMappings = []; console.error("[Renderer] Error parsing custom extension mappings from LS", e); localStorage.removeItem(STORAGE_EXTENSION_MAPPINGS_KEY); } renderCustomExtensionMappingsUI(); }
+    function saveCustomExtensionMappings() { try { localStorage.setItem(STORAGE_EXTENSION_MAPPINGS_KEY, JSON.stringify(customExtensionMappings)); } catch (e) { console.error('[Renderer] Error saving custom extension mappings:', e); showAppNotification('Error saving extension mappings!', 'error');} if (activeFilePath) { handleSaveActiveProject(false); } }
     function renderCustomExtensionMappingsUI() {
-        if (!DOM.extensionMappingsContainer) return;
-        DOM.extensionMappingsContainer.innerHTML = '';
-        if (customExtensionMappings.length === 0) {
-            DOM.extensionMappingsContainer.innerHTML = `<p style="font-size:0.85rem; color:#90a4ae;">No custom extension mappings defined yet.</p>`;
-            return;
-        }
+        if (!DOM.extensionMappingsContainer) return; DOM.extensionMappingsContainer.innerHTML = '';
+        if (customExtensionMappings.length === 0) { DOM.extensionMappingsContainer.innerHTML = `<p style="font-size:0.85rem; color:#90a4ae;">No custom extension mappings defined yet.</p>`; return; }
         customExtensionMappings.forEach((mapping, index) => {
             const catDisplay = getCategoryDisplay(mapping.categoryKey) || 'Unknown Category';
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'extension-mapping-item';
-            itemDiv.innerHTML = `
-                <span><strong>${escapeHTML(mapping.extension)}</strong> &rarr; ${escapeHTML(catDisplay)}</span>
-                <button class="btn-icon" onclick="handleDeleteCustomExtensionMapping(${index})" title="Delete Mapping">
-                    <svg viewBox="0 0 24 24"><use xlink:href="#icon-delete"></use></svg>
-                </button>
-            `;
+            const itemDiv = document.createElement('div'); itemDiv.className = 'extension-mapping-item';
+            itemDiv.innerHTML = `<span><strong>${escapeHTML(mapping.extension)}</strong> &rarr; ${escapeHTML(catDisplay)}</span><button class="btn-icon" onclick="handleDeleteCustomExtensionMapping(${index})" title="Delete Mapping"><svg viewBox="0 0 24 24"><use xlink:href="#icon-delete"></use></svg></button>`;
             DOM.extensionMappingsContainer.appendChild(itemDiv);
         });
     }
     function handleAddCustomExtensionMapping() {
-        const extension = DOM.newExtensionInput.value.trim().toLowerCase();
-        const categoryDisplayName = DOM.newExtensionCategoryNameInput.value.trim();
-
-        if (!extension || !categoryDisplayName) {
-            showAppNotification('Extension and Category Name cannot be empty.', 'warning'); return;
-        }
-        if (!extension.startsWith('.')) {
-            showAppNotification('Extension must start with a dot (e.g., .txt).', 'warning'); DOM.newExtensionInput.focus(); return;
-        }
-        if (customExtensionMappings.some(m => m.extension === extension)) {
-            showAppNotification(`Mapping for extension "${extension}" already exists. Delete the old one first.`, 'warning'); return;
-        }
-
-        let categoryKey = '';
-        const existingCategory = appCategories.find(cat => cat.display.toLowerCase() === categoryDisplayName.toLowerCase());
-
-        if (existingCategory) {
-            categoryKey = existingCategory.key;
-        } else {
-            // Create a new custom category
-            const nonAutoDetectCategories = appCategories.filter(c => c.key !== 'auto_detect');
-            const orders = nonAutoDetectCategories.map(c => c.order).filter(o => typeof o === 'number');
-            const maxOrder = orders.length > 0 ? Math.max(0, ...orders) : -1; 
-            categoryKey = `custom_${categoryDisplayName.toLowerCase().replace(/\s+/g, '_')}_${Date.now().toString().slice(-5)}`;
-            appCategories.push({ key: categoryKey, display: categoryDisplayName, isCustom: true, order: maxOrder + 1, isEditable: true, isDeletable: true });
-            saveCategoriesToStorage();
-            populateCategoryDropdown(); // Update dropdown with new category
-            if(document.getElementById('categoryManagerModal').classList.contains('show')) renderCategoryManagerList(); // if modal is open
-            showAppNotification(`New category "${categoryDisplayName}" created.`, 'info');
-        }
-
+        const extension = DOM.newExtensionInput.value.trim().toLowerCase(); const categoryDisplayName = DOM.newExtensionCategoryNameInput.value.trim();
+        if (!extension || !categoryDisplayName) { showAppNotification('Extension and Category Name cannot be empty.', 'warning'); return; }
+        if (!extension.startsWith('.')) { showAppNotification('Extension must start with a dot (e.g., .txt).', 'warning'); DOM.newExtensionInput.focus(); return; }
+        if (customExtensionMappings.some(m => m.extension === extension)) { showAppNotification(`Mapping for extension "${extension}" already exists. Delete the old one first.`, 'warning'); return; }
+        let categoryKey = ''; const existingCategory = appCategories.find(cat => cat.display.toLowerCase() === categoryDisplayName.toLowerCase());
+        if (existingCategory) { categoryKey = existingCategory.key; } 
+        else { const nonAutoDetectCategories = appCategories.filter(c => c.key !== 'auto_detect'); const orders = nonAutoDetectCategories.map(c => c.order).filter(o => typeof o === 'number'); const maxOrder = orders.length > 0 ? Math.max(0, ...orders) : -1; categoryKey = `custom_${categoryDisplayName.toLowerCase().replace(/\s+/g, '_')}_${Date.now().toString().slice(-5)}`; appCategories.push({ key: categoryKey, display: categoryDisplayName, isCustom: true, order: maxOrder + 1, isEditable: true, isDeletable: true }); saveCategoriesToStorage(); populateCategoryDropdown(DOM.categorySelectInputModal); if(document.getElementById('categoryManagerModal').classList.contains('show')) renderCategoryManagerList(); showAppNotification(`New category "${categoryDisplayName}" created.`, 'info'); }
         customExtensionMappings.push({ extension: extension, categoryKey: categoryKey });
-        saveCustomExtensionMappings();
-        renderCustomExtensionMappingsUI();
-        DOM.newExtensionInput.value = '';
-        DOM.newExtensionCategoryNameInput.value = '';
+        saveCustomExtensionMappings(); renderCustomExtensionMappingsUI(); DOM.newExtensionInput.value = ''; DOM.newExtensionCategoryNameInput.value = '';
         showAppNotification(`Mapping for "${extension}" to "${categoryDisplayName}" added.`, 'success');
     }
-    function handleDeleteCustomExtensionMapping(index) {
-        if (index >= 0 && index < customExtensionMappings.length) {
-            const mapping = customExtensionMappings[index];
-            showAppCustomConfirm(`Are you sure you want to delete the mapping for "${mapping.extension}"?`, (confirmed) => {
-                if (confirmed) {
-                    customExtensionMappings.splice(index, 1);
-                    saveCustomExtensionMappings();
-                    renderCustomExtensionMappingsUI();
-                    showAppNotification(`Mapping for "${mapping.extension}" deleted.`, 'success');
-                }
-            });
+    function handleDeleteCustomExtensionMapping(index) { if (index >= 0 && index < customExtensionMappings.length) { const mapping = customExtensionMappings[index]; showAppCustomConfirm(`Are you sure you want to delete the mapping for "${mapping.extension}"?`, (confirmed) => { if (confirmed) { customExtensionMappings.splice(index, 1); saveCustomExtensionMappings(); renderCustomExtensionMappingsUI(); showAppNotification(`Mapping for "${mapping.extension}" deleted.`, 'success'); } }); } }
+
+    // --- Project File Operations & History ---
+    const MAX_HISTORY_ITEMS_COUNT = 10; // Define max history items
+
+    function loadProjectHistory() {
+        try {
+            const storedHistory = localStorage.getItem(STORAGE_PROJECT_HISTORY_KEY);
+            projectHistory = storedHistory ? JSON.parse(storedHistory) : [];
+        } catch (e) {
+            projectHistory = [];
+            console.error("[Renderer] Error parsing project history from LS", e);
+            localStorage.removeItem(STORAGE_PROJECT_HISTORY_KEY);
+        }
+        renderProjectHistoryUI();
+    }
+    function saveProjectHistory() {
+        try { localStorage.setItem(STORAGE_PROJECT_HISTORY_KEY, JSON.stringify(projectHistory)); }
+        catch (e) { console.error('[Renderer] Error saving project history:', e); }
+    }
+    function addToProjectHistory(filePath, projectName = null) {
+        const now = new Date();
+        const entry = {
+            path: filePath,
+            name: projectName || (pathModule ? pathModule.basename(filePath) : filePath.split(/[/\\]/).pop()),
+            timestamp: now.toISOString(),
+            displayDate: now.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })
+        };
+        projectHistory = projectHistory.filter(item => item.path !== filePath); // Remove duplicates
+        projectHistory.unshift(entry); // Add to the beginning
+        if (projectHistory.length > MAX_HISTORY_ITEMS_COUNT) {
+            projectHistory.length = MAX_HISTORY_ITEMS_COUNT; // Limit history size
+        }
+        saveProjectHistory();
+        renderProjectHistoryUI();
+    }
+    function renderProjectHistoryUI() {
+        if (!DOM.projectHistoryContainer) return;
+        DOM.projectHistoryContainer.innerHTML = '';
+        if (projectHistory.length === 0) {
+            DOM.projectHistoryContainer.innerHTML = `<p style="font-size:0.85rem; color:#90a4ae; text-align:center;">No recent projects.</p>`;
+            return;
+        }
+        projectHistory.forEach(item => {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'extension-mapping-item'; // Re-use style for now
+            itemDiv.style.cursor = 'pointer';
+            itemDiv.title = `Open: ${item.path}`;
+            itemDiv.innerHTML = `
+                <span style="flex-grow:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                    <strong>${escapeHTML(item.name)}</strong>
+                    <br><small style="color:#78828c;">${item.displayDate}</small>
+                </span>
+                <button class="btn-icon" onclick="event.stopPropagation(); handleLoadProjectFromPath('${item.path.replace(/\\/g, '\\\\')}')"> <svg viewBox="0 0 24 24"><use xlink:href="#icon-open"></use></svg>
+                </button>
+            `;
+            itemDiv.addEventListener('click', () => handleLoadProjectFromPath(item.path));
+            DOM.projectHistoryContainer.appendChild(itemDiv);
+        });
+    }
+    function updateActiveProjectInfo() {
+        if (DOM.activeProjectInfo) {
+            if (activeFilePath) {
+                const fileName = pathModule ? pathModule.basename(activeFilePath) : activeFilePath.split(/[/\\]/).pop();
+                DOM.activeProjectInfo.textContent = `Active Project: ${fileName}`;
+                DOM.saveActiveProjectBtn.disabled = false;
+            } else {
+                DOM.activeProjectInfo.textContent = 'No active project file.';
+                DOM.saveActiveProjectBtn.disabled = true;
+            }
+        }
+    }
+
+    async function handleSaveProjectAs() {
+        if (!ipcRenderer) { showAppNotification('File operations are available in the desktop app only.', 'warning'); return; }
+        const projectData = {
+            projectFiles,
+            appCategories,
+            todos,
+            customExtensionMappings,
+            version: "1.0" // Versioning for future compatibility
+        };
+        try {
+            const filePath = await ipcRenderer.invoke('save-dialog', JSON.stringify(projectData));
+            if (filePath) {
+                activeFilePath = filePath;
+                addToProjectHistory(filePath);
+                updateActiveProjectInfo();
+                showAppNotification(`Project saved to: ${pathModule ? pathModule.basename(filePath) : filePath}`, 'success');
+            }
+        } catch (error) {
+            console.error('Error saving project:', error);
+            showAppNotification(`Error saving project: ${error.message}`, 'error');
+        }
+    }
+
+    async function handleSaveActiveProject(showNotification = true) {
+        if (!activeFilePath) {
+            if (showNotification) showAppNotification('No active project to save. Use "Save Project As..." first.', 'warning');
+            return;
+        }
+        if (!ipcRenderer) { showAppNotification('File operations are available in the desktop app only.', 'warning'); return; }
+        const projectData = { projectFiles, appCategories, todos, customExtensionMappings, version: "1.0" };
+        try {
+            await ipcRenderer.invoke('save-file', {filePath: activeFilePath, data: JSON.stringify(projectData) });
+            if (showNotification) showAppNotification(`Project "${pathModule ? pathModule.basename(activeFilePath) : activeFilePath}" saved.`, 'success');
+            // Update timestamp in history if needed, or just rely on it being at the top
+            addToProjectHistory(activeFilePath); // This will move it to top and update timestamp
+        } catch (error) {
+            console.error('Error saving active project:', error);
+            if (showNotification) showAppNotification(`Error saving project: ${error.message}`, 'error');
         }
     }
 
 
-    function saveItemsToStorage() { try { localStorage.setItem(STORAGE_ITEMS_KEY, JSON.stringify(projectFiles)); } catch (e) { console.error('[Renderer] Error saving items:', e); showAppNotification('Error saving items!', 'error');}}
-    function saveCategoriesToStorage() { try { localStorage.setItem(STORAGE_CATEGORIES_KEY, JSON.stringify(appCategories)); } catch (e) { console.error('[Renderer] Error saving categories:', e); showAppNotification('Error saving categories!', 'error');}}
+    async function handleImportProject() {
+        if (!ipcRenderer) { showAppNotification('File operations are available in the desktop app only.', 'warning'); return; }
+        try {
+            const result = await ipcRenderer.invoke('open-dialog-for-hpmt');
+            if (result && result.filePath && result.content) {
+                loadProjectData(JSON.parse(result.content));
+                activeFilePath = result.filePath;
+                addToProjectHistory(result.filePath);
+                updateActiveProjectInfo();
+                showAppNotification(`Project "${pathModule ? pathModule.basename(result.filePath) : result.filePath}" imported successfully!`, 'success');
+            }
+        } catch (error) {
+            console.error('Error importing project:', error);
+            showAppNotification(`Error importing project: ${error.message}`, 'error');
+        }
+    }
+    
+    async function handleLoadProjectFromPath(filePath) {
+        if (!ipcRenderer) { showAppNotification('File operations are available in the desktop app only.', 'warning'); return; }
+        try {
+            const content = await ipcRenderer.invoke('read-file', filePath);
+            if (content) {
+                loadProjectData(JSON.parse(content));
+                activeFilePath = filePath;
+                addToProjectHistory(filePath); // Moves to top and updates timestamp
+                updateActiveProjectInfo();
+                showAppNotification(`Project "${pathModule ? pathModule.basename(filePath) : filePath}" loaded.`, 'success');
+                showPage('pathsPage'); // Switch to path manager after loading
+            }
+        } catch (error) {
+            console.error(`Error loading project from path "${filePath}":`, error);
+            showAppNotification(`Error loading project: ${error.message}`, 'error');
+            // Remove from history if it's invalid
+            projectHistory = projectHistory.filter(item => item.path !== filePath);
+            saveProjectHistory();
+            renderProjectHistoryUI();
+        }
+    }
+
+
+    function loadProjectData(data) {
+        // Basic validation
+        if (!data || typeof data !== 'object') {
+            showAppNotification('Invalid project file format.', 'error');
+            return;
+        }
+        projectFiles = Array.isArray(data.projectFiles) ? data.projectFiles : [];
+        // Merge categories carefully, preserving defaults if possible
+        if (Array.isArray(data.appCategories)) {
+            const loadedCats = data.appCategories;
+            const mergedCategories = DEFAULT_CATEGORIES_STRUCTURE.map(defaultCat => {
+                const savedCat = loadedCats.find(sc => sc.key === defaultCat.key && !sc.isCustom); // Match non-custom defaults
+                if (savedCat) return { ...defaultCat, ...savedCat, isCustom: false }; // Ensure isCustom is false for defaults
+                return {...defaultCat};
+            });
+            loadedCats.forEach(savedCat => { // Add custom categories from file
+                if (savedCat.isCustom && !mergedCategories.some(mc => mc.key === savedCat.key)) {
+                    mergedCategories.push(savedCat);
+                }
+            });
+            appCategories = mergedCategories.sort((a,b) => (a.order ?? Infinity) - (b.order ?? Infinity));
+        } else {
+            appCategories = DEFAULT_CATEGORIES_STRUCTURE.map(cat => ({...cat}));
+        }
+        todos = Array.isArray(data.todos) ? data.todos : [];
+        customExtensionMappings = Array.isArray(data.customExtensionMappings) ? data.customExtensionMappings : [];
+
+        // Refresh UI
+        populateCategoryDropdown(DOM.categorySelectInputModal);
+        renderProjectFilesUI();
+        renderTodos();
+        renderCustomExtensionMappingsUI();
+        if (document.getElementById('categoryManagerModal').classList.contains('show')) {
+             renderCategoryManagerList(); // Update if modal is open
+        }
+    }
+
+
+    function saveItemsToStorage() { try { localStorage.setItem(STORAGE_ITEMS_KEY, JSON.stringify(projectFiles)); } catch (e) { console.error('[Renderer] Error saving items:', e); showAppNotification('Error saving items!', 'error');} if (activeFilePath) { handleSaveActiveProject(false); }}
+    function saveCategoriesToStorage() { try { localStorage.setItem(STORAGE_CATEGORIES_KEY, JSON.stringify(appCategories)); } catch (e) { console.error('[Renderer] Error saving categories:', e); showAppNotification('Error saving categories!', 'error');} if (activeFilePath) { handleSaveActiveProject(false); }}
     
     function loadData() {
         try { const storedItems = localStorage.getItem(STORAGE_ITEMS_KEY); projectFiles = storedItems ? JSON.parse(storedItems).filter(i => i.location && i.name && i.id) : []; } catch (e) { projectFiles = []; console.error("[Renderer] Error parsing items from LS", e); localStorage.removeItem(STORAGE_ITEMS_KEY); }
@@ -1164,53 +1402,66 @@
         if (!Array.isArray(appCategories) || appCategories.length === 0 || !appCategories.find(c => c.key === 'auto_detect')) { appCategories = DEFAULT_CATEGORIES_STRUCTURE.map(cat => ({...cat})); }
         
         loadTodos(); 
-        loadCustomExtensionMappings(); // Load custom mappings
-        populateCategoryDropdown();
+        loadCustomExtensionMappings();
+        loadProjectHistory();
+        updateActiveProjectInfo();
+        populateCategoryDropdown(DOM.categorySelectInputModal); // Populate modal dropdown
         renderProjectFilesUI();
     }
     
     function setupIpcListeners() {
         if (!ipcRenderer) {
             console.warn("[Renderer] ipcRenderer not available.");
-            [DOM.selectFilesBtn, DOM.addFolderLinkBtn, DOM.importFromFolderBtn, DOM.pastePathBtn, DOM.addPastedPathButton].forEach(btn => { if(btn) { btn.disabled = true; btn.title = (btn.title || btn.textContent || btn.id) + ' (Desktop app feature only)'; btn.style.opacity = "0.5"; btn.style.cursor = "not-allowed"; } }); return;
+            [DOM.selectFilesButtonModal, DOM.addFolderLinkButtonModal, DOM.importFromFolderButtonModal, DOM.pastePathButtonModal, DOM.addPastedPathButtonModal, DOM.saveProjectAsBtn, DOM.importProjectBtn, DOM.saveActiveProjectBtn].forEach(btn => { if(btn) { btn.disabled = true; btn.title = (btn.title || btn.textContent || btn.id) + ' (Desktop app feature only)'; btn.style.opacity = "0.5"; btn.style.cursor = "not-allowed"; } }); return;
         }
-        ipcRenderer.on('selected-files-for-files', (event, paths) => updateStagedPaths(paths, 'file', 'Files ready: '));
-        ipcRenderer.on('selected-folder-for-link', (event, paths) => updateStagedPaths(paths, 'folderLink', 'Folder links ready: '));
-        ipcRenderer.on('selected-folder-for-import', (event, contents) => { if (contents && Array.isArray(contents) && contents.length > 0) { stagedFilePaths = contents.map(item => ({ ...item, entryType: 'file' })); let baseName = "Selected folder"; if (pathModule && contents[0].path) { const parentDir = pathModule.dirname(contents[0].path); baseName = pathModule.basename(parentDir); if (!baseName && parentDir) baseName = parentDir; } DOM.selectedFilesDisplay.textContent = `Files to import from "${baseName}" (${stagedFilePaths.length})`; DOM.pathInput.value = ''; } else if (!DOM.pathInput.value.trim()) clearStagedFilesDisplay(); });
-        ipcRenderer.on('pasted-path-processed', (event, { items, originalPath }) => { if (items && Array.isArray(items) && items.length > 0) { stagedFilePaths = items; DOM.selectedFilesDisplay.textContent = `Processed path. Ready to add: ${items.map(f => f.name).join(', ')}`; } else { clearStagedFilesDisplay(); const name = (pathModule && originalPath) ? pathModule.basename(originalPath) : "Pasted path"; showAppNotification(`Path "${name}" is invalid, empty, or inaccessible.`, 'error'); } });
-        ipcRenderer.on('pasted-path-error', (event, { message, originalPath }) => { const name = (pathModule && originalPath) ? pathModule.basename(originalPath) : "Pasted path"; showAppNotification(`Error processing "${name}": ${message}`, 'error'); clearStagedFilesDisplay(); });
-    }
-    function handleSelectFilesClick() { if (ipcRenderer) ipcRenderer.send('open-file-dialog-for-files'); else showAppNotification('This feature is available in the desktop app only.', 'warning'); }
-    function handleAddFolderLinkClick() { if (ipcRenderer) ipcRenderer.send('open-folder-dialog-for-link'); else showAppNotification('This feature is available in the desktop app only.', 'warning'); }
-    function handleImportFromFolderClick() { if (ipcRenderer) ipcRenderer.send('open-folder-dialog-for-import'); else showAppNotification('This feature is available in the desktop app only.', 'warning'); }
-    async function handlePastePathClick() {
-        let clipboardText = '';
-        try { if (electronClipboard) { clipboardText = electronClipboard.readText(); } else if (navigator.clipboard && navigator.clipboard.readText) { clipboardText = await navigator.clipboard.readText(); } else { showAppNotification('Clipboard API not available.', 'warning'); return; } DOM.pathInput.value = clipboardText; showAppNotification(clipboardText ? 'Path pasted.' : 'Clipboard is empty.', clipboardText ? 'success' : 'warning');
-        } catch (err) { console.error('[Renderer] Failed to read clipboard: ', err); showAppNotification('Failed to paste from clipboard. Ensure permission if prompted.', 'error'); }
-    }
-    function handleAddPastedPathClick() {
-        const pathValue = DOM.pathInput.value.trim(); if (!pathValue) { showAppNotification('Please enter or paste a path first.', 'warning'); return; }
-        if (ipcRenderer) { stagedFilePaths = []; DOM.selectedFilesDisplay.textContent = `Processing: ${pathValue.substring(pathValue.lastIndexOf(/[/\\]/) + 1)}`; ipcRenderer.send('process-pasted-path', pathValue); } 
-        else { if (pathValue.toLowerCase().startsWith('https://') || pathValue.toLowerCase().startsWith('http://')) { updateStagedPaths([pathValue], 'websiteLink', 'Website link ready: '); } else { showAppNotification('This feature (for local paths) is available in the desktop app only.', 'warning'); } }
+        ipcRenderer.on('selected-files-for-files', (event, paths) => updateStagedPathsModal(paths, 'file', 'Files ready: '));
+        ipcRenderer.on('selected-folder-for-link', (event, paths) => updateStagedPathsModal(paths, 'folderLink', 'Folder links ready: '));
+        ipcRenderer.on('selected-folder-for-import', (event, contents) => { if (contents && Array.isArray(contents) && contents.length > 0) { stagedFilePaths = contents.map(item => ({ ...item, entryType: 'file' })); let baseName = "Selected folder"; if (pathModule && contents[0].path) { const parentDir = pathModule.dirname(contents[0].path); baseName = pathModule.basename(parentDir); if (!baseName && parentDir) baseName = parentDir; } DOM.selectedFilesDisplayModal.textContent = `Files to import from "${baseName}" (${stagedFilePaths.length})`; DOM.pathInputModal.value = ''; } else if (!DOM.pathInputModal.value.trim()) clearStagedFilesDisplayModal(); });
+        ipcRenderer.on('pasted-path-processed', (event, { items, originalPath }) => { if (items && Array.isArray(items) && items.length > 0) { stagedFilePaths = items; DOM.selectedFilesDisplayModal.textContent = `Processed path. Ready to add: ${items.map(f => f.name).join(', ')}`; } else { clearStagedFilesDisplayModal(); const name = (pathModule && originalPath) ? pathModule.basename(originalPath) : "Pasted path"; showAppNotification(`Path "${name}" is invalid, empty, or inaccessible.`, 'error'); } });
+        ipcRenderer.on('pasted-path-error', (event, { message, originalPath }) => { const name = (pathModule && originalPath) ? pathModule.basename(originalPath) : "Pasted path"; showAppNotification(`Error processing "${name}": ${message}`, 'error'); clearStagedFilesDisplayModal(); });
     }
     
+    // --- Add Item Modal Logic ---
+    function openAddItemModal() {
+        populateCategoryDropdown(DOM.categorySelectInputModal); // Ensure dropdown is up-to-date
+        clearStagedFilesDisplayModal(); // Clear any previous selections
+        DOM.projectNameInputModal.value = ''; // Clear project name
+        DOM.pathInputModal.value = ''; // Clear path input
+        DOM.addItemModal.classList.add('show');
+    }
+    function closeAddItemModal() {
+        DOM.addItemModal.classList.remove('show');
+    }
+
+    // --- Event Listeners for Modal ---
+    if(DOM.addItemFab) DOM.addItemFab.addEventListener('click', openAddItemModal);
+    if(DOM.closeAddItemModalBtn) DOM.closeAddItemModalBtn.addEventListener('click', closeAddItemModal);
+    if(DOM.selectFilesButtonModal) DOM.selectFilesButtonModal.addEventListener('click', () => { if (ipcRenderer) ipcRenderer.send('open-file-dialog-for-files'); else showAppNotification('This feature is available in the desktop app only.', 'warning'); });
+    if(DOM.addFolderLinkButtonModal) DOM.addFolderLinkButtonModal.addEventListener('click', () => { if (ipcRenderer) ipcRenderer.send('open-folder-dialog-for-link'); else showAppNotification('This feature is available in the desktop app only.', 'warning'); });
+    if(DOM.importFromFolderButtonModal) DOM.importFromFolderButtonModal.addEventListener('click', () => { if (ipcRenderer) ipcRenderer.send('open-folder-dialog-for-import'); else showAppNotification('This feature is available in the desktop app only.', 'warning'); });
+    if(DOM.pastePathButtonModal) DOM.pastePathButtonModal.addEventListener('click', async () => {
+        let clipboardText = '';
+        try { if (electronClipboard) { clipboardText = electronClipboard.readText(); } else if (navigator.clipboard && navigator.clipboard.readText) { clipboardText = await navigator.clipboard.readText(); } else { showAppNotification('Clipboard API not available.', 'warning'); return; } DOM.pathInputModal.value = clipboardText; showAppNotification(clipboardText ? 'Path pasted.' : 'Clipboard is empty.', clipboardText ? 'success' : 'warning');
+        } catch (err) { console.error('[Renderer] Failed to read clipboard: ', err); showAppNotification('Failed to paste from clipboard. Ensure permission if prompted.', 'error'); }
+    });
+    if(DOM.addPastedPathButtonModal) DOM.addPastedPathButtonModal.addEventListener('click', () => {
+        const pathValue = DOM.pathInputModal.value.trim(); if (!pathValue) { showAppNotification('Please enter or paste a path first.', 'warning'); return; }
+        if (ipcRenderer) { stagedFilePaths = []; DOM.selectedFilesDisplayModal.textContent = `Processing: ${pathValue.substring(pathValue.lastIndexOf(/[/\\]/) + 1)}`; ipcRenderer.send('process-pasted-path', pathValue); } 
+        else { if (pathValue.toLowerCase().startsWith('https://') || pathValue.toLowerCase().startsWith('http://')) { updateStagedPathsModal([pathValue], 'websiteLink', 'Website link ready: '); } else { showAppNotification('This feature (for local paths) is available in the desktop app only.', 'warning'); } }
+    });
+    if(DOM.addItemsButtonModal) DOM.addItemsButtonModal.addEventListener('click', handleProcessStagedItemsFromModal);
+    if(DOM.projectNameInputModal) DOM.projectNameInputModal.addEventListener('keydown', e => { if (e.key === 'Enter' && stagedFilePaths.length > 0) handleProcessStagedItemsFromModal(); });
+    if(DOM.pathInputModal) DOM.pathInputModal.addEventListener('keydown', e => { if (e.key === 'Enter') DOM.addPastedPathButtonModal.click(); });
+
+
     document.addEventListener('DOMContentLoaded', () => {
         document.documentElement.dir = 'ltr'; document.documentElement.lang = 'en';
         setupIpcListeners(); loadData(); showPage('pathsPage'); 
         if (window.innerWidth > 768) { DOM.sidebar.classList.remove('collapsed'); DOM.mainContent.classList.remove('expanded'); } 
         else { DOM.sidebar.classList.add('collapsed'); DOM.mainContent.classList.add('expanded'); }
         
-        // Remove the original clearAllDataBtn listener if it exists, as it's moved to options
-        if(DOM.clearAllDataBtn) DOM.clearAllDataBtn.removeEventListener('click', clearAllData);
-
-
         DOM.openAllBtn.addEventListener('click', handleOpenAllClick);
-        DOM.selectFilesBtn.addEventListener('click', handleSelectFilesClick);
-        DOM.addFolderLinkBtn.addEventListener('click', handleAddFolderLinkClick);
-        DOM.importFromFolderBtn.addEventListener('click', handleImportFromFolderClick);
-        DOM.pastePathBtn.addEventListener('click', handlePastePathClick);
-        DOM.addPastedPathBtn.addEventListener('click', handleAddPastedPathClick);
-        DOM.addItemsBtn.addEventListener('click', handleProcessStagedItems);
+        // Removed listeners for old add item section buttons
         
         if(DOM.manageCategoriesBtn) DOM.manageCategoriesBtn.addEventListener('click', openCategoryManagerModal);
         DOM.closeCategoryManagerBtn.addEventListener('click', closeCategoryManagerModal);
@@ -1219,6 +1470,9 @@
         if(DOM.todoInput) DOM.todoInput.addEventListener('keydown', e => { if (e.key === 'Enter') addTodo(); });
         if(DOM.clearAllDataBtnOptionsPage) DOM.clearAllDataBtnOptionsPage.addEventListener('click', clearAllData);
         if(DOM.addExtensionMappingBtn) DOM.addExtensionMappingBtn.addEventListener('click', handleAddCustomExtensionMapping);
+        if(DOM.saveProjectAsBtn) DOM.saveProjectAsBtn.addEventListener('click', handleSaveProjectAs);
+        if(DOM.importProjectBtn) DOM.importProjectBtn.addEventListener('click', handleImportProject);
+        if(DOM.saveActiveProjectBtn) DOM.saveActiveProjectBtn.addEventListener('click', () => handleSaveActiveProject(true));
 
 
         DOM.filesDisplayContainer.addEventListener('click', e => {
@@ -1233,8 +1487,6 @@
                 else if (action === 'delete') deleteItemEntry(item.id);
             }
         });
-        DOM.projectNameInput.addEventListener('keydown', e => { if (e.key === 'Enter' && stagedFilePaths.length > 0) handleProcessStagedItems(); });
-        DOM.pathInput.addEventListener('keydown', e => { if (e.key === 'Enter') handleAddPastedPathClick(); });
         DOM.newManagedCategoryInput.addEventListener('keydown', e => { if (e.key === 'Enter') DOM.addManagedCategoryBtn.click(); }); 
     });
     window.addEventListener('error', e => { console.error('[Renderer] Unhandled Error:', e); showAppNotification('An unexpected error occurred!', 'error'); });
