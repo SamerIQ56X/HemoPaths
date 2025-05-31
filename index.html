@@ -5,362 +5,350 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hemo Paths Manager</title>
     <style>
-        /* --- Base Styles (Inspired by New Theme) --- */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        .title-bar { /* افترض أن لديك عنصر بهذا الكلاس */
-            -webkit-app-region: drag;
-            /* أنماط أخرى للشريط العلوي */
-            height: 30px; /* أو أي ارتفاع مناسب */
-            background-color: #333; /* أو أي لون خلفية */
-            width: 100%;
-            position: fixed; /* أو حسب تصميمك */
-            top: 0;
-            left: 0;
-            z-index: 9990; /* تأكد أنه خلف أزرار التحكم الفعلية */
-        }
-
-
-        .title-bar-button { /* افترض أن أزرار التحكم لديك بهذا الكلاس */
-            -webkit-app-region: no-drag;
-        }
-
-        /* وأيضاً لأزرار التحكم بالنافذة التي لديك بالفعل */
-        .window-controls {
-            /* ... أنماطك الحالية ... */
-            -webkit-app-region: no-drag; /* مهم جداً */
-            z-index: 99999; /* يجب أن تكون فوق منطقة السحب */
-        }
-
+        /* --- Base Styles --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #0a0a0a, #1a1a2e, #16213e, #0f0f23);
-            min-height: 100vh;
-            color: white;
-            overflow-x: hidden;
-            line-height: 1.6;
-            font-size: 14px;
+            min-height: 100vh; color: white; overflow: hidden; /* Changed overflow-x to overflow */
+            line-height: 1.6; font-size: 14px;
         }
 
-        /* Custom Scrollbar Styling */
+        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #0f0f23; border-radius: 12px; }
         ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 12px; border: 2px solid #0f0f23; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.25); }
         html { scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.15) #0f0f23; }
 
-        /* --- Window Controls --- */
-        .window-controls {
+        /* --- Custom Draggable Title Bar --- */
+        .custom-title-bar {
             position: fixed;
-            top: 10px;
-            right: 15px; /* Adjusted for LTR */
-            left: auto;
-            z-index: 10000;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 38px; /* Increased height slightly for better grab area */
+            background-color: rgba(10, 10, 20, 0.85); /* Slightly more opaque for title bar */
+            backdrop-filter: blur(12px);
+            -webkit-app-region: drag; /* Makes the entire bar draggable */
+            z-index: 100000; /* Highest z-index */
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* To position title and controls */
+            padding: 0 10px 0 15px; /* Padding: top right bottom left */
+            user-select: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .window-app-title {
+            color: #b0bec5; /* Lighter title color */
+            font-size: 0.85em;
+            font-weight: 500;
+            -webkit-app-region: no-drag; /* Text itself should not interfere with drag */
+        }
+
+        /* --- Window Controls (Positioned within custom-title-bar) --- */
+        .window-controls {
+            position: static; /* No longer fixed, part of the title bar flow */
+            -webkit-app-region: no-drag; /* Crucial: Makes buttons clickable */
             display: flex;
             gap: 8px;
+            margin-left: auto; /* Pushes to the right in LTR */
         }
+        html[dir="rtl"] .window-controls { margin-right: auto; margin-left: initial; }
 
         .window-btn {
             width: 12px; height: 12px; border-radius: 50%; cursor: pointer;
-            transition: all 0.3s ease; border: none; position: relative;
+            transition: all 0.2s ease; border: none; position: relative;
+            -webkit-app-region: no-drag; /* Ensure buttons are clickable */
         }
-        .window-btn:hover { transform: scale(1.2); box-shadow: 0 0 10px rgba(255, 255, 255, 0.3); }
-        .close-btn { background: linear-gradient(45deg, #ff5f56, #ff3b30); }
-        .minimize-btn { background: linear-gradient(45deg, #ffbd2e, #ffa500); }
-        .close-btn:hover::after {
-            content: '×'; position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%); font-size: 8px; color: #000; font-weight: bold;
+        .window-btn:hover { transform: scale(1.15); box-shadow: 0 0 8px rgba(255, 255, 255, 0.25); }
+        .close-btn { background: linear-gradient(45deg, #ff5f56, #e64a19); } /* Adjusted red */
+        .minimize-btn { background: linear-gradient(45deg, #ffbd2e, #ffa000); } /* Adjusted yellow */
+
+        .close-btn:hover::after, .minimize-btn:hover::after {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 8px; color: rgba(0,0,0,0.7); font-weight: bold;
         }
-        .minimize-btn:hover::after {
-            content: '−'; position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%); font-size: 8px; color: #000; font-weight: bold;
-        }
+        .close-btn:hover::after { content: '×'; }
+        .minimize-btn:hover::after { content: '−'; }
+
 
         /* --- Sidebar --- */
         .sidebar {
-            position: fixed;
-            left: 0; /* Adjusted for LTR */
-            right: auto;
-            top: 0; width: 250px; height: 100vh;
-            background: rgba(5, 5, 15, 0.9); backdrop-filter: blur(15px);
-            border-right: 1px solid rgba(255, 255, 255, 0.1); /* Adjusted for LTR */
-            border-left: none;
-            padding: 20px; transition: all 0.3s ease; z-index: 9999;
+            position: fixed; left: 0; top: 38px; /* Start below custom title bar */
+            width: 250px; height: calc(100vh - 38px); /* Adjust height */
+            background: rgba(5, 5, 15, 0.85); backdrop-filter: blur(18px);
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 15px; transition: all 0.3s ease; z-index: 9999;
             display: flex; flex-direction: column;
         }
-        .sidebar.collapsed { width: 70px; transform: translateX(0); }
-
+        .sidebar.collapsed { width: 70px; }
         html[dir="ltr"] .sidebar.collapsed .nav-text,
         html[dir="ltr"] .sidebar.collapsed .logo h2,
         html[dir="ltr"] .sidebar.collapsed .logo p { display: none; }
-
         html[dir="ltr"] .sidebar:not(.collapsed) .logo,
-        html[dir="ltr"] .sidebar:not(.collapsed) .nav-text {
-            opacity: 1; transition: opacity 0.2s 0.1s ease-in-out;
-        }
+        html[dir="ltr"] .sidebar:not(.collapsed) .nav-text { opacity: 1; transition: opacity 0.2s 0.1s ease-in-out; }
         html[dir="ltr"] .sidebar.collapsed .logo,
         html[dir="ltr"] .sidebar.collapsed .nav-text { opacity: 0; pointer-events: none; }
 
         .sidebar-header {
             display: flex; align-items: center; justify-content: space-between;
-            margin-bottom: 30px; padding-top: 35px;
+            margin-bottom: 25px; padding-top: 10px; /* Reduced top padding */
         }
         .logo { opacity: 1; transition: opacity 0.3s ease; }
         .sidebar.collapsed .logo { opacity: 0; pointer-events: none; }
         .logo h2 {
-            font-size: 22px;
+            font-size: 20px; /* Slightly smaller */
             background: linear-gradient(45deg, #4fc3f7, #29b6f6, #03a9f4, #0288d1);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             background-clip: text; text-fill-color: transparent; white-space: nowrap;
         }
-        .logo p { color: #64b5f6; font-size: 11px; margin-top: -5px; white-space: nowrap; }
+        .logo p { color: #64b5f6; font-size: 10px; margin-top: -4px; white-space: nowrap; }
         .menu-toggle {
             background: none; border: none; color: #90a4ae; cursor: pointer;
             padding: 8px; border-radius: 8px; transition: all 0.3s ease;
             display: flex; align-items: center; justify-content: center;
+            -webkit-app-region: no-drag; /* Make toggle clickable */
         }
         .menu-toggle:hover { background: rgba(255, 255, 255, 0.1); color: white; }
-        .sidebar.collapsed .menu-toggle { margin-left: auto; margin-right: auto; } /* Centered when collapsed */
+        .sidebar.collapsed .menu-toggle { margin-left: auto; margin-right: auto; }
 
         .nav-menu { list-style: none; padding: 0; }
-        .nav-item { margin-bottom: 8px; }
+        .nav-item { margin-bottom: 6px; } /* Reduced margin */
         .nav-link {
-            display: flex; align-items: center; padding: 12px 15px; color: #90a4ae;
-            text-decoration: none; border-radius: 10px; transition: all 0.3s ease;
-            cursor: pointer; white-space: nowrap;
+            display: flex; align-items: center; padding: 10px 15px; /* Adjusted padding */
+            color: #90a4ae; text-decoration: none; border-radius: 8px; /* Smaller radius */
+            transition: all 0.2s ease; cursor: pointer; white-space: nowrap;
         }
-        .nav-link:hover, .nav-link.active:hover { background: rgba(255, 255, 255, 0.08); color: white; }
+        .nav-link:hover, .nav-link.active:hover { background: rgba(255, 255, 255, 0.1); color: white; }
         .nav-link.active {
             background: linear-gradient(90deg, #1e3a8a, #3b82f6, #6366f1); color: white;
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.25);
+            box-shadow: 0 3px 12px rgba(59, 130, 246, 0.2);
         }
-        .nav-icon {
-            margin-right: 15px; /* Adjusted for LTR */
-            margin-left: 0;
-            width: 20px; height: 20px; flex-shrink: 0;
-        }
+        .nav-icon { margin-right: 12px; width: 18px; height: 18px; flex-shrink: 0; }
         .sidebar.collapsed .nav-link { justify-content: center; }
         .sidebar.collapsed .nav-icon { margin-right: 0; }
 
         /* --- Main Content Area --- */
         .main-content {
-            margin-left: 250px; /* Adjusted for LTR */
-            margin-right: 0;
-            padding: 20px; transition: margin-left 0.3s ease; min-height: 100vh;
+            margin-left: 250px; padding: 20px;
+            padding-top: calc(20px + 38px); /* Account for title bar height */
+            transition: margin-left 0.3s ease; min-height: 100vh;
+            overflow-y: auto; /* Allow scrolling for main content if it overflows */
+            height: calc(100vh - 38px); /* Full height minus title bar */
         }
-        .main-content.expanded { margin-left: 70px; /* Adjusted for LTR */ }
-        .page { display: none; animation: fadeInContent 0.5s ease-out; }
+        .main-content.expanded { margin-left: 70px; }
+        .page { display: none; animation: fadeInContent 0.4s ease-out; }
         .page.active { display: block; }
-        @keyframes fadeInContent { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInContent { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
         .page-header-container {
             display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 30px; padding-top: 20px;
+            margin-bottom: 25px; /* Adjusted margin */
+            /* padding-top: 0; /* Removed as main-content has top padding */
         }
         .page-header-container .page-title {
+            font-size: 1.8rem; /* Adjusted size */
+            font-weight: 700;
+            background: linear-gradient(45deg, #ffffff, #e3f2fd, #bbdefb);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; text-fill-color: transparent; margin-bottom: 4px;
+        }
+        .page-header-container .page-subtitle { color: #64b5f6; font-size: 0.9rem; }
+
+        .container {
+            max-width: 100%; margin: 0 auto; background: rgba(10, 10, 30, 0.45); 
+            backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px; box-shadow: 0 6px 25px 0 rgba(0, 0, 0, 0.3); overflow: hidden;
+        }
+        .header { padding: 20px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+        .header h1 {
             font-size: 2rem; font-weight: 700;
             background: linear-gradient(45deg, #ffffff, #e3f2fd, #bbdefb);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            background-clip: text; text-fill-color: transparent; margin-bottom: 5px;
-        }
-        .page-header-container .page-subtitle { color: #64b5f6; font-size: 1rem; }
-
-        .container {
-            max-width: 100%; margin: 0 auto; background: rgba(10, 10, 30, 0.5); 
-            backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); overflow: hidden;
-        }
-        .header { padding: 25px 20px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
-        .header h1 {
-            font-size: 2.2rem; font-weight: 700;
-            background: linear-gradient(45deg, #ffffff, #e3f2fd, #bbdefb);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             background-clip: text; text-fill-color: transparent;
-            margin-bottom: 8px; text-transform: capitalize;
+            margin-bottom: 6px; text-transform: capitalize;
         }
-        .header p { color: #64b5f6; font-size: 0.95rem; }
+        .header p { color: #64b5f6; font-size: 0.9rem; }
         .top-actions-bar {
-            display: flex; justify-content: space-between; align-items: center; padding: 15px 20px;
-            background: rgba(15, 15, 35, 0.4); border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            flex-wrap: wrap; gap: 12px;
+            display: flex; justify-content: space-between; align-items: center; padding: 12px 18px;
+            background: rgba(15, 15, 35, 0.35); border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+            flex-wrap: wrap; gap: 10px;
         }
-        .stats { font-size: 0.9rem; font-weight: 500; display: flex; align-items: center; color: #90a4ae; }
-        .stats svg { margin-right: 8px; margin-left: 0; width: 18px; height: 18px; vertical-align: middle; fill: #64b5f6; }
+        .stats { font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; color: #90a4ae; }
+        .stats svg { margin-right: 8px; width: 16px; height: 16px; vertical-align: middle; fill: #64b5f6; }
 
         .btn {
-            padding: 10px 20px; border: none; border-radius: 10px; font-size: 0.9rem; font-weight: 600;
-            cursor: pointer; transition: all 0.3s ease; text-decoration: none; display: inline-flex;
-            align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); text-transform: none;
+            padding: 9px 18px; border: none; border-radius: 8px; font-size: 0.85rem; font-weight: 600;
+            cursor: pointer; transition: all 0.25s ease; text-decoration: none; display: inline-flex;
+            align-items: center; gap: 7px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); text-transform: none;
         }
-        .btn svg { width: 16px; height: 16px; fill: currentColor; }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); }
-        .btn:active { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+        .btn svg { width: 15px; height: 15px; fill: currentColor; }
+        .btn:hover { transform: translateY(-1px); box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25); }
+        .btn:active { transform: translateY(0px); box-shadow: 0 1px 4px rgba(0,0,0,0.15); }
         .btn:disabled {
-            background: rgba(120, 120, 120, 0.2) !important; border-color: rgba(120, 120, 120, 0.2) !important;
-            color: #78828c !important; cursor: not-allowed; opacity: 0.6; transform: translateY(0); box-shadow: none;
+            background: rgba(120, 120, 120, 0.15) !important; border-color: rgba(120, 120, 120, 0.15) !important;
+            color: #6c7a86 !important; cursor: not-allowed; opacity: 0.5;
+            transform: translateY(0); box-shadow: none;
         }
         .btn-primary {
             background: linear-gradient(45deg, #1565c0, #1976d2, #1e88e5, #2196f3); color: white;
-            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3); padding: 12px 24px; border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(33, 150, 243, 0.25); padding: 10px 22px; border-radius: 10px;
         }
-        .btn-primary:hover { box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4); }
+        .btn-primary:hover { box-shadow: 0 5px 18px rgba(33, 150, 243, 0.35); }
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.1); color: #90a4ae; border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.08); color: #90a4ae; border: 1px solid rgba(255, 255, 255, 0.15);
         }
-        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); color: white; }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.12); color: white; }
         .btn-danger {
             background: linear-gradient(45deg, #d32f2f, #e53935, #f44336); color: white;
-            box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+            box-shadow: 0 3px 12px rgba(244, 67, 54, 0.25);
         }
-        .btn-danger:hover { background: linear-gradient(45deg, #c62828, #d32f2f, #e53935); box-shadow: 0 6px 20px rgba(244, 67, 54, 0.4); }
+        .btn-danger:hover { background: linear-gradient(45deg, #c62828, #d32f2f, #e53935); box-shadow: 0 5px 18px rgba(244, 67, 54, 0.35); }
         .btn-success {
             background: linear-gradient(45deg, #2e7d32, #388e3c, #43a047, #4caf50); color: white;
-            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+            box-shadow: 0 3px 12px rgba(76, 175, 80, 0.25);
         }
-        .btn-success:hover { background: linear-gradient(45deg, #1b5e20, #2e7d32, #388e3c); box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4); }
+        .btn-success:hover { background: linear-gradient(45deg, #1b5e20, #2e7d32, #388e3c); box-shadow: 0 5px 18px rgba(76, 175, 80, 0.35); }
         .btn-icon {
-            background: transparent; border: none; color: #90a4ae; padding: 8px; line-height: 1;
-            border-radius: 8px; transition: all 0.3s ease;
+            background: transparent; border: none; color: #90a4ae; padding: 7px; line-height: 1;
+            border-radius: 6px; transition: all 0.2s ease;
         }
-        .btn-icon:hover { color: white; background-color: rgba(255, 255, 255, 0.1); }
-        .btn-icon svg { width: 18px; height: 18px; }
+        .btn-icon:hover { color: white; background-color: rgba(255, 255, 255, 0.08); }
+        .btn-icon svg { width: 16px; height: 16px; }
         .btn-icon:disabled { color: #5f6770 !important; background-color: transparent !important; cursor: not-allowed;}
         .btn-icon:disabled svg { fill: #5f6770 !important; }
 
-        .add-item-section { padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); background: rgba(10, 10, 25, 0.4); }
-        .input-group { display: flex; flex-direction: column; gap: 15px; } 
-        .input-row { display: flex; gap: 15px; flex-wrap: wrap; }
+        .add-item-section { padding: 18px; border-bottom: 1px solid rgba(255, 255, 255, 0.07); background: rgba(10, 10, 25, 0.35); }
+        .input-group { display: flex; flex-direction: column; gap: 12px; } 
+        .input-row { display: flex; gap: 12px; flex-wrap: wrap; }
         .input-field, #categorySelectInput, .category-name-input-inline {
-            flex: 1; padding: 12px 15px; border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px; font-size: 0.9rem; min-width: 150px; 
-            background-color: rgba(255, 255, 255, 0.05); color: white; transition: all 0.3s ease;
+            flex: 1; padding: 10px 14px; border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 7px; font-size: 0.85rem; min-width: 140px; 
+            background-color: rgba(255, 255, 255, 0.04); color: white; transition: all 0.25s ease;
         }
-        .input-field::placeholder { color: #64b5f6; opacity: 0.8; }
+        .input-field::placeholder { color: #64b5f6; opacity: 0.7; }
         .input-field:focus, #categorySelectInput:focus, .category-name-input-inline:focus {
-            outline: none; border-color: #2196f3; background-color: rgba(255, 255, 255, 0.1);
-            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
+            outline: none; border-color: #2196f3; background-color: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.15);
         }
         #categorySelectInput {
             appearance: none; -webkit-appearance: none; -moz-appearance: none;
             background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2364b5f6%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
-            background-repeat: no-repeat; background-size: 12px; 
+            background-repeat: no-repeat; background-size: 11px; 
         }
-        html[dir="ltr"] #categorySelectInput { background-position: right 15px center; padding-right: 40px; }
-        html[dir="rtl"] #categorySelectInput { background-position: left 15px center; padding-left: 40px; }
+        html[dir="ltr"] #categorySelectInput { background-position: right 12px center; padding-right: 35px; }
+        html[dir="rtl"] #categorySelectInput { background-position: left 12px center; padding-left: 35px; }
         #categorySelectInput option { background: #1a1a2e; color: white; }
 
-        #selectedFilesDisplay { margin-top: 12px; font-size: 0.8rem; color: #90a4ae; }
-        #itemsDisplayArea { padding: 20px; }
+        #selectedFilesDisplay { margin-top: 10px; font-size: 0.75rem; color: #90a4ae; }
+        #itemsDisplayArea { padding: 18px; }
 
         .category-section {
-            margin-bottom: 25px; background: rgba(5, 5, 20, 0.5); 
-            backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.25); transition: all 0.3s ease;
+            margin-bottom: 20px; background: rgba(5, 5, 20, 0.45); 
+            backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 10px; box-shadow: 0 3px 18px rgba(0,0,0,0.2); transition: all 0.25s ease;
         }
-        .category-section:hover { background: rgba(10, 10, 25, 0.6); border-color: rgba(255, 255, 255, 0.12); }
+        .category-section:hover { background: rgba(10, 10, 25, 0.55); border-color: rgba(255, 255, 255, 0.1); }
         .category-header {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 15px 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            cursor: pointer; user-select: none; background-color: rgba(20, 20, 40, 0.5); 
-            border-top-left-radius: 12px; border-top-right-radius: 12px; transition: background-color 0.3s ease;
+            padding: 12px 18px; border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+            cursor: pointer; user-select: none; background-color: rgba(20, 20, 40, 0.45); 
+            border-top-left-radius: 10px; border-top-right-radius: 10px; transition: background-color 0.25s ease;
         }
-        .category-header:hover { background-color: rgba(25, 25, 45, 0.6); }
+        .category-header:hover { background-color: rgba(25, 25, 45, 0.55); }
         .category-header:hover .category-title { color: #64b5f6; } 
-        .category-title-container { display: flex; align-items: center; gap: 12px; flex-grow: 1; }
-        .category-toggle-icon svg { width: 12px; height: 12px; fill: #90a4ae; transition: transform 0.3s ease-in-out; }
+        .category-title-container { display: flex; align-items: center; gap: 10px; flex-grow: 1; }
+        .category-toggle-icon svg { width: 11px; height: 11px; fill: #90a4ae; transition: transform 0.25s ease-in-out; }
         html[dir="ltr"] .category-section:not(.collapsed) .category-toggle-icon svg { transform: rotate(90deg); }
         html[dir="rtl"] .category-section:not(.collapsed) .category-toggle-icon svg { transform: rotate(-90deg); }
-        .category-title { font-size: 1.15rem; font-weight: 600; color: white; text-transform: capitalize;}
+        .category-title { font-size: 1.1rem; font-weight: 600; color: white; text-transform: capitalize;}
         .category-item-count {
-            background: rgba(255, 255, 255, 0.1); color: #64b5f6; padding: 3px 10px;
-            border-radius: 20px; font-size: 0.75rem; margin-left: 10px; /* Adjusted for LTR */
+            background: rgba(255, 255, 255, 0.08); color: #64b5f6; padding: 2px 9px;
+            border-radius: 18px; font-size: 0.7rem; margin-left: 8px;
         }
-        html[dir="rtl"] .category-item-count { margin-right: 10px; margin-left: 0; }
+        html[dir="rtl"] .category-item-count { margin-right: 8px; margin-left: 0; }
         
-        .category-controls { display: flex; align-items: center; gap: 10px; }
-        .category-controls .btn-icon { padding: 7px; }
-        .category-controls .btn-icon svg { width: 15px; height: 15px; }
-        .category-controls .btn-open-all-in-category { padding: 7px 14px; font-size: 0.8rem; }
-        .category-controls .btn-open-all-in-category svg { width: 14px; height: 14px;}
+        .category-controls { display: flex; align-items: center; gap: 8px; }
+        .category-controls .btn-icon { padding: 6px; }
+        .category-controls .btn-icon svg { width: 14px; height: 14px; }
+        .category-controls .btn-open-all-in-category { padding: 6px 12px; font-size: 0.75rem; }
+        .category-controls .btn-open-all-in-category svg { width: 13px; height: 13px;}
 
         .items-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
-            gap: 20px; padding: 20px; max-height: 1200px; overflow-y: auto; opacity: 1;
-            transition: max-height 0.3s ease-out, opacity 0.3s ease-out, padding 0.3s ease-out;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); 
+            gap: 18px; padding: 18px; max-height: 1200px; overflow-y: auto; opacity: 1;
+            transition: max-height 0.25s ease-out, opacity 0.25s ease-out, padding 0.25s ease-out;
         }
         .category-section.collapsed .items-grid { max-height: 0; opacity: 0; padding-top: 0; padding-bottom: 0; margin-top:0; overflow: hidden; }
-        .category-section.collapsed .category-header { border-bottom-color: transparent; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; }
+        .category-section.collapsed .category-header { border-bottom-color: transparent; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; }
 
         .item-card {
-            background: rgba(5, 5, 20, 0.7); backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; 
-            padding: 18px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            transition: all 0.3s ease; display: flex; flex-direction: column;
-            justify-content: space-between; position: relative; min-height: 140px; 
+            background: rgba(5, 5, 20, 0.65); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.07); border-radius: 10px; 
+            padding: 16px; box-shadow: 0 3px 12px rgba(0,0,0,0.18);
+            transition: all 0.25s ease; display: flex; flex-direction: column;
+            justify-content: space-between; position: relative; min-height: 130px; 
         }
         .item-card:hover {
-            background: rgba(10, 10, 25, 0.8); border-color: rgba(255, 255, 255, 0.15);
-            transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            background: rgba(10, 10, 25, 0.75); border-color: rgba(255, 255, 255, 0.12);
+            transform: translateY(-2px); box-shadow: 0 5px 18px rgba(0,0,0,0.28);
         }
-        .item-card-main { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
-        .item-card-icon svg { width: 30px; height: 30px; fill: #64b5f6; flex-shrink: 0; }
+        .item-card-main { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .item-card-icon svg { width: 28px; height: 28px; fill: #64b5f6; flex-shrink: 0; }
         .item-card-info { overflow: hidden; }
-        .item-card-name { font-size: 1rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: white; }
-        .item-card-filetype { font-size: 0.8rem; color: #90a4ae; } 
+        .item-card-name { font-size: 0.95rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: white; }
+        .item-card-filetype { font-size: 0.75rem; color: #90a4ae; } 
         .item-card-path {
-            font-size: 0.75rem; color: #64b5f6; margin: 8px 0; word-break: break-all;
-            max-height: 3em; overflow: hidden; text-overflow: ellipsis;
+            font-size: 0.7rem; color: #64b5f6; margin: 6px 0; word-break: break-all;
+            max-height: 2.8em; overflow: hidden; text-overflow: ellipsis;
             display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
         }
         .item-card-footer {
             margin-top: auto; display: flex; justify-content: space-between; align-items: center;
-            padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding-top: 8px; border-top: 1px solid rgba(255, 255, 255, 0.07);
         }
-        .item-card-date { font-size: 0.7rem; color: #78828c; }
-        .item-card-actions-trigger svg { width: 18px; height: 18px; }
+        .item-card-date { font-size: 0.65rem; color: #78828c; }
+        .item-card-actions-trigger svg { width: 16px; height: 16px; }
 
         .item-actions-menu {
-            display: none; position: absolute; background-color: rgba(20, 20, 40, 0.9); 
-            backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-            z-index: 500; min-width: 200px; overflow: hidden; padding: 8px; 
+            display: none; position: absolute; background-color: rgba(20, 20, 40, 0.88); 
+            backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 8px; box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+            z-index: 500; min-width: 190px; overflow: hidden; padding: 6px; 
         }
-        .item-actions-menu.show { display: block; animation: fadeIn 0.2s ease-out; }
-        html[dir="ltr"] .item-actions-menu { left: 10px; right:auto; } 
-        html[dir="rtl"] .item-actions-menu { right: 10px; left:auto; } 
+        .item-actions-menu.show { display: block; animation: fadeIn 0.15s ease-out; }
+        html[dir="ltr"] .item-actions-menu { left: 8px; right:auto; } 
+        html[dir="rtl"] .item-actions-menu { right: 8px; left:auto; } 
         .item-actions-menu button {
-            display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 15px;
-            background: none; border: none; cursor: pointer; font-size: 0.85rem;
-            color: #b0bec5; transition: all 0.2s ease; text-align: left; /* LTR default */
-            border-radius: 8px; margin: 0; 
+            display: flex; align-items: center; gap: 8px; width: 100%; padding: 9px 12px;
+            background: none; border: none; cursor: pointer; font-size: 0.8rem;
+            color: #b0bec5; transition: all 0.15s ease; text-align: left; 
+            border-radius: 6px; margin: 0; 
         }
         html[dir="rtl"] .item-actions-menu button { text-align: right; }
-        .item-actions-menu button svg { width: 15px; height: 15px; fill: currentColor; margin-right: 10px; margin-left:0; } /* LTR */
-        html[dir="rtl"] .item-actions-menu button svg { margin-left: 10px; margin-right: 0; }
-        .item-actions-menu button:hover { background-color: rgba(33, 150, 243, 0.2); color: #64b5f6; }
+        .item-actions-menu button svg { width: 14px; height: 14px; fill: currentColor; margin-right: 8px; margin-left:0; } 
+        html[dir="rtl"] .item-actions-menu button svg { margin-left: 8px; margin-right: 0; }
+        .item-actions-menu button:hover { background-color: rgba(33, 150, 243, 0.18); color: #64b5f6; }
         .item-actions-menu button:hover svg { fill: #64b5f6; }
-        .item-actions-menu button[data-action="delete"]:hover { background-color: rgba(244, 67, 54, 0.2); color: #f44336; }
+        .item-actions-menu button[data-action="delete"]:hover { background-color: rgba(244, 67, 54, 0.18); color: #f44336; }
         .item-actions-menu button[data-action="delete"]:hover svg { fill: #f44336; }
 
-        .empty-placeholder { text-align: center; padding: 40px 20px; color: #90a4ae; }
-        .empty-placeholder .icon svg { width: 50px; height: 50px; fill: rgba(255,255,255,0.2); margin-bottom: 15px; }
-        .empty-placeholder h3 { font-size: 1.4rem; margin-bottom: 8px; color: white;}
-        .empty-placeholder p { font-size: 1rem; }
+        .empty-placeholder { text-align: center; padding: 35px 18px; color: #90a4ae; }
+        .empty-placeholder .icon svg { width: 45px; height: 45px; fill: rgba(255,255,255,0.18); margin-bottom: 12px; }
+        .empty-placeholder h3 { font-size: 1.3rem; margin-bottom: 7px; color: white;}
+        .empty-placeholder p { font-size: 0.95rem; }
 
         .notification-toast {
-            position: fixed; bottom: 20px; background-color: rgba(20, 20, 40, 0.85); 
-            backdrop-filter: blur(10px); color: white; padding: 15px 22px;
-            border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-            z-index: 10000; opacity: 0; transform: translateY(20px) scale(0.95);
-            transition: opacity 0.3s ease-out, transform 0.3s ease-out;
-            max-width: 350px; font-size: 0.9rem;
-            border-left: 4px solid transparent; border-right:none; /* LTR */
+            position: fixed; bottom: 18px; background-color: rgba(20, 20, 40, 0.82); 
+            backdrop-filter: blur(10px); color: white; padding: 14px 20px;
+            border-radius: 10px; box-shadow: 0 5px 18px rgba(0,0,0,0.28);
+            z-index: 10000; opacity: 0; transform: translateY(18px) scale(0.96);
+            transition: opacity 0.25s ease-out, transform 0.25s ease-out;
+            max-width: 340px; font-size: 0.88rem;
+            border-left: 3px solid transparent; border-right:none; 
         }
-        html[dir="rtl"] .notification-toast { right: 20px; left: auto; border-right: 4px solid transparent; border-left:none; }
+        html[dir="rtl"] .notification-toast { right: 18px; left: auto; border-right: 3px solid transparent; border-left:none; }
         .notification-toast.show { opacity: 1; transform: translateY(0) scale(1); }
         .notification-toast.success { border-color: #4caf50; } 
         .notification-toast.error { border-color: #f44336; } 
@@ -368,161 +356,170 @@
         
         .loading-indicator, .modal-backdrop {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.7); backdrop-filter: blur(10px);
+            background-color: rgba(0, 0, 0, 0.65); backdrop-filter: blur(8px);
             display: flex; justify-content: center; align-items: center;
             z-index: 99998; opacity: 0; visibility: hidden;
-            transition: opacity 0.3s ease-out, visibility 0s 0.3s linear;
+            transition: opacity 0.25s ease-out, visibility 0s 0.25s linear;
         }
         #confirmModalBackdrop { z-index: 100001; } 
         .loading-indicator.show, .modal-backdrop.show { opacity: 1; visibility: visible; transition-delay: 0s; }
         .spinner {
-            width: 35px; height: 35px; border: 4px solid rgba(255, 255, 255, 0.2); 
-            border-top-color: #2196f3; border-radius: 50%; animation: spin 0.7s linear infinite;
+            width: 32px; height: 32px; border: 3.5px solid rgba(255, 255, 255, 0.18); 
+            border-top-color: #2196f3; border-radius: 50%; animation: spin 0.65s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
         .modal-dialog { 
-            background: rgba(10, 10, 30, 0.9); backdrop-filter: blur(20px);
-            padding: 25px 30px; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-            text-align: center; max-width: 400px; 
-            transform: scale(0.95) translateY(10px);
-            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
-            border: 1px solid rgba(255, 255, 255, 0.15); opacity: 0;
+            background: rgba(10, 10, 30, 0.88); backdrop-filter: blur(18px);
+            padding: 22px 28px; border-radius: 14px; box-shadow: 0 7px 30px rgba(0,0,0,0.38);
+            text-align: center; max-width: 380px; 
+            transform: scale(0.96) translateY(8px);
+            transition: transform 0.25s ease-out, opacity 0.25s ease-out;
+            border: 1px solid rgba(255, 255, 255, 0.12); opacity: 0;
         }
         .modal-backdrop.show .modal-dialog { transform: scale(1) translateY(0); opacity: 1; }
-        .modal-dialog p { margin-bottom: 20px; font-size: 1rem; color: white; }
-        .modal-dialog-actions { display: flex; justify-content: center; gap: 15px; }
-        .modal-dialog-actions button { min-width: 100px; }
+        .modal-dialog p { margin-bottom: 18px; font-size: 0.95rem; color: white; }
+        .modal-dialog-actions { display: flex; justify-content: center; gap: 12px; }
+        .modal-dialog-actions button { min-width: 90px; }
 
         #categoryManagerModal { z-index: 100000; } 
         .category-manager-content {
-            background: rgba(15, 15, 35, 0.95); backdrop-filter: blur(25px);
-            padding: 25px; border-radius: 16px; width: 90%; max-width: 600px; 
-            border: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-            transform: scale(0.95) translateY(10px);
-            transition: transform 0.3s ease-out, opacity 0.3s ease-out; opacity: 0;
+            background: rgba(15, 15, 35, 0.92); backdrop-filter: blur(22px);
+            padding: 22px; border-radius: 14px; width: 90%; max-width: 580px; 
+            border: 1px solid rgba(255, 255, 255, 0.12); box-shadow: 0 8px 35px rgba(0,0,0,0.45);
+            transform: scale(0.96) translateY(8px);
+            transition: transform 0.25s ease-out, opacity 0.25s ease-out; opacity: 0;
         }
         .modal-backdrop.show .category-manager-content { transform: scale(1) translateY(0); opacity: 1; }
         .category-manager-content h2 {
-            text-align: center; font-size: 1.8rem; font-weight: 700; margin-bottom: 25px;
+            text-align: center; font-size: 1.7rem; font-weight: 700; margin-bottom: 22px;
             background: linear-gradient(45deg, #4fc3f7, #29b6f6, #03a9f4); 
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             background-clip: text; text-fill-color: transparent;
         }
         #categoryListContainer {
-            max-height: 350px; overflow-y: auto; margin-bottom: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px;
-            padding: 10px; background-color: rgba(5, 5, 20, 0.5); 
+            max-height: 330px; overflow-y: auto; margin-bottom: 22px;
+            border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px;
+            padding: 8px; background-color: rgba(5, 5, 20, 0.45); 
         }
         .category-manager-item {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 12px 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            font-size: 0.95rem; color: white; transition: background-color 0.2s ease;
-            border-radius: 8px; margin-bottom: 5px; 
+            padding: 10px 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+            font-size: 0.9rem; color: white; transition: background-color 0.15s ease;
+            border-radius: 7px; margin-bottom: 4px; 
         }
-        .category-manager-item:hover { background-color: rgba(255,255,255,0.07); }
+        .category-manager-item:hover { background-color: rgba(255,255,255,0.06); }
         .category-manager-item:last-child { border-bottom: none; margin-bottom: 0; }
-        .category-manager-item-name-container { flex-grow: 1; display: flex; align-items: center; min-width: 0; gap: 10px; }
-        .category-manager-item-name { flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 3px 0; }
-        .category-name-input-inline { font-size: 0.95rem; padding: 8px 12px; margin: 0; height: auto; line-height: 1.5; width: 100%; }
-        .category-manager-item-controls { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-        .category-manager-item .btn-icon { margin-left: 0; margin-right: 0; padding: 8px; }
+        .category-manager-item-name-container { flex-grow: 1; display: flex; align-items: center; min-width: 0; gap: 8px; }
+        .category-manager-item-name { flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 2px 0; }
+        .category-name-input-inline { font-size: 0.9rem; padding: 7px 10px; margin: 0; height: auto; line-height: 1.4; width: 100%; }
+        .category-manager-item-controls { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+        .category-manager-item .btn-icon { margin-left: 0; margin-right: 0; padding: 7px; }
         .category-manager-item .btn-icon.btn-edit-managed-category { color: #64b5f6; } 
-        .category-manager-item .btn-icon.btn-edit-managed-category:hover { background-color: rgba(33, 150, 243, 0.15); }
+        .category-manager-item .btn-icon.btn-edit-managed-category:hover { background-color: rgba(33, 150, 243, 0.12); }
         .category-manager-item .btn-icon.btn-delete-managed-category { color: #f44336; } 
-        .category-manager-item .btn-icon.btn-delete-managed-category:hover { background-color: rgba(244, 67, 54, 0.15); }
+        .category-manager-item .btn-icon.btn-delete-managed-category:hover { background-color: rgba(244, 67, 54, 0.12); }
         .category-manager-item .btn-icon.btn-save-inline-edit { color: #4caf50; } 
-        .category-manager-item .btn-icon.btn-save-inline-edit:hover { background-color: rgba(76, 175, 80, 0.15); }
+        .category-manager-item .btn-icon.btn-save-inline-edit:hover { background-color: rgba(76, 175, 80, 0.12); }
         .category-manager-item .btn-icon.btn-cancel-inline-edit { color: #90a4ae; }
-        .category-manager-item .btn-icon.btn-cancel-inline-edit:hover { background-color: rgba(144, 164, 174, 0.15); }
-        .category-manager-item .btn-icon svg { width: 16px; height: 16px; }
+        .category-manager-item .btn-icon.btn-cancel-inline-edit:hover { background-color: rgba(144, 164, 174, 0.12); }
+        .category-manager-item .btn-icon svg { width: 15px; height: 15px; }
         .category-tag {
-            font-size: 0.7rem; padding: 4px 10px; border-radius: 20px; 
-            color: white; background-color: rgba(255, 255, 255, 0.1);
+            font-size: 0.65rem; padding: 3px 9px; border-radius: 18px; 
+            color: white; background-color: rgba(255, 255, 255, 0.08);
             font-weight: 500; flex-shrink: 0;
         }
-        .category-tag.custom { background-color: rgba(33, 150, 243, 0.3); color: #e3f2fd; } 
-        .add-category-form { display: flex; gap: 15px; margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+        .category-tag.custom { background-color: rgba(33, 150, 243, 0.25); color: #e3f2fd; } 
+        .add-category-form { display: flex; gap: 12px; margin-top: 18px; padding-top: 18px; border-top: 1px solid rgba(255, 255, 255, 0.08); }
         #newManagedCategoryInput { margin-bottom: 0; width: 100%; }
         #addManagedCategoryBtn { flex-shrink: 0; }
-        .category-manager-actions { text-align: center; margin-top:30px;}
+        .category-manager-actions { text-align: center; margin-top:25px;}
 
         /* --- To-Do List Specific Styles --- */
-        .todo-input-container { display: flex; gap: 12px; margin-bottom: 20px; }
-        .todo-input { /* Uses .input-field styles */ flex: 1; }
-        #todosContainer { display: flex; flex-direction: column; gap: 10px; }
+        .todo-input-container { display: flex; gap: 10px; margin-bottom: 18px; }
+        .todo-input { flex: 1; }
+        #todosContainer { display: flex; flex-direction: column; gap: 8px; }
         .todo-item {
             display: flex; align-items: center; justify-content: space-between;
-            padding: 12px 15px; background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px;
-            transition: all 0.3s ease;
+            padding: 10px 14px; background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 7px;
+            transition: all 0.25s ease;
         }
-        .todo-item:hover { background: rgba(255, 255, 255, 0.1); }
-        .todo-item.completed { background: rgba(76, 175, 80, 0.1); border-left-color: #4caf50; }
-        html[dir="rtl"] .todo-item.completed { border-right-color: #4caf50; border-left-color: rgba(255,255,255,0.1); }
-
-
-        .todo-item-left { display: flex; align-items: center; gap: 10px; flex-grow: 1; }
+        .todo-item:hover { background: rgba(255, 255, 255, 0.08); }
+        .todo-item.completed { background: rgba(76, 175, 80, 0.08); border-left-color: #4caf50; }
+        html[dir="rtl"] .todo-item.completed { border-right-color: #4caf50; border-left-color: rgba(255,255,255,0.08); }
+        .todo-item-left { display: flex; align-items: center; gap: 8px; flex-grow: 1; }
         .todo-checkbox {
-            width: 20px; height: 20px; border: 2px solid #64b5f6; border-radius: 6px;
+            width: 18px; height: 18px; border: 1.5px solid #64b5f6; border-radius: 5px;
             display: flex; align-items: center; justify-content: center; cursor: pointer;
-            transition: all 0.3s ease; flex-shrink: 0;
+            transition: all 0.25s ease; flex-shrink: 0;
         }
-        .todo-checkbox svg { width: 12px; height: 12px; fill: white; opacity: 0; transition: opacity 0.2s; }
+        .todo-checkbox svg { width: 11px; height: 11px; fill: white; opacity: 0; transition: opacity 0.15s; }
         .todo-item.completed .todo-checkbox { background: #4caf50; border-color: #4caf50; }
         .todo-item.completed .todo-checkbox svg { opacity: 1; }
-        .todo-text { color: white; transition: all 0.3s ease; word-break: break-word; }
-        .todo-item.completed .todo-text { text-decoration: line-through; opacity: 0.7; }
-        .todo-date { font-size: 0.75rem; color: #90a4ae; margin-left: auto; padding-left: 10px; flex-shrink: 0;} /* LTR */
-        html[dir="rtl"] .todo-date { margin-right: auto; padding-right: 10px; margin-left:0; padding-left:0;}
+        .todo-text { color: white; transition: all 0.25s ease; word-break: break-word; font-size: 0.9rem; }
+        .todo-item.completed .todo-text { text-decoration: line-through; opacity: 0.65; }
+        .todo-date { font-size: 0.7rem; color: #90a4ae; margin-left: auto; padding-left: 8px; flex-shrink: 0;}
+        html[dir="rtl"] .todo-date { margin-right: auto; padding-right: 8px; margin-left:0; padding-left:0;}
+        .todo-item .btn-icon { padding: 5px; } 
+        .todo-item .btn-icon svg { width: 13px; height: 13px; }
 
-        .todo-item .btn-icon { padding: 6px; } /* Smaller padding for todo delete */
-        .todo-item .btn-icon svg { width: 14px; height: 14px; }
+        /* Options Page Specific Styles */
+        #optionsPage .glass-card { padding: 25px; }
+        #optionsPage .options-group { margin-bottom: 25px; }
+        #optionsPage .options-group h3 {
+            font-size: 1.2rem; color: #64b5f6; margin-bottom: 15px;
+            padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        #optionsPage .options-group .btn { margin-top: 5px;}
 
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
-        .fade-in-item { animation: fadeIn 0.3s ease-out forwards; animation-delay: calc(var(--card-index, 0) * 0.05s); opacity: 0; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .fade-in-item { animation: fadeIn 0.25s ease-out forwards; animation-delay: calc(var(--card-index, 0) * 0.04s); opacity: 0; }
 
-        /* --- Responsive Adjustments --- */
         @media (max-width: 768px) {
-            body { padding: 0; font-size:13.5px; }
-            .main-content { margin-left: 0; margin-right:0; padding:10px; } /* Sidebar overlays on mobile */
+            body { padding: 0; font-size:13px; }
+            .main-content { margin-left: 0; margin-right:0; padding:10px; padding-top: calc(10px + 38px); }
             .main-content.expanded { margin-left: 0; margin-right:0; } 
-            
-            .sidebar { transform: translateX(-100%); box-shadow: 5px 0 15px rgba(0,0,0,0.2); } /* LTR default */
-            html[dir="rtl"] .sidebar { transform: translateX(100%); box-shadow: -5px 0 15px rgba(0,0,0,0.2); }
+            .sidebar { transform: translateX(-100%); box-shadow: 3px 0 12px rgba(0,0,0,0.15); } 
+            html[dir="rtl"] .sidebar { transform: translateX(100%); box-shadow: -3px 0 12px rgba(0,0,0,0.15); }
             .sidebar.show { transform: translateX(0); }
-
-            .container { margin: 10px; width:auto; }
-            .header { padding: 20px 15px; } .header h1 { font-size: 1.8rem; }
-            .top-actions-bar, .add-item-section, #itemsDisplayArea { padding: 15px; }
+            .container { margin: 8px; width:auto; }
+            .header { padding: 18px 12px; } .header h1 { font-size: 1.7rem; }
+            .top-actions-bar, .add-item-section, #itemsDisplayArea { padding: 12px; }
             .top-actions-bar { flex-direction: column; align-items: stretch; }
-            .top-actions-bar .btn { width: 100%; margin-bottom: 10px; }
-            .input-row { flex-direction: column; gap: 15px; }
-            .items-grid { grid-template-columns: 1fr; gap: 15px;} 
-            .item-card { min-height: auto; padding: 15px; } 
-            .notification-toast { max-width: calc(100% - 24px); bottom: 10px; left:12px; right:12px;}
-            .category-manager-content { max-width: 95%; padding: 20px;}
-            .modal-dialog { max-width: 90%; padding: 20px; }
+            .top-actions-bar .btn { width: 100%; margin-bottom: 8px; }
+            .input-row { flex-direction: column; gap: 12px; }
+            .items-grid { grid-template-columns: 1fr; gap: 12px;} 
+            .item-card { min-height: auto; padding: 12px; } 
+            .notification-toast { max-width: calc(100% - 20px); bottom: 8px; left:10px; right:10px;}
+            .category-manager-content { max-width: 96%; padding: 18px;}
+            .modal-dialog { max-width: 92%; padding: 18px; }
         }
         @media (max-width: 480px) {
-            .header h1 { font-size: 1.6rem; } .header p { font-size: 0.85rem; }
-            .btn { font-size: 0.85rem; padding: 10px 15px; } .btn-primary { padding: 10px 20px; }
-            .category-title { font-size: 1.05rem; }
-            .category-item-count { font-size: 0.7rem; padding: 2px 8px;}
-            .category-controls .btn-open-all-in-category { font-size: 0.75rem; padding: 6px 10px;}
-            .category-manager-content h2 { font-size: 1.5rem; }
-            .sidebar.collapsed { width: 60px; } 
-            .main-content.expanded { margin-left: 60px; } /* LTR */
-            html[dir="rtl"] .main-content.expanded { margin-right: 60px; }
+            .custom-title-bar { height: 32px; padding: 0 8px 0 10px; }
+            .sidebar { top: 32px; height: calc(100vh - 32px); }
+            .main-content { padding-top: calc(10px + 32px); height: calc(100vh - 32px); }
+            .header h1 { font-size: 1.5rem; } .header p { font-size: 0.8rem; }
+            .btn { font-size: 0.8rem; padding: 8px 14px; } .btn-primary { padding: 9px 18px; }
+            .category-title { font-size: 1rem; }
+            .category-item-count { font-size: 0.65rem; padding: 2px 7px;}
+            .category-controls .btn-open-all-in-category { font-size: 0.7rem; padding: 5px 9px;}
+            .category-manager-content h2 { font-size: 1.4rem; }
+            .sidebar.collapsed { width: 55px; } 
+            .main-content.expanded { margin-left: 55px; } 
+            html[dir="rtl"] .main-content.expanded { margin-right: 55px; }
         }
 
     </style>
 </head>
 <body>
-    <div class="window-controls">
-        <button class="window-btn minimize-btn" onclick="handleMinimizeWindow()" title="Minimize"></button>
-        <button class="window-btn close-btn" onclick="handleCloseWindow()" title="Close"></button>
+    <div class="custom-title-bar">
+        <span class="window-app-title">Hemo Paths Manager</span>
+        <div class="window-controls">
+            <button class="window-btn minimize-btn" onclick="handleMinimizeWindow()" title="Minimize"></button>
+            <button class="window-btn close-btn" onclick="handleCloseWindow()" title="Close"></button>
+        </div>
     </div>
 
     <nav class="sidebar" id="sidebar">
@@ -547,8 +544,12 @@
             </li>
             <li class="nav-item">
                 <a href="#" class="nav-link" onclick="showPage('todosPage')">
-                    <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"> <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/> </svg>
-                    <span class="nav-text">To-Do List</span>
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><use xlink:href="#icon-check"></use></svg> <span class="nav-text">To-Do List</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" onclick="showPage('optionsPage')"> <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><use xlink:href="#icon-settings"></use></svg>
+                    <span class="nav-text">Options</span>
                 </a>
             </li>
             <li class="nav-item">
@@ -571,9 +572,6 @@
                         <svg viewBox="0 0 24 24"><use xlink:href="#icon-folder"></use></svg>
                         Total Items: <span id="fileCount">0</span> </div>
                     <div>
-                        <button id="manageCategoriesBtn" class="btn btn-secondary">
-                            <svg viewBox="0 0 24 24"><use xlink:href="#icon-settings"></use></svg>
-                            Manage Categories </button>
                         <button id="openAllBtn" class="btn btn-primary">
                             <svg viewBox="0 0 24 24"><use xlink:href="#icon-rocket"></use></svg>
                             Open All </button>
@@ -608,8 +606,7 @@
                     <div id="selectedFilesDisplay"></div>
                 </div>
 
-                <div id="itemsDisplayArea">
-                    </div>
+                <div id="itemsDisplayArea"></div>
             </div>
         </div>
 
@@ -624,7 +621,7 @@
                 <div class="todo-input-container">
                     <input type="text" id="todoInput" class="input-field todo-input" placeholder="Add a new task...">
                     <button id="addTodoBtn" class="btn btn-primary">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;">
                             <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
                         </svg>
                         Add Task
@@ -635,6 +632,33 @@
             </div>
         </div>
 
+        <div id="optionsPage" class="page">
+            <div class="page-header-container">
+                <div>
+                    <h1 class="page-title">Options</h1>
+                    <p class="page-subtitle">Configure application settings and preferences</p>
+                </div>
+            </div>
+            <div class="glass-card">
+                <div class="options-group">
+                    <h3>Categories</h3>
+                    <p>Organize how your items are grouped.</p>
+                    <button id="manageCategoriesBtn" class="btn btn-secondary">
+                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-settings"></use></svg>
+                        Manage Categories
+                    </button>
+                </div>
+                <div class="options-group">
+                    <h3>Data Management</h3>
+                     <p>Manage all stored application data.</p>
+                    <button id="clearAllDataBtnOptionsPage" class="btn btn-danger"> <svg viewBox="0 0 24 24"><use xlink:href="#icon-clear-all"></use></svg>
+                        Clear All Application Data
+                    </button>
+                </div>
+            </div>
+        </div>
+
+
         <div id="aboutPage" class="page">
              <div class="page-header-container">
                 <div>
@@ -644,7 +668,7 @@
             </div>
             <div class="glass-card">
                 <h3>Hemo Paths Manager</h3>
-                <p>Version: 1.3 (Glass Theme & Features)</p>
+                <p>Version: 1.4 (Frameless & Enhanced)</p>
                 <p>Developed to streamline the management of your project file paths, website links, and tasks.</p>
                 <br>
                 <h4>Key Features:</h4>
@@ -685,36 +709,11 @@
         <symbol id="icon-settings" viewBox="0 0 24 24"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17-.59-1.69-.98l-2.49-1c-.23-.08-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12-.64l2 3.46c.12.22.39.3.61-.22l2.49-1c.52.4 1.08.73 1.69-.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l-.38-2.65c.61-.25 1.17-.59-1.69-.98l2.49 1c.23.08.49 0 .61.22l2-3.46c.12-.22-.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></symbol>
         <symbol id="icon-close" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></symbol>
         <symbol id="icon-check" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></symbol>
-
     </svg>
 
     <div id="notificationToast" class="notification-toast"></div>
-
-    <div id="confirmModalBackdrop" class="modal-backdrop">
-        <div class="modal-dialog">
-            <p id="confirmModalMessage"></p>
-            <div class="modal-dialog-actions">
-                <button id="confirmModalYesBtn" class="btn btn-danger">Yes</button> 
-                <button id="confirmModalNoBtn" class="btn btn-primary">No</button> 
-            </div>
-        </div>
-    </div>
-
-    <div id="categoryManagerModal" class="modal-backdrop">
-        <div class="category-manager-content">
-            <h2>Manage Categories</h2> 
-            <div id="categoryListContainer"></div>
-            <div class="add-category-form">
-                <input type="text" id="newManagedCategoryInput" class="input-field" placeholder="New category name"> 
-                <button id="addManagedCategoryBtn" class="btn btn-success">
-                    <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>Add Category </button>
-            </div>
-            <div class="category-manager-actions">
-                <button id="closeCategoryManagerBtn" class="btn btn-secondary">Close</button> 
-            </div>
-        </div>
-    </div>
-    
+    <div id="confirmModalBackdrop" class="modal-backdrop"> <div class="modal-dialog"> <p id="confirmModalMessage"></p> <div class="modal-dialog-actions"> <button id="confirmModalYesBtn" class="btn btn-danger">Yes</button> <button id="confirmModalNoBtn" class="btn btn-primary">No</button> </div> </div> </div>
+    <div id="categoryManagerModal" class="modal-backdrop"> <div class="category-manager-content"> <h2>Manage Categories</h2> <div id="categoryListContainer"></div> <div class="add-category-form"> <input type="text" id="newManagedCategoryInput" class="input-field" placeholder="New category name"> <button id="addManagedCategoryBtn" class="btn btn-success"> <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>Add Category </button> </div> <div class="category-manager-actions"> <button id="closeCategoryManagerBtn" class="btn btn-secondary">Close</button> </div> </div> </div>
     <div class="loading-indicator" id="loadingOverlay"> <div class="spinner"></div></div>
 
     <script>
@@ -722,61 +721,36 @@
     let shell = null, pathModule = null, ipcRenderer = null, electronClipboard = null;
     try {
         if (typeof require === 'function' && typeof window !== 'undefined' && window.process && window.process.type === 'renderer') {
-            shell = require('electron').shell;
-            pathModule = require('path');
-            ipcRenderer = require('electron').ipcRenderer;
-            electronClipboard = require('electron').clipboard;
+            shell = require('electron').shell; pathModule = require('path'); ipcRenderer = require('electron').ipcRenderer; electronClipboard = require('electron').clipboard;
             console.log("[Renderer] Electron environment detected.");
         }
-    } catch (e) { console.warn("[Renderer] Error loading Electron modules. Some features might be disabled.", e); }
+    } catch (e) { console.warn("[Renderer] Error loading Electron modules.", e); }
 
-    // Global state variables
-    let projectFiles = [];
-    let stagedFilePaths = []; 
-    let appCategories = [];
-    let todos = []; // For To-Do List
-
-    // DOM Elements Cache
+    let projectFiles = []; let stagedFilePaths = []; let appCategories = []; let todos = [];
     const DOM = {
-        sidebar: document.getElementById('sidebar'),
-        mainContent: document.getElementById('mainContent'),
-        selectedFilesDisplay: document.getElementById('selectedFilesDisplay'),
-        projectNameInput: document.getElementById('projectNameInput'),
-        categorySelectInput: document.getElementById('categorySelectInput'),
-        filesDisplayContainer: document.getElementById('itemsDisplayArea'),
-        fileCountDisplay: document.getElementById('fileCount'),
-        openAllBtn: document.getElementById('openAllBtn'),
-        selectFilesBtn: document.getElementById('selectFilesButton'),
-        addFolderLinkBtn: document.getElementById('addFolderLinkButton'),
-        importFromFolderBtn: document.getElementById('importFromFolderButton'),
-        pathInput: document.getElementById('pathInput'),
-        pastePathBtn: document.getElementById('pastePathButton'),
-        addPastedPathBtn: document.getElementById('addPastedPathButton'),
-        addItemsBtn: document.getElementById('addItemsButton'),
-        clearAllDataBtn: document.getElementById('clearAllDataBtn'),
-        loadingOverlay: document.getElementById('loadingOverlay'),
-        notification: document.getElementById('notificationToast'),
-        confirmModal: document.getElementById('confirmModalBackdrop'),
-        confirmModalMessage: document.getElementById('confirmModalMessage'),
-        confirmModalYesBtn: document.getElementById('confirmModalYesBtn'),
-        confirmModalNoBtn: document.getElementById('confirmModalNoBtn'),
-        manageCategoriesBtn: document.getElementById('manageCategoriesBtn'),
-        categoryManagerModal: document.getElementById('categoryManagerModal'),
-        categoryListContainer: document.getElementById('categoryListContainer'),
-        newManagedCategoryInput: document.getElementById('newManagedCategoryInput'),
-        addManagedCategoryBtn: document.getElementById('addManagedCategoryBtn'),
+        sidebar: document.getElementById('sidebar'), mainContent: document.getElementById('mainContent'),
+        selectedFilesDisplay: document.getElementById('selectedFilesDisplay'), projectNameInput: document.getElementById('projectNameInput'),
+        categorySelectInput: document.getElementById('categorySelectInput'), filesDisplayContainer: document.getElementById('itemsDisplayArea'),
+        fileCountDisplay: document.getElementById('fileCount'), openAllBtn: document.getElementById('openAllBtn'),
+        selectFilesBtn: document.getElementById('selectFilesButton'), addFolderLinkBtn: document.getElementById('addFolderLinkButton'),
+        importFromFolderBtn: document.getElementById('importFromFolderButton'), pathInput: document.getElementById('pathInput'),
+        pastePathBtn: document.getElementById('pastePathButton'), addPastedPathBtn: document.getElementById('addPastedPathButton'),
+        addItemsBtn: document.getElementById('addItemsButton'), clearAllDataBtn: document.getElementById('clearAllDataBtn'),
+        loadingOverlay: document.getElementById('loadingOverlay'), notification: document.getElementById('notificationToast'),
+        confirmModal: document.getElementById('confirmModalBackdrop'), confirmModalMessage: document.getElementById('confirmModalMessage'),
+        confirmModalYesBtn: document.getElementById('confirmModalYesBtn'), confirmModalNoBtn: document.getElementById('confirmModalNoBtn'),
+        manageCategoriesBtn: document.getElementById('manageCategoriesBtn'), // This will be the one in Options page
+        categoryManagerModal: document.getElementById('categoryManagerModal'), categoryListContainer: document.getElementById('categoryListContainer'),
+        newManagedCategoryInput: document.getElementById('newManagedCategoryInput'), addManagedCategoryBtn: document.getElementById('addManagedCategoryBtn'),
         closeCategoryManagerBtn: document.getElementById('closeCategoryManagerBtn'),
-        // To-Do List elements
-        todoInput: document.getElementById('todoInput'),
-        addTodoBtn: document.getElementById('addTodoBtn'),
-        todosContainer: document.getElementById('todosContainer')
+        todoInput: document.getElementById('todoInput'), addTodoBtn: document.getElementById('addTodoBtn'),
+        todosContainer: document.getElementById('todosContainer'),
+        clearAllDataBtnOptionsPage: document.getElementById('clearAllDataBtnOptionsPage') // Button in options
     };
 
-    // Storage Keys
-    const STORAGE_ITEMS_KEY = 'projectFileManagerData_v1.4_English'; 
-    const STORAGE_CATEGORIES_KEY = 'projectFileManagerCategories_v1.4_English';
-    const STORAGE_TODOS_KEY = 'projectFileManagerTodos_v1.4_English';
-
+    const STORAGE_ITEMS_KEY = 'projectFileManagerData_v1.5_Frameless'; 
+    const STORAGE_CATEGORIES_KEY = 'projectFileManagerCategories_v1.5_Frameless';
+    const STORAGE_TODOS_KEY = 'projectFileManagerTodos_v1.5_Frameless';
 
     const DEFAULT_CATEGORIES_STRUCTURE = [
         { key: 'auto_detect', display: '--- Auto-Detect Category ---', isCustom: false, isDefaultOption: true, order: 0, isEditable: false, isDeletable: false },
@@ -784,157 +758,70 @@
         { key: 'aftereffects', display: 'After Effects Projects', isCustom: false, order: 2, isEditable: true, isDeletable: false },
         { key: 'premiere', display: 'Premiere Pro Projects', isCustom: false, order: 3, isEditable: true, isDeletable: false },
         { key: 'folder', display: 'Folder Links', isCustom: false, order: 4, isEditable: true, isDeletable: false },
-        { key: 'website', display: 'Website Links', isCustom: false, order: 5, isEditable: true, isDeletable: false }, // New category
+        { key: 'website', display: 'Website Links', isCustom: false, order: 5, isEditable: true, isDeletable: false },
         { key: 'general', display: 'General Files', isCustom: false, order: 6, isEditable: true, isDeletable: false },
     ];
+    const FILE_TYPE_TO_DEFAULT_CAT_KEY = { 'photoshop': 'photoshop', 'aftereffects': 'aftereffects', 'premiere': 'premiere', 'folderLink': 'folder', 'websiteLink': 'website' };
     
-    const FILE_TYPE_TO_DEFAULT_CAT_KEY = {
-        'photoshop': 'photoshop', 'aftereffects': 'aftereffects', 'premiere': 'premiere', 
-        'folderLink': 'folder', 'websiteLink': 'website' // New mapping
-    };
-    
-    // --- Sidebar and Page Navigation ---
     function toggleSidebar() {
-        DOM.sidebar.classList.toggle('collapsed');
-        DOM.mainContent.classList.toggle('expanded');
-        // On mobile, if sidebar is opened by toggle, add 'show' for overlay behavior
-        if (window.innerWidth <= 768 && !DOM.sidebar.classList.contains('collapsed')) {
-            DOM.sidebar.classList.add('show');
-        } else if (window.innerWidth <= 768 && DOM.sidebar.classList.contains('collapsed')) {
-            DOM.sidebar.classList.remove('show');
-        }
+        DOM.sidebar.classList.toggle('collapsed'); DOM.mainContent.classList.toggle('expanded');
+        if (window.innerWidth <= 768 && !DOM.sidebar.classList.contains('collapsed')) { DOM.sidebar.classList.add('show'); } 
+        else if (window.innerWidth <= 768 && DOM.sidebar.classList.contains('collapsed')) { DOM.sidebar.classList.remove('show'); }
     }
-
     function showPage(pageId) {
         document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-        const targetPage = document.getElementById(pageId);
-        if (targetPage) {
-            targetPage.classList.add('active');
-        }
-        
+        const targetPage = document.getElementById(pageId); if (targetPage) targetPage.classList.add('active');
         document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
-        const activeLink = document.querySelector(`.nav-link[onclick="showPage('${pageId}')"]`);
-        if (activeLink) {
-            activeLink.classList.add('active');
-        }
-
-        if (window.innerWidth <= 768) {
-            DOM.sidebar.classList.add('collapsed'); // Always collapse on mobile after navigation
-            DOM.sidebar.classList.remove('show'); // Ensure overlay is hidden
-            DOM.mainContent.classList.add('expanded'); // Ensure content takes full width
-        }
+        const activeLink = document.querySelector(`.nav-link[onclick="showPage('${pageId}')"]`); if (activeLink) activeLink.classList.add('active');
+        if (window.innerWidth <= 768) { DOM.sidebar.classList.add('collapsed'); DOM.sidebar.classList.remove('show'); DOM.mainContent.classList.add('expanded'); }
     }
-    
-    function handleMinimizeWindow() {
-        if (ipcRenderer) ipcRenderer.send('minimize-window');
-        else showAppNotification('Minimize feature is available in the desktop app only.', 'warning');
-    }
-    function handleCloseWindow() {
-        if (ipcRenderer) ipcRenderer.send('close-window');
-        else showAppCustomConfirm("Are you sure you want to close this tab?", (confirmed) => { if (confirmed) window.close(); });
-    }
-
+    function handleMinimizeWindow() { if (ipcRenderer) ipcRenderer.send('minimize-window'); else showAppNotification('Minimize feature is available in the desktop app only.', 'warning'); }
+    function handleCloseWindow() { if (ipcRenderer) ipcRenderer.send('close-window'); else showAppCustomConfirm("Are you sure you want to close this tab?", (confirmed) => { if (confirmed) window.close(); }); }
     function escapeHTML(str) { return typeof str === 'string' ? str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'})[m]) : String(str); }
     function escapeAttr(str) { return typeof str === 'string' ? str.replace(/"/g, '&quot;') : String(str); }
-    
-    function showAppNotification(message, type = 'success') { 
-        const el = DOM.notification; 
-        el.textContent = message; 
-        el.className = `notification-toast ${type} show`; 
-        if (el.timeoutId) clearTimeout(el.timeoutId);
-        el.timeoutId = setTimeout(() => el.classList.remove('show'), 3500);
-    }
+    function showAppNotification(message, type = 'success') { const el = DOM.notification; el.textContent = message; el.className = `notification-toast ${type} show`; if (el.timeoutId) clearTimeout(el.timeoutId); el.timeoutId = setTimeout(() => el.classList.remove('show'), 3500); }
     function showAppLoading(isLoading) { DOM.loadingOverlay.classList.toggle('show', isLoading); }
-    
     function showAppCustomConfirm(message, callback) {
-        DOM.confirmModalMessage.textContent = message; 
-        DOM.confirmModal.classList.add('show');
-        const newYes = DOM.confirmModalYesBtn.cloneNode(true);
-        DOM.confirmModalYesBtn.parentNode.replaceChild(newYes, DOM.confirmModalYesBtn);
-        DOM.confirmModalYesBtn = newYes;
-        const newNo = DOM.confirmModalNoBtn.cloneNode(true);
-        DOM.confirmModalNoBtn.parentNode.replaceChild(newNo, DOM.confirmModalNoBtn);
-        DOM.confirmModalNoBtn = newNo;
+        DOM.confirmModalMessage.textContent = message; DOM.confirmModal.classList.add('show');
+        const newYes = DOM.confirmModalYesBtn.cloneNode(true); DOM.confirmModalYesBtn.parentNode.replaceChild(newYes, DOM.confirmModalYesBtn); DOM.confirmModalYesBtn = newYes;
+        const newNo = DOM.confirmModalNoBtn.cloneNode(true); DOM.confirmModalNoBtn.parentNode.replaceChild(newNo, DOM.confirmModalNoBtn); DOM.confirmModalNoBtn = newNo;
         DOM.confirmModalYesBtn.onclick = () => { DOM.confirmModal.classList.remove('show'); callback(true); };
         DOM.confirmModalNoBtn.onclick = () => { DOM.confirmModal.classList.remove('show'); callback(false); };
     }
-
     function clearStagedFilesDisplay() { stagedFilePaths = []; DOM.selectedFilesDisplay.textContent = ''; }
     function updateStagedPaths(paths, entryType, prefix) {
         if (paths && Array.isArray(paths) && paths.length > 0) {
-            stagedFilePaths = paths.map(p => ({ 
-                path: p, 
-                name: pathModule ? pathModule.basename(p) : p.substring(p.lastIndexOf(/[/\\]/) + 1), 
-                entryType 
-            }));
-            DOM.selectedFilesDisplay.textContent = `${prefix} ${stagedFilePaths.map(f => f.name).join(', ')}`;
-            DOM.pathInput.value = ''; 
+            stagedFilePaths = paths.map(p => ({ path: p, name: pathModule ? pathModule.basename(p) : p.substring(p.lastIndexOf(/[/\\]/) + 1), entryType }));
+            DOM.selectedFilesDisplay.textContent = `${prefix} ${stagedFilePaths.map(f => f.name).join(', ')}`; DOM.pathInput.value = ''; 
         } else if (!DOM.pathInput.value.trim()) { clearStagedFilesDisplay(); }
     }
-
     function populateCategoryDropdown() {
         DOM.categorySelectInput.innerHTML = '';
-        const sortedForDropdown = [...appCategories].sort((a,b) => (a.order === undefined ? Infinity : a.order) - (b.order === undefined ? Infinity : b.order));
-        sortedForDropdown.forEach(cat => {
-            const option = document.createElement('option');
-            option.value = cat.key; option.textContent = cat.display;
-            if (cat.isDefaultOption) option.selected = true;
-            DOM.categorySelectInput.appendChild(option);
-        });
+        const sortedForDropdown = [...appCategories].sort((a,b) => (a.order ?? Infinity) - (b.order ?? Infinity));
+        sortedForDropdown.forEach(cat => { const option = document.createElement('option'); option.value = cat.key; option.textContent = cat.display; if (cat.isDefaultOption) option.selected = true; DOM.categorySelectInput.appendChild(option); });
     }
-    
     function getFileType(pathOrName, entryType = 'file') {
         if (entryType === 'folderLink') return 'folderLink';
-        if (typeof pathOrName === 'string' && pathOrName.toLowerCase().startsWith('https://')) return 'websiteLink';
+        if (typeof pathOrName === 'string' && (pathOrName.toLowerCase().startsWith('https://') || pathOrName.toLowerCase().startsWith('http://'))) return 'websiteLink';
         if (!pathOrName || typeof pathOrName !== 'string') return 'unknown';
         const name = pathModule ? pathModule.basename(pathOrName) : pathOrName.substring(pathOrName.lastIndexOf(/[/\\]/) + 1);
         const ext = name.split('.').pop().toLowerCase();
-        return ext === 'psd' ? 'photoshop' 
-             : ext === 'aep' ? 'aftereffects' 
-             : ext === 'prproj' ? 'premiere' 
-             : 'unknown';
+        return ext === 'psd' ? 'photoshop' : ext === 'aep' ? 'aftereffects' : ext === 'prproj' ? 'premiere' : 'unknown';
     }
-
-    function determineItemCategoryKey(fileType, chosenKey) {
-        if (chosenKey && chosenKey !== 'auto_detect') return chosenKey;
-        return FILE_TYPE_TO_DEFAULT_CAT_KEY[fileType] || 'general';
-    }
-    function getCategoryDisplay(key) {
-        const cat = appCategories.find(c => c.key === key);
-        return cat ? cat.display : (key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' '));
-    }
-    
+    function determineItemCategoryKey(fileType, chosenKey) { if (chosenKey && chosenKey !== 'auto_detect') return chosenKey; return FILE_TYPE_TO_DEFAULT_CAT_KEY[fileType] || 'general'; }
+    function getCategoryDisplay(key) { const cat = appCategories.find(c => c.key === key); return cat ? cat.display : (key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ')); }
     function openCategoryManagerModal() { renderCategoryManagerList(); DOM.categoryManagerModal.classList.add('show'); DOM.newManagedCategoryInput.value = ''; DOM.newManagedCategoryInput.focus(); }
-    function closeCategoryManagerModal() {
-        const activeEditInput = DOM.categoryListContainer.querySelector('.category-name-input-inline');
-        if (activeEditInput) { cancelInlineEdit(activeEditInput.dataset.key, activeEditInput.closest('.category-manager-item')); }
-        DOM.categoryManagerModal.classList.remove('show');
-    }
-
+    function closeCategoryManagerModal() { const activeEditInput = DOM.categoryListContainer.querySelector('.category-name-input-inline'); if (activeEditInput) { cancelInlineEdit(activeEditInput.dataset.key, activeEditInput.closest('.category-manager-item')); } DOM.categoryManagerModal.classList.remove('show'); }
     function renderCategoryManagerList() {
         DOM.categoryListContainer.innerHTML = '';
         const manageableCategories = appCategories.filter(c => c.key !== 'auto_detect').sort((a,b) => (a.order ?? Infinity) - (b.order ?? Infinity));
         const orders = manageableCategories.map(c => c.order).filter(o => typeof o === 'number');
-        const minOrder = orders.length > 0 ? Math.min(...orders) : 0;
-        const maxOrder = orders.length > 0 ? Math.max(...orders) : 0;
-
+        const minOrder = orders.length > 0 ? Math.min(...orders) : 0; const maxOrder = orders.length > 0 ? Math.max(...orders) : 0;
         manageableCategories.forEach((cat) => {
             const itemDiv = document.createElement('div'); itemDiv.className = 'category-manager-item'; itemDiv.dataset.categoryKey = cat.key; 
             const isMinOrder = cat.order === minOrder; const isMaxOrder = cat.order === maxOrder;
             const canMoveUp = !isMinOrder && manageableCategories.length > 1; const canMoveDown = !isMaxOrder && manageableCategories.length > 1;
-            itemDiv.innerHTML = `
-                <div class="category-manager-item-name-container">
-                    <span class="category-tag ${cat.isCustom ? 'custom' : ''}">${cat.isCustom ? 'Custom' : 'Default'}</span>
-                    <span class="category-manager-item-name">${escapeHTML(cat.display)}</span>
-                </div>
-                <div class="category-manager-item-controls">
-                    <button class="btn-icon btn-move-managed-category-up" data-key="${escapeAttr(cat.key)}" title="Move Up" ${!canMoveUp ? 'disabled' : ''}><svg viewBox="0 0 24 24"><use xlink:href="#icon-arrow-up"></use></svg></button>
-                    <button class="btn-icon btn-move-managed-category-down" data-key="${escapeAttr(cat.key)}" title="Move Down" ${!canMoveDown ? 'disabled' : ''}><svg viewBox="0 0 24 24"><use xlink:href="#icon-arrow-down"></use></svg></button>
-                    <button class="btn-icon btn-edit-managed-category" data-key="${escapeAttr(cat.key)}" title="Edit Name" ${(!cat.isCustom && !cat.isEditable) ? 'disabled' : ''}><svg viewBox="0 0 24 24"><use xlink:href="#icon-edit"></use></svg></button>
-                    <button class="btn-icon btn-delete-managed-category" data-key="${escapeAttr(cat.key)}" title="Delete Category" ${!cat.isCustom || !cat.isDeletable ? 'disabled' : ''}><svg viewBox="0 0 24 24"><use xlink:href="#icon-delete"></use></svg></button>
-                    <button class="btn-icon btn-save-inline-edit" data-key="${escapeAttr(cat.key)}" title="Save Changes" style="display:none;"><svg viewBox="0 0 24 24"><use xlink:href="#icon-save"></use></svg></button>
-                    <button class="btn-icon btn-cancel-inline-edit" data-key="${escapeAttr(cat.key)}" title="Cancel Edit" style="display:none;"><svg viewBox="0 0 24 24"><use xlink:href="#icon-cancel"></use></svg></button>
-                </div>`;
+            itemDiv.innerHTML = `<div class="category-manager-item-name-container"><span class="category-tag ${cat.isCustom ? 'custom' : ''}">${cat.isCustom ? 'Custom' : 'Default'}</span><span class="category-manager-item-name">${escapeHTML(cat.display)}</span></div><div class="category-manager-item-controls"><button class="btn-icon btn-move-managed-category-up" data-key="${escapeAttr(cat.key)}" title="Move Up" ${!canMoveUp ? 'disabled' : ''}><svg viewBox="0 0 24 24"><use xlink:href="#icon-arrow-up"></use></svg></button><button class="btn-icon btn-move-managed-category-down" data-key="${escapeAttr(cat.key)}" title="Move Down" ${!canMoveDown ? 'disabled' : ''}><svg viewBox="0 0 24 24"><use xlink:href="#icon-arrow-down"></use></svg></button><button class="btn-icon btn-edit-managed-category" data-key="${escapeAttr(cat.key)}" title="Edit Name" ${(!cat.isCustom && !cat.isEditable) ? 'disabled' : ''}><svg viewBox="0 0 24 24"><use xlink:href="#icon-edit"></use></svg></button><button class="btn-icon btn-delete-managed-category" data-key="${escapeAttr(cat.key)}" title="Delete Category" ${!cat.isCustom || !cat.isDeletable ? 'disabled' : ''}><svg viewBox="0 0 24 24"><use xlink:href="#icon-delete"></use></svg></button><button class="btn-icon btn-save-inline-edit" data-key="${escapeAttr(cat.key)}" title="Save Changes" style="display:none;"><svg viewBox="0 0 24 24"><use xlink:href="#icon-save"></use></svg></button><button class="btn-icon btn-cancel-inline-edit" data-key="${escapeAttr(cat.key)}" title="Cancel Edit" style="display:none;"><svg viewBox="0 0 24 24"><use xlink:href="#icon-cancel"></use></svg></button></div>`;
             itemDiv.querySelector('.btn-edit-managed-category').addEventListener('click', (e) => activateInlineEdit(e.currentTarget.dataset.key, itemDiv));
             itemDiv.querySelector('.btn-delete-managed-category').addEventListener('click', (e) => handleDeleteManagedCategory(e.currentTarget.dataset.key));
             itemDiv.querySelector('.btn-move-managed-category-up').addEventListener('click', (e) => handleMoveCategory(e.currentTarget.dataset.key, 'up', true));
@@ -944,218 +831,123 @@
             DOM.categoryListContainer.appendChild(itemDiv);
         });
     }
-
     function activateInlineEdit(categoryKey, itemDiv) {
-        const currentlyEditing = DOM.categoryListContainer.querySelector('.category-name-input-inline');
+        const currentlyEditing = DOM.categoryListContainer.querySelector('.category-name-input-inline'); 
         if (currentlyEditing && currentlyEditing.dataset.key !== categoryKey) { cancelInlineEdit(currentlyEditing.dataset.key, currentlyEditing.closest('.category-manager-item'));}
-        const nameContainer = itemDiv.querySelector('.category-manager-item-name-container');
-        const nameSpan = itemDiv.querySelector('.category-manager-item-name');
-        const category = appCategories.find(c => c.key === categoryKey);
-        if (!nameSpan || !category || (!category.isCustom && !category.isEditable)) return;
-        const currentName = category.display;
-        const tagSpanHTML = nameContainer.querySelector('.category-tag').outerHTML; 
+        const nameContainer = itemDiv.querySelector('.category-manager-item-name-container'); const nameSpan = itemDiv.querySelector('.category-manager-item-name');
+        const category = appCategories.find(c => c.key === categoryKey); if (!nameSpan || !category || (!category.isCustom && !category.isEditable)) return;
+        const currentName = category.display; const tagSpanHTML = nameContainer.querySelector('.category-tag').outerHTML; 
         nameContainer.innerHTML = `<${tagSpanHTML}<input type="text" class="category-name-input-inline input-field" value="${escapeAttr(currentName)}" data-key="${categoryKey}" data-original-name="${escapeAttr(currentName)}">`;
-        const inputField = nameContainer.querySelector('.category-name-input-inline');
-        inputField.focus(); inputField.select(); 
-        itemDiv.querySelector('.btn-edit-managed-category').style.display = 'none';
-        itemDiv.querySelector('.btn-delete-managed-category').style.display = 'none'; 
-        itemDiv.querySelector('.btn-move-managed-category-up').style.display = 'none';
-        itemDiv.querySelector('.btn-move-managed-category-down').style.display = 'none';
-        itemDiv.querySelector('.btn-save-inline-edit').style.display = 'inline-flex';
-        itemDiv.querySelector('.btn-cancel-inline-edit').style.display = 'inline-flex';
-        inputField.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') { e.preventDefault(); saveInlineEdit(categoryKey, itemDiv); } 
-            else if (e.key === 'Escape') { cancelInlineEdit(categoryKey, itemDiv); }
-        });
+        const inputField = nameContainer.querySelector('.category-name-input-inline'); inputField.focus(); inputField.select(); 
+        itemDiv.querySelector('.btn-edit-managed-category').style.display = 'none'; itemDiv.querySelector('.btn-delete-managed-category').style.display = 'none'; 
+        itemDiv.querySelector('.btn-move-managed-category-up').style.display = 'none'; itemDiv.querySelector('.btn-move-managed-category-down').style.display = 'none';
+        itemDiv.querySelector('.btn-save-inline-edit').style.display = 'inline-flex'; itemDiv.querySelector('.btn-cancel-inline-edit').style.display = 'inline-flex';
+        inputField.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); saveInlineEdit(categoryKey, itemDiv); } else if (e.key === 'Escape') { cancelInlineEdit(categoryKey, itemDiv); } });
     }
-
     function saveInlineEdit(categoryKey, itemDiv) {
-        const inputField = itemDiv.querySelector('.category-name-input-inline');
-        const category = appCategories.find(c => c.key === categoryKey);
-        if (!inputField || !category) return;
-        const newDisplayName = inputField.value.trim();
-        const originalName = inputField.dataset.originalName;
+        const inputField = itemDiv.querySelector('.category-name-input-inline'); const category = appCategories.find(c => c.key === categoryKey);
+        if (!inputField || !category) return; const newDisplayName = inputField.value.trim(); const originalName = inputField.dataset.originalName;
         if (!newDisplayName) { showAppNotification("Category name cannot be empty.", "warning"); inputField.focus(); return; }
-        if (newDisplayName !== originalName && appCategories.some(cat => cat.key !== categoryKey && cat.display.toLowerCase() === newDisplayName.toLowerCase())) {
-            showAppNotification(`Category name "${newDisplayName}" already exists.`, 'warning'); inputField.focus(); return;
-        }
-        category.display = newDisplayName;
-        saveCategoriesToStorage(); renderCategoryManagerList(); populateCategoryDropdown(); renderProjectFilesUI(); 
-        showAppNotification("Category name updated.", "success");
+        if (newDisplayName !== originalName && appCategories.some(cat => cat.key !== categoryKey && cat.display.toLowerCase() === newDisplayName.toLowerCase())) { showAppNotification(`Category name "${newDisplayName}" already exists.`, 'warning'); inputField.focus(); return; }
+        category.display = newDisplayName; saveCategoriesToStorage(); renderCategoryManagerList(); populateCategoryDropdown(); renderProjectFilesUI(); showAppNotification("Category name updated.", "success");
     }
-
     function cancelInlineEdit(categoryKey, itemDiv) {
-        const category = appCategories.find(c => c.key === categoryKey);
-        if (!category || !itemDiv) return; 
+        const category = appCategories.find(c => c.key === categoryKey); if (!category || !itemDiv) return; 
         const nameContainer = itemDiv.querySelector('.category-manager-item-name-container');
         nameContainer.innerHTML = `<span class="category-tag ${category.isCustom ? 'custom' : ''}">${category.isCustom ? 'Custom' : 'Default'}</span><span class="category-manager-item-name">${escapeHTML(category.display)}</span>`;
-        itemDiv.querySelector('.btn-edit-managed-category').style.display = 'inline-flex';
-        itemDiv.querySelector('.btn-delete-managed-category').style.display = 'inline-flex';
-        itemDiv.querySelector('.btn-move-managed-category-up').style.display = 'inline-flex';
-        itemDiv.querySelector('.btn-move-managed-category-down').style.display = 'inline-flex';
-        itemDiv.querySelector('.btn-save-inline-edit').style.display = 'none';
-        itemDiv.querySelector('.btn-cancel-inline-edit').style.display = 'none';
+        itemDiv.querySelector('.btn-edit-managed-category').style.display = 'inline-flex'; itemDiv.querySelector('.btn-delete-managed-category').style.display = 'inline-flex';
+        itemDiv.querySelector('.btn-move-managed-category-up').style.display = 'inline-flex'; itemDiv.querySelector('.btn-move-managed-category-down').style.display = 'inline-flex';
+        itemDiv.querySelector('.btn-save-inline-edit').style.display = 'none'; itemDiv.querySelector('.btn-cancel-inline-edit').style.display = 'none';
     }
-
     function handleAddManagedCategory() {
         const displayName = DOM.newManagedCategoryInput.value.trim();
         if (!displayName) { showAppNotification("Category name cannot be empty.", "warning"); DOM.newManagedCategoryInput.focus(); return; }
-        if (appCategories.some(cat => cat.display.toLowerCase() === displayName.toLowerCase())) {
-            showAppNotification(`Category name "${displayName}" already exists.`, 'warning'); DOM.newManagedCategoryInput.focus(); return;
-        }
+        if (appCategories.some(cat => cat.display.toLowerCase() === displayName.toLowerCase())) { showAppNotification(`Category name "${displayName}" already exists.`, 'warning'); DOM.newManagedCategoryInput.focus(); return; }
         const nonAutoDetectCategories = appCategories.filter(c => c.key !== 'auto_detect');
         const orders = nonAutoDetectCategories.map(c => c.order).filter(o => typeof o === 'number');
         const maxOrder = orders.length > 0 ? Math.max(0, ...orders) : -1; 
         const newKey = `custom_${displayName.toLowerCase().replace(/\s+/g, '_')}_${Date.now().toString().slice(-5)}`;
         appCategories.push({ key: newKey, display: displayName, isCustom: true, order: maxOrder + 1, isEditable: true, isDeletable: true });
         saveCategoriesToStorage(); renderCategoryManagerList(); populateCategoryDropdown(); 
-        DOM.newManagedCategoryInput.value = ''; DOM.newManagedCategoryInput.focus();
-        showAppNotification(`Category "${displayName}" added.`, 'success');
+        DOM.newManagedCategoryInput.value = ''; DOM.newManagedCategoryInput.focus(); showAppNotification(`Category "${displayName}" added.`, 'success');
     }
-    
     function handleDeleteManagedCategory(categoryKey) {
         const category = appCategories.find(cat => cat.key === categoryKey);
-        if (!category || (!category.isCustom || !category.isDeletable)) { 
-            showAppNotification("Only custom, deletable categories can be removed.", "warning"); return;
-        }
+        if (!category || (!category.isCustom || !category.isDeletable)) { showAppNotification("Only custom, deletable categories can be removed.", "warning"); return; }
         showAppCustomConfirm(`Are you sure you want to delete category "${category.display}"? Items in this category will be moved to "General Files".`, (confirmed) => {
             if (confirmed) {
                 projectFiles.forEach(item => { if (item.category === categoryKey) item.category = 'general'; });
                 appCategories = appCategories.filter(cat => cat.key !== categoryKey);
-                let currentOrder = 0;
-                appCategories.filter(c => c.key !== 'auto_detect').sort((a,b) => (a.order || 0) - (b.order || 0)).forEach(c => c.order = currentOrder++);
-                saveItemsToStorage(); saveCategoriesToStorage();
-                renderCategoryManagerList(); populateCategoryDropdown(); renderProjectFilesUI();
+                let currentOrder = 0; appCategories.filter(c => c.key !== 'auto_detect').sort((a,b) => (a.order || 0) - (b.order || 0)).forEach(c => c.order = currentOrder++);
+                saveItemsToStorage(); saveCategoriesToStorage(); renderCategoryManagerList(); populateCategoryDropdown(); renderProjectFilesUI();
                 showAppNotification(`Category "${category.display}" deleted.`, "success");
             }
         });
     }
-    
     function handleMoveCategory(categoryKey, direction, isFromModal = false) {
-        let sortableCats = appCategories.filter(c => c.key !== 'auto_detect');
-        const catIndexInSortable = sortableCats.findIndex(cat => cat.key === categoryKey);
-        if (catIndexInSortable === -1) return; 
-        const targetIndexInSortable = direction === 'up' ? catIndexInSortable - 1 : catIndexInSortable + 1;
+        let sortableCats = appCategories.filter(c => c.key !== 'auto_detect'); const catIndexInSortable = sortableCats.findIndex(cat => cat.key === categoryKey);
+        if (catIndexInSortable === -1) return; const targetIndexInSortable = direction === 'up' ? catIndexInSortable - 1 : catIndexInSortable + 1;
         if (targetIndexInSortable < 0 || targetIndexInSortable >= sortableCats.length) return;
-        const catToMove = sortableCats[catIndexInSortable];
-        const catToSwapWith = sortableCats[targetIndexInSortable];
-        const appCatToMove = appCategories.find(c => c.key === catToMove.key);
-        const appCatToSwapWith = appCategories.find(c => c.key === catToSwapWith.key);
+        const catToMove = sortableCats[catIndexInSortable]; const catToSwapWith = sortableCats[targetIndexInSortable];
+        const appCatToMove = appCategories.find(c => c.key === catToMove.key); const appCatToSwapWith = appCategories.find(c => c.key === catToSwapWith.key);
         if (appCatToMove && appCatToSwapWith) {
-            const tempOrder = appCatToMove.order;
-            appCatToMove.order = appCatToSwapWith.order;
-            appCatToSwapWith.order = tempOrder;
+            const tempOrder = appCatToMove.order; appCatToMove.order = appCatToSwapWith.order; appCatToSwapWith.order = tempOrder;
             appCategories.sort((a,b) => (a.order ?? Infinity) - (b.order ?? Infinity));
             saveCategoriesToStorage(); populateCategoryDropdown(); renderProjectFilesUI();
             if (isFromModal) { renderCategoryManagerList(); }
         }
     }
-
     function handleProcessStagedItems() {
-        if (!stagedFilePaths || stagedFilePaths.length === 0) {
-            showAppNotification('Please select or paste items first.', 'warning'); return;
-        }
-        const groupName = DOM.projectNameInput.value.trim();
-        let addedCount = 0;
+        if (!stagedFilePaths || stagedFilePaths.length === 0) { showAppNotification('Please select or paste items first.', 'warning'); return; }
+        const groupName = DOM.projectNameInput.value.trim(); let addedCount = 0;
         stagedFilePaths.forEach(itemInfo => {
             const { path, name, entryType = 'file' } = itemInfo; 
             if (!path || typeof path !== 'string' || projectFiles.some(pf => pf.location.toLowerCase() === path.toLowerCase())) {
-                if (projectFiles.some(pf => pf.location.toLowerCase() === path.toLowerCase())) {
-                    showAppNotification(`Item "${name}" already exists.`, 'warning');
-                } return; 
+                if (projectFiles.some(pf => pf.location.toLowerCase() === path.toLowerCase())) { showAppNotification(`Item "${name}" already exists.`, 'warning'); } return; 
             }
-            const itemType = getFileType(path, entryType); // Pass full path for website detection
+            const itemType = getFileType(path, entryType); 
             const catKey = determineItemCategoryKey(itemType, DOM.categorySelectInput.value); 
-            projectFiles.push({
-                id: Date.now() + Math.random(), 
-                name: groupName ? `${groupName} - ${name}` : name,
-                actualName: name, location: path, type: itemType, category: catKey, entryType,
-                dateAdded: new Date().toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' }) 
-            });
+            projectFiles.push({ id: Date.now() + Math.random(), name: groupName ? `${groupName} - ${name}` : name, actualName: name, location: path, type: itemType, category: catKey, entryType, dateAdded: new Date().toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' }) });
             addedCount++;
         });
-        if (addedCount > 0) {
-            saveItemsToStorage(); renderProjectFilesUI();
-            showAppNotification(`✨ Added ${addedCount} item(s)!`, 'success');
-        }
-        DOM.projectNameInput.value = ''; clearStagedFilesDisplay();
-        DOM.categorySelectInput.value = 'auto_detect'; 
+        if (addedCount > 0) { saveItemsToStorage(); renderProjectFilesUI(); showAppNotification(`✨ Added ${addedCount} item(s)!`, 'success'); }
+        DOM.projectNameInput.value = ''; clearStagedFilesDisplay(); DOM.categorySelectInput.value = 'auto_detect'; 
         if (addedCount > 0) DOM.projectNameInput.focus(); 
     }
-
     function renderProjectFilesUI() {
-        DOM.fileCountDisplay.textContent = projectFiles.length;
-        DOM.openAllBtn.disabled = projectFiles.length === 0;
-        DOM.filesDisplayContainer.innerHTML = '';
-        if (projectFiles.length === 0) {
-            DOM.filesDisplayContainer.innerHTML = `<div class="empty-placeholder"><div class="icon"><svg viewBox="0 0 24 24"><use xlink:href="#icon-empty-folder"></use></svg></div><h3>List is empty.</h3><p>Start by adding files, folders, or website links.</p></div>`;
-            return;
-        }
-        const grouped = projectFiles.reduce((acc, item) => {
-            const key = item.category || 'general'; 
-            if (!acc[key]) acc[key] = [];
-            acc[key].push(item); return acc;
-        }, {});
-        const sortedKeys = Object.keys(grouped).sort((a, b) => {
-            const catA = appCategories.find(c => c.key === a) || { order: Infinity, display: a }; 
-            const catB = appCategories.find(c => c.key === b) || { order: Infinity, display: b };
-            return (catA.order ?? Infinity) - (catB.order ?? Infinity) || catA.display.localeCompare(catB.display, 'en'); 
-        });
+        DOM.fileCountDisplay.textContent = projectFiles.length; DOM.openAllBtn.disabled = projectFiles.length === 0; DOM.filesDisplayContainer.innerHTML = '';
+        if (projectFiles.length === 0) { DOM.filesDisplayContainer.innerHTML = `<div class="empty-placeholder"><div class="icon"><svg viewBox="0 0 24 24"><use xlink:href="#icon-empty-folder"></use></svg></div><h3>List is empty.</h3><p>Start by adding files, folders, or website links.</p></div>`; return; }
+        const grouped = projectFiles.reduce((acc, item) => { const key = item.category || 'general'; if (!acc[key]) acc[key] = []; acc[key].push(item); return acc; }, {});
+        const sortedKeys = Object.keys(grouped).sort((a, b) => { const catA = appCategories.find(c => c.key === a) || { order: Infinity, display: a }; const catB = appCategories.find(c => c.key === b) || { order: Infinity, display: b }; return (catA.order ?? Infinity) - (catB.order ?? Infinity) || catA.display.localeCompare(catB.display, 'en'); });
         sortedKeys.forEach(catKey => {
-            const items = grouped[catKey];
-            const section = document.createElement('div'); section.className = 'category-section collapsed'; section.dataset.categoryKey = catKey;
-            const header = document.createElement('div'); header.className = 'category-header';
-            const catDisplay = getCategoryDisplay(catKey);
-            const categoryObject = appCategories.find(c => c.key === catKey);
-            const sortableCatsForOrderCheck = appCategories.filter(c => c.key !== 'auto_detect');
+            const items = grouped[catKey]; const section = document.createElement('div'); section.className = 'category-section collapsed'; section.dataset.categoryKey = catKey;
+            const header = document.createElement('div'); header.className = 'category-header'; const catDisplay = getCategoryDisplay(catKey);
+            const categoryObject = appCategories.find(c => c.key === catKey); const sortableCatsForOrderCheck = appCategories.filter(c => c.key !== 'auto_detect');
             const orders = sortableCatsForOrderCheck.map(c => c.order).filter(o => typeof o === 'number');
-            const minOrder = orders.length > 0 ? Math.min(...orders) : 0;
-            const maxOrder = orders.length > 0 ? Math.max(...orders) : 0;
-            const isMinOrder = categoryObject && categoryObject.order === minOrder;
-            const isMaxOrder = categoryObject && categoryObject.order === maxOrder;
+            const minOrder = orders.length > 0 ? Math.min(...orders) : 0; const maxOrder = orders.length > 0 ? Math.max(...orders) : 0;
+            const isMinOrder = categoryObject && categoryObject.order === minOrder; const isMaxOrder = categoryObject && categoryObject.order === maxOrder;
             const canMoveUp = categoryObject && categoryObject.key !== 'auto_detect' && !isMinOrder && sortableCatsForOrderCheck.length > 1;
             const canMoveDown = categoryObject && categoryObject.key !== 'auto_detect' && !isMaxOrder && sortableCatsForOrderCheck.length > 1;
             const chevronIcon = document.dir === 'rtl' ? '#icon-chevron-left' : '#icon-chevron-right';
-            header.innerHTML = `
-                <div class="category-title-container">
-                    <span class="category-toggle-icon"><svg viewBox="0 0 24 24"><use xlink:href="${chevronIcon}"></use></svg></span>
-                    <h2 class="category-title">${escapeHTML(catDisplay)}</h2>
-                    <span class="category-item-count">(${items.length})</span>
-                </div>
-                <div class="category-controls">
-                    <button class="btn-icon btn-move-category-up" title="Move Category Up" data-category-key="${escapeAttr(catKey)}" ${!canMoveUp ? 'disabled' : ''}><svg viewBox="0 0 24 24"><use xlink:href="#icon-arrow-up"></use></svg></button>
-                    <button class="btn-icon btn-move-category-down" title="Move Category Down" data-category-key="${escapeAttr(catKey)}" ${!canMoveDown ? 'disabled' : ''}><svg viewBox="0 0 24 24"><use xlink:href="#icon-arrow-down"></use></svg></button>
-                    <button class="btn btn-secondary btn-open-all-in-category" data-category-key="${escapeAttr(catKey)}">
-                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-folder"></use></svg>Open All in Category
-                    </button>
-                </div>`;
+            header.innerHTML = `<div class="category-title-container"><span class="category-toggle-icon"><svg viewBox="0 0 24 24"><use xlink:href="${chevronIcon}"></use></svg></span><h2 class="category-title">${escapeHTML(catDisplay)}</h2><span class="category-item-count">(${items.length})</span></div><div class="category-controls"><button class="btn-icon btn-move-category-up" title="Move Category Up" data-category-key="${escapeAttr(catKey)}" ${!canMoveUp ? 'disabled' : ''}><svg viewBox="0 0 24 24"><use xlink:href="#icon-arrow-up"></use></svg></button><button class="btn-icon btn-move-category-down" title="Move Category Down" data-category-key="${escapeAttr(catKey)}" ${!canMoveDown ? 'disabled' : ''}><svg viewBox="0 0 24 24"><use xlink:href="#icon-arrow-down"></use></svg></button><button class="btn btn-secondary btn-open-all-in-category" data-category-key="${escapeAttr(catKey)}"><svg viewBox="0 0 24 24"><use xlink:href="#icon-folder"></use></svg>Open All in Category</button></div>`;
             header.querySelector('.category-title-container').addEventListener('click', () => section.classList.toggle('collapsed'));
             header.querySelector('.btn-open-all-in-category').addEventListener('click', (e) => { e.stopPropagation(); handleOpenAllFilesInCategory(e); });
             header.querySelector('.btn-move-category-up').addEventListener('click', (e) => { e.stopPropagation(); handleMoveCategory(e.currentTarget.dataset.categoryKey, 'up'); });
             header.querySelector('.btn-move-category-down').addEventListener('click', (e) => { e.stopPropagation(); handleMoveCategory(e.currentTarget.dataset.categoryKey, 'down'); });
             const grid = document.createElement('div'); grid.className = 'items-grid';
-            items.forEach((item, idx) => {
-                const cardHTML = createFileCardHTML(item, idx);
-                const tempDiv = document.createElement('div'); tempDiv.innerHTML = cardHTML.trim();
-                const cardElement = tempDiv.firstChild;
-                if (cardElement) { cardElement.classList.add('fade-in-item'); grid.appendChild(cardElement); }
-            });
+            items.forEach((item, idx) => { const cardHTML = createFileCardHTML(item, idx); const tempDiv = document.createElement('div'); tempDiv.innerHTML = cardHTML.trim(); const cardElement = tempDiv.firstChild; if (cardElement) { cardElement.classList.add('fade-in-item'); grid.appendChild(cardElement); } });
             section.appendChild(header); section.appendChild(grid); DOM.filesDisplayContainer.appendChild(section);
         });
         DOM.filesDisplayContainer.querySelectorAll('.path-card-options-btn').forEach(btn => btn.addEventListener('click', handleOptionsMenu));
     }
-    
     function handleOptionsMenu(event) {
-        event.stopPropagation(); 
-        const itemId = event.currentTarget.dataset.itemId; const menuId = `options-menu-${itemId}`;
-        const currentMenu = document.getElementById(menuId);
+        event.stopPropagation(); const itemId = event.currentTarget.dataset.itemId; const menuId = `options-menu-${itemId}`; const currentMenu = document.getElementById(menuId);
         document.querySelectorAll('.item-actions-menu.show').forEach(m => { if (m.id !== menuId) { m.classList.remove('show'); } });
         if (currentMenu) {
             currentMenu.classList.toggle('show'); 
             if (currentMenu.classList.contains('show')) { 
                 const btnRect = event.currentTarget.getBoundingClientRect(); let top = btnRect.height + 5; 
-                let positionProp = document.dir === 'rtl' ? 'right' : 'left';
-                let oppositeProp = document.dir === 'rtl' ? 'left' : 'right';
+                let positionProp = document.dir === 'rtl' ? 'right' : 'left'; let oppositeProp = document.dir === 'rtl' ? 'left' : 'right';
                 currentMenu.style[positionProp] = '0px'; currentMenu.style[oppositeProp] = 'auto'; currentMenu.style.top = `${top}px`;
                 const menuRect = currentMenu.getBoundingClientRect(); const viewportWidth = window.innerWidth; const viewportHeight = window.innerHeight;
                 if (document.dir === 'rtl') { if (menuRect.left < 10) { currentMenu.style.right = 'auto'; currentMenu.style.left = '0px'; } } 
@@ -1165,419 +957,122 @@
             }
         }
     }
-    
-    document.addEventListener('click', e => { 
-        if (!e.target.closest('.path-card-options-btn') && !e.target.closest('.item-actions-menu')) {
-            document.querySelectorAll('.item-actions-menu.show').forEach(m => m.classList.remove('show'));
-        }
-    });
-
+    document.addEventListener('click', e => { if (!e.target.closest('.path-card-options-btn') && !e.target.closest('.item-actions-menu')) { document.querySelectorAll('.item-actions-menu.show').forEach(m => m.classList.remove('show')); } });
     function createFileCardHTML(item, index) {
-        let typeDisplay = 'File';
-        let iconId = 'icon-file';
-
-        if (item.entryType === 'folderLink') {
-            typeDisplay = 'Folder Link';
-            iconId = 'icon-folder';
-        } else if (item.type === 'websiteLink') {
-            typeDisplay = 'Website Link';
-            iconId = 'icon-website'; // New icon
-        } else if (FILE_TYPE_TO_DEFAULT_CAT_KEY[item.type]) {
-            typeDisplay = getCategoryDisplay(FILE_TYPE_TO_DEFAULT_CAT_KEY[item.type]);
-            if (item.type === 'photoshop') iconId = 'icon-photoshop';
-            else if (item.type === 'aftereffects') iconId = 'icon-aftereffects';
-            else if (item.type === 'premiere') iconId = 'icon-premiere';
-        }
-        
+        let typeDisplay = 'File'; let iconId = 'icon-file';
+        if (item.entryType === 'folderLink') { typeDisplay = 'Folder Link'; iconId = 'icon-folder'; } 
+        else if (item.type === 'websiteLink') { typeDisplay = 'Website Link'; iconId = 'icon-website'; } 
+        else if (FILE_TYPE_TO_DEFAULT_CAT_KEY[item.type]) { typeDisplay = getCategoryDisplay(FILE_TYPE_TO_DEFAULT_CAT_KEY[item.type]); if (item.type === 'photoshop') iconId = 'icon-photoshop'; else if (item.type === 'aftereffects') iconId = 'icon-aftereffects'; else if (item.type === 'premiere') iconId = 'icon-premiere'; }
         const openActionText = item.type === 'websiteLink' ? 'Open Website' : 'Open';
         const openIcon = item.type === 'websiteLink' ? 'icon-website' : (item.entryType === 'folderLink' ? 'icon-folder' : 'icon-open');
-
-
-        return `
-            <div class="item-card" style="--card-index: ${index};">
-                <div class="item-card-main">
-                    <span class="item-card-icon"><svg viewBox="0 0 24 24"><use xlink:href="#${iconId}"></use></svg></span>
-                    <div class="item-card-info">
-                        <div class="item-card-name" title="${escapeAttr(item.name)}">${escapeHTML(item.name)}</div>
-                        <div class="item-card-filetype">${escapeHTML(typeDisplay)}</div>
-                    </div>
-                </div>
-                <div class="item-card-path" title="${escapeAttr(item.location)}">${escapeHTML(item.location)}</div>
-                <div class="item-card-footer">
-                    <span class="item-card-date">Added: ${item.dateAdded}</span>
-                    <button class="btn btn-icon path-card-options-btn" data-item-id="${item.id}" title="Options"><svg viewBox="0 0 24 24"><use xlink:href="#icon-options"></use></svg></button>
-                </div>
-                <div class="item-actions-menu" id="options-menu-${item.id}">
-                    <button data-action="open" data-id="${item.id}"><svg viewBox="0 0 24 24"><use xlink:href="#${openIcon}"></use></svg>${openActionText}</button>
-                    ${item.type !== 'websiteLink' ? `<button data-action="show-location" data-id="${item.id}"><svg viewBox="0 0 24 24"><use xlink:href="#icon-show-location"></use></svg>Open File Location</button>` : ''}
-                    <button data-action="delete" data-id="${item.id}"><svg viewBox="0 0 24 24"><use xlink:href="#icon-delete"></use></svg>Delete from List</button>
-                </div>
-            </div>`;
+        return `<div class="item-card" style="--card-index: ${index};"><div class="item-card-main"><span class="item-card-icon"><svg viewBox="0 0 24 24"><use xlink:href="#${iconId}"></use></svg></span><div class="item-card-info"><div class="item-card-name" title="${escapeAttr(item.name)}">${escapeHTML(item.name)}</div><div class="item-card-filetype">${escapeHTML(typeDisplay)}</div></div></div><div class="item-card-path" title="${escapeAttr(item.location)}">${escapeHTML(item.location)}</div><div class="item-card-footer"><span class="item-card-date">Added: ${item.dateAdded}</span><button class="btn btn-icon path-card-options-btn" data-item-id="${item.id}" title="Options"><svg viewBox="0 0 24 24"><use xlink:href="#icon-options"></use></svg></button></div><div class="item-actions-menu" id="options-menu-${item.id}"><button data-action="open" data-id="${item.id}"><svg viewBox="0 0 24 24"><use xlink:href="#${openIcon}"></use></svg>${openActionText}</button>${item.type !== 'websiteLink' ? `<button data-action="show-location" data-id="${item.id}"><svg viewBox="0 0 24 24"><use xlink:href="#icon-show-location"></use></svg>Open File Location</button>` : ''}<button data-action="delete" data-id="${item.id}"><svg viewBox="0 0 24 24"><use xlink:href="#icon-delete"></use></svg>Delete from List</button></div></div>`;
     }
-
-    function openItem(location, entryType = 'file', itemType = 'unknown') { // Added itemType
-        if (!shell && itemType !== 'websiteLink') { // Allow website links to open in browser even without Electron
-            showAppNotification('This feature is available in the desktop app only.', 'warning'); return;
-        }
+    function openItem(location, entryType = 'file', itemType = 'unknown') {
+        if (!shell && itemType !== 'websiteLink') { showAppNotification('This feature is available in the desktop app only.', 'warning'); return; }
         if (!location || typeof location !== 'string') { showAppNotification('❌ Invalid path/URL.', 'error'); return; }
-        
-        if (itemType === 'websiteLink') { // Handle website links
-            try {
-                // For web environment, directly use window.open
-                // For Electron, shell.openExternal is preferred for security.
-                if (shell && shell.openExternal) {
-                    shell.openExternal(location);
-                } else {
-                    window.open(location, '_blank', 'noopener,noreferrer');
-                }
-                showAppNotification(`✅ Opening website...`, 'success');
-            } catch (e) {
-                showAppNotification(`❌ Error opening website: ${e.message}`, 'error');
-            }
-            return;
-        }
-
-        // Existing logic for files/folders
+        if (itemType === 'websiteLink') { try { if (shell && shell.openExternal) { shell.openExternal(location); } else { window.open(location, '_blank', 'noopener,noreferrer'); } showAppNotification(`✅ Opening website...`, 'success'); } catch (e) { showAppNotification(`❌ Error opening website: ${e.message}`, 'error'); } return; }
         showAppLoading(true);
-        shell.openPath(location)
-            .then(errMessage => { 
-                showAppLoading(false); 
-                if (errMessage) { showAppNotification(`❌ Error opening ${entryType === 'folderLink' ? 'folder' : 'file'}: ${errMessage.split('\n')[0]}`, 'error');  } 
-                else { showAppNotification(`✅ Opened ${entryType === 'folderLink' ? 'folder' : 'file'}.`, 'success'); }
-            })
-            .catch(e => { showAppLoading(false); showAppNotification(`❌ Exception opening item: ${e.message}`, 'error'); });
+        shell.openPath(location).then(errMessage => { showAppLoading(false); if (errMessage) { showAppNotification(`❌ Error opening ${entryType === 'folderLink' ? 'folder' : 'file'}: ${errMessage.split('\n')[0]}`, 'error');  } else { showAppNotification(`✅ Opened ${entryType === 'folderLink' ? 'folder' : 'file'}.`, 'success'); } }).catch(e => { showAppLoading(false); showAppNotification(`❌ Exception opening item: ${e.message}`, 'error'); });
     }
-
     function showItemInFolder(itemPath, entryType = 'file') {
-        if (entryType === 'websiteLink') { // This action doesn't apply to websites
-            showAppNotification('This action is not applicable to website links.', 'info');
-            return;
-        }
+        if (entryType === 'websiteLink') { showAppNotification('This action is not applicable to website links.', 'info'); return; }
         if (!shell || !pathModule) { showAppNotification('This feature is available in the desktop app only.', 'warning'); return; }
         if (!itemPath || typeof itemPath !== 'string') { showAppNotification('❌ Invalid path.', 'error'); return; }
         showAppLoading(true);
-        setTimeout(() => { 
-            try {
-                if (entryType === 'folderLink') { 
-                    shell.openPath(itemPath)
-                        .then(errMessage => {
-                            if (errMessage) showAppNotification('❌ Error opening folder location: ' + errMessage.split('\n')[0], 'error');
-                            else showAppNotification('✅ Opened folder location.', 'success');
-                        }).catch(e => showAppNotification('❌ Exception opening folder location: ' + e.message, 'error'));
-                } else { 
-                    shell.showItemInFolder(itemPath); 
-                    showAppNotification('✅ Shown file in folder.', 'success');
-                }
-            } catch (e) {
-                try { 
-                    shell.openPath(pathModule.dirname(itemPath))
-                        .then(errMessage => {
-                            if (errMessage) showAppNotification('❌ Error opening containing folder: ' + errMessage.split('\n')[0], 'error');
-                            else showAppNotification('✅ Opened containing folder.', 'success');
-                        }).catch(e2 => showAppNotification('❌ Exception opening containing folder: ' + e2.message, 'error'));
-                }
-                catch (e2) { showAppNotification('❌ Critical error opening location.', 'error');}
-            }
-            showAppLoading(false);
-        }, 100);
+        setTimeout(() => { try { if (entryType === 'folderLink') { shell.openPath(itemPath).then(errMessage => { if (errMessage) showAppNotification('❌ Error opening folder location: ' + errMessage.split('\n')[0], 'error'); else showAppNotification('✅ Opened folder location.', 'success'); }).catch(e => showAppNotification('❌ Exception opening folder location: ' + e.message, 'error')); } else { shell.showItemInFolder(itemPath); showAppNotification('✅ Shown file in folder.', 'success'); } } catch (e) { try { shell.openPath(pathModule.dirname(itemPath)).then(errMessage => { if (errMessage) showAppNotification('❌ Error opening containing folder: ' + errMessage.split('\n')[0], 'error'); else showAppNotification('✅ Opened containing folder.', 'success'); }).catch(e2 => showAppNotification('❌ Exception opening containing folder: ' + e2.message, 'error')); } catch (e2) { showAppNotification('❌ Critical error opening location.', 'error');} } showAppLoading(false); }, 100);
     }
-    function deleteItemEntry(id) {
-        showAppCustomConfirm('Are you sure you want to remove this entry from the list? (The actual file/folder/website will NOT be deleted).', conf => {
-            if (conf) { projectFiles = projectFiles.filter(i => i.id !== id); saveItemsToStorage(); renderProjectFilesUI(); showAppNotification('🗑️ Entry removed from list.', 'success');}
-        });
-    }
-    function clearAllData() {
-        showAppCustomConfirm('Are you sure you want to delete all data (all listed items and custom categories)? This action cannot be undone.', conf => {
-            if (conf) {
-                projectFiles = []; 
-                appCategories = DEFAULT_CATEGORIES_STRUCTURE.map(cat => ({...cat})); 
-                todos = []; // Clear todos as well
-                saveItemsToStorage(); saveCategoriesToStorage(); saveTodos();
-                populateCategoryDropdown(); renderProjectFilesUI(); renderTodos();
-                clearStagedFilesDisplay(); DOM.pathInput.value = '';
-                showAppNotification('🗑️ All data has been cleared.', 'success');
-            }
-        });
-    }
+    function deleteItemEntry(id) { showAppCustomConfirm('Are you sure you want to remove this entry from the list? (The actual file/folder/website will NOT be deleted).', conf => { if (conf) { projectFiles = projectFiles.filter(i => i.id !== id); saveItemsToStorage(); renderProjectFilesUI(); showAppNotification('🗑️ Entry removed from list.', 'success');} }); }
+    function clearAllData() { showAppCustomConfirm('Are you sure you want to delete all data (all listed items and custom categories)? This action cannot be undone.', conf => { if (conf) { projectFiles = []; appCategories = DEFAULT_CATEGORIES_STRUCTURE.map(cat => ({...cat})); todos = []; saveItemsToStorage(); saveCategoriesToStorage(); saveTodos(); populateCategoryDropdown(); renderProjectFilesUI(); renderTodos(); clearStagedFilesDisplay(); DOM.pathInput.value = ''; showAppNotification('🗑️ All data has been cleared.', 'success'); } }); }
     function openMultiple(itemsToOpen, itemEntryType, context) {
         if (!shell && itemEntryType !== 'websiteLink') { showAppNotification('This feature is available in the desktop app only.', 'warning'); return; }
-        
-        const validItems = itemsToOpen.filter(i => {
-            if (i.entryType === 'websiteLink') return i.location && typeof i.location === 'string' && i.location.startsWith('https://');
-            return i.entryType === itemEntryType && i.location && typeof i.location === 'string';
-        });
-
-        if (validItems.length === 0) { 
-            if (context !== 'All Files' && context !== 'All Folder Links' && context !== 'All Website Links') { }
-            return; 
-        }
-        
-        showAppLoading(true);
-        let successCount = 0, failureCount = 0;
-        
-        const openPromises = validItems.map((item, i) => 
-            new Promise(resolve => 
-                setTimeout(() => {
-                    if (item.entryType === 'websiteLink') {
-                        try {
-                            if (shell && shell.openExternal) shell.openExternal(item.location);
-                            else window.open(item.location, '_blank', 'noopener,noreferrer');
-                            successCount++;
-                        } catch (e) { failureCount++; }
-                        resolve();
-                    } else if (shell) { // Only use shell for non-website links if shell is available
-                        shell.openPath(item.location)
-                            .then(errMessage => { if (errMessage) failureCount++; else successCount++; resolve(); })
-                            .catch(() => { failureCount++; resolve(); });
-                    } else { // No shell for file/folder, count as failure
-                        failureCount++;
-                        resolve();
-                    }
-                }, i * 300) 
-            )
-        );
-
-        Promise.all(openPromises)
-            .then(() => {
-                showAppLoading(false);
-                let message = '';
-                const typeString = itemEntryType === 'file' ? 'file(s)' : itemEntryType === 'folderLink' ? 'folder(s)' : 'website(s)';
-                if (successCount > 0) message += `✅ Attempted to open ${successCount} ${typeString}. `;
-                if (failureCount > 0) message += `❌ Failed to open ${failureCount} ${typeString}. `;
-                if (message.trim()) { 
-                    showAppNotification(message.trim(), failureCount > 0 && successCount === 0 ? 'error' : failureCount > 0 ? 'warning' : 'success');
-                }
-            });
+        const validItems = itemsToOpen.filter(i => { if (i.entryType === 'websiteLink') return i.location && typeof i.location === 'string' && (i.location.startsWith('https://') || i.location.startsWith('http://')); return i.entryType === itemEntryType && i.location && typeof i.location === 'string'; });
+        if (validItems.length === 0) { if (context !== 'All Files' && context !== 'All Folder Links' && context !== 'All Website Links') { } return; }
+        showAppLoading(true); let successCount = 0, failureCount = 0;
+        const openPromises = validItems.map((item, i) => new Promise(resolve => setTimeout(() => { if (item.entryType === 'websiteLink') { try { if (shell && shell.openExternal) shell.openExternal(item.location); else window.open(item.location, '_blank', 'noopener,noreferrer'); successCount++; } catch (e) { failureCount++; } resolve(); } else if (shell) { shell.openPath(item.location).then(errMessage => { if (errMessage) failureCount++; else successCount++; resolve(); }).catch(() => { failureCount++; resolve(); }); } else { failureCount++; resolve(); } }, i * 300)));
+        Promise.all(openPromises).then(() => { showAppLoading(false); let message = ''; const typeString = itemEntryType === 'file' ? 'file(s)' : itemEntryType === 'folderLink' ? 'folder(s)' : 'website(s)'; if (successCount > 0) message += `✅ Attempted to open ${successCount} ${typeString}. `; if (failureCount > 0) message += `❌ Failed to open ${failureCount} ${typeString}. `; if (message.trim()) { showAppNotification(message.trim(), failureCount > 0 && successCount === 0 ? 'error' : failureCount > 0 ? 'warning' : 'success'); } });
     }
-
     function handleOpenAllClick() {
         if (projectFiles.length === 0) { showAppNotification("The list is empty. Nothing to open.", "info"); return; }
         openMultiple(projectFiles.filter(i => i.entryType === 'file'), 'file', 'All Files');
         let delay = projectFiles.filter(i => i.entryType === 'file').length * 300 + 300;
-        setTimeout(() => {
-            openMultiple(projectFiles.filter(i => i.entryType === 'folderLink'), 'folderLink', 'All Folder Links');
-        }, delay);
+        setTimeout(() => { openMultiple(projectFiles.filter(i => i.entryType === 'folderLink'), 'folderLink', 'All Folder Links'); }, delay);
         delay += projectFiles.filter(i => i.entryType === 'folderLink').length * 300 + 300;
-        setTimeout(() => {
-            openMultiple(projectFiles.filter(i => i.entryType === 'websiteLink'), 'websiteLink', 'All Website Links');
-        }, delay);
+        setTimeout(() => { openMultiple(projectFiles.filter(i => i.entryType === 'websiteLink'), 'websiteLink', 'All Website Links'); }, delay);
     }
-
     function handleOpenAllFilesInCategory(event) {
-        const key = event.currentTarget.dataset.categoryKey;
-        const itemsInCategory = projectFiles.filter(i => i.category === key);
-        const categoryDisplay = getCategoryDisplay(key);
+        const key = event.currentTarget.dataset.categoryKey; const itemsInCategory = projectFiles.filter(i => i.category === key); const categoryDisplay = getCategoryDisplay(key);
         if (itemsInCategory.length === 0) { showAppNotification(`No items to open in category "${categoryDisplay}".`, "info"); return; }
-        
         openMultiple(itemsInCategory.filter(i => i.entryType === 'file'), 'file', categoryDisplay);
         let delay = itemsInCategory.filter(i => i.entryType === 'file').length * 300 + 300;
-        setTimeout(() => {
-            openMultiple(itemsInCategory.filter(i => i.entryType === 'folderLink'), 'folderLink', categoryDisplay);
-        }, delay);
+        setTimeout(() => { openMultiple(itemsInCategory.filter(i => i.entryType === 'folderLink'), 'folderLink', categoryDisplay); }, delay);
         delay += itemsInCategory.filter(i => i.entryType === 'folderLink').length * 300 + 300;
-        setTimeout(() => {
-            openMultiple(itemsInCategory.filter(i => i.entryType === 'websiteLink'), 'websiteLink', categoryDisplay);
-        }, delay);
+        setTimeout(() => { openMultiple(itemsInCategory.filter(i => i.entryType === 'websiteLink'), 'websiteLink', categoryDisplay); }, delay);
     }
-
-    // --- To-Do List Functions ---
-    function loadTodos() {
-        try {
-            const storedTodos = localStorage.getItem(STORAGE_TODOS_KEY);
-            todos = storedTodos ? JSON.parse(storedTodos) : [];
-        } catch (e) {
-            todos = [];
-            console.error("[Renderer] Error parsing todos from LS", e);
-            localStorage.removeItem(STORAGE_TODOS_KEY);
-        }
-        renderTodos();
-    }
-    function saveTodos() {
-        try { localStorage.setItem(STORAGE_TODOS_KEY, JSON.stringify(todos)); }
-        catch (e) { console.error('[Renderer] Error saving todos:', e); showAppNotification('Error saving to-do list!', 'error');}
-    }
+    function loadTodos() { try { const storedTodos = localStorage.getItem(STORAGE_TODOS_KEY); todos = storedTodos ? JSON.parse(storedTodos) : []; } catch (e) { todos = []; console.error("[Renderer] Error parsing todos from LS", e); localStorage.removeItem(STORAGE_TODOS_KEY); } renderTodos(); }
+    function saveTodos() { try { localStorage.setItem(STORAGE_TODOS_KEY, JSON.stringify(todos)); } catch (e) { console.error('[Renderer] Error saving todos:', e); showAppNotification('Error saving to-do list!', 'error');} }
     function renderTodos() {
-        if (!DOM.todosContainer) return; // Ensure container exists
-        DOM.todosContainer.innerHTML = '';
-        if (todos.length === 0) {
-            DOM.todosContainer.innerHTML = `<p style="text-align:center; color: #90a4ae;">No tasks yet. Add one above!</p>`;
-            return;
-        }
+        if (!DOM.todosContainer) return; DOM.todosContainer.innerHTML = '';
+        if (todos.length === 0) { DOM.todosContainer.innerHTML = `<p style="text-align:center; color: #90a4ae;">No tasks yet. Add one above!</p>`; return; }
         todos.forEach(todo => {
-            const todoItemDiv = document.createElement('div');
-            todoItemDiv.className = `todo-item ${todo.completed ? 'completed' : ''}`;
-            todoItemDiv.dataset.id = todo.id;
-            todoItemDiv.innerHTML = `
-                <div class="todo-item-left">
-                    <span class="todo-checkbox" onclick="toggleTodoComplete(${todo.id})">
-                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-check"></use></svg>
-                    </span>
-                    <span class="todo-text">${escapeHTML(todo.text)}</span>
-                </div>
-                <div class="todo-item-right">
-                    <span class="todo-date">${todo.dateAdded}</span>
-                    <button class="btn-icon" onclick="deleteTodo(${todo.id})" title="Delete Task">
-                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-delete"></use></svg>
-                    </button>
-                </div>
-            `;
+            const todoItemDiv = document.createElement('div'); todoItemDiv.className = `todo-item ${todo.completed ? 'completed' : ''}`; todoItemDiv.dataset.id = todo.id;
+            todoItemDiv.innerHTML = `<div class="todo-item-left"><span class="todo-checkbox" onclick="toggleTodoComplete(${todo.id})"><svg viewBox="0 0 24 24"><use xlink:href="#icon-check"></use></svg></span><span class="todo-text">${escapeHTML(todo.text)}</span></div><div class="todo-item-right"><span class="todo-date">${todo.dateAdded}</span><button class="btn-icon" onclick="deleteTodo(${todo.id})" title="Delete Task"><svg viewBox="0 0 24 24"><use xlink:href="#icon-delete"></use></svg></button></div>`;
             DOM.todosContainer.appendChild(todoItemDiv);
         });
     }
     function addTodo() {
-        if (!DOM.todoInput) return;
-        const text = DOM.todoInput.value.trim();
-        if (!text) {
-            showAppNotification('Task cannot be empty.', 'warning');
-            return;
-        }
-        todos.push({
-            id: Date.now(),
-            text: text,
-            completed: false,
-            dateAdded: new Date().toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' })
-        });
-        DOM.todoInput.value = '';
-        saveTodos();
-        renderTodos();
-        showAppNotification('Task added!', 'success');
+        if (!DOM.todoInput) return; const text = DOM.todoInput.value.trim();
+        if (!text) { showAppNotification('Task cannot be empty.', 'warning'); return; }
+        todos.push({ id: Date.now(), text: text, completed: false, dateAdded: new Date().toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' }) });
+        DOM.todoInput.value = ''; saveTodos(); renderTodos(); showAppNotification('Task added!', 'success');
     }
-    function toggleTodoComplete(id) {
-        const todo = todos.find(t => t.id === id);
-        if (todo) {
-            todo.completed = !todo.completed;
-            saveTodos();
-            renderTodos();
-        }
-    }
-    function deleteTodo(id) {
-        showAppCustomConfirm('Are you sure you want to delete this task?', (confirmed) => {
-            if (confirmed) {
-                todos = todos.filter(t => t.id !== id);
-                saveTodos();
-                renderTodos();
-                showAppNotification('Task deleted.', 'success');
-            }
-        });
-    }
-
-
+    function toggleTodoComplete(id) { const todo = todos.find(t => t.id === id); if (todo) { todo.completed = !todo.completed; saveTodos(); renderTodos(); } }
+    function deleteTodo(id) { showAppCustomConfirm('Are you sure you want to delete this task?', (confirmed) => { if (confirmed) { todos = todos.filter(t => t.id !== id); saveTodos(); renderTodos(); showAppNotification('Task deleted.', 'success'); } }); }
     function saveItemsToStorage() { try { localStorage.setItem(STORAGE_ITEMS_KEY, JSON.stringify(projectFiles)); } catch (e) { console.error('[Renderer] Error saving items:', e); showAppNotification('Error saving items!', 'error');}}
     function saveCategoriesToStorage() { try { localStorage.setItem(STORAGE_CATEGORIES_KEY, JSON.stringify(appCategories)); } catch (e) { console.error('[Renderer] Error saving categories:', e); showAppNotification('Error saving categories!', 'error');}}
-    
     function loadData() {
-        try {
-            const storedItems = localStorage.getItem(STORAGE_ITEMS_KEY);
-            projectFiles = storedItems ? JSON.parse(storedItems).filter(i => i.location && i.name && i.id) : []; 
-        } catch (e) { projectFiles = []; console.error("[Renderer] Error parsing items from LS", e); localStorage.removeItem(STORAGE_ITEMS_KEY); }
-
+        try { const storedItems = localStorage.getItem(STORAGE_ITEMS_KEY); projectFiles = storedItems ? JSON.parse(storedItems).filter(i => i.location && i.name && i.id) : []; } catch (e) { projectFiles = []; console.error("[Renderer] Error parsing items from LS", e); localStorage.removeItem(STORAGE_ITEMS_KEY); }
         try {
             const storedCategories = localStorage.getItem(STORAGE_CATEGORIES_KEY);
             if (storedCategories) {
                 const parsedCats = JSON.parse(storedCategories);
-                const mergedCategories = DEFAULT_CATEGORIES_STRUCTURE.map(defaultCat => {
-                    const savedCat = parsedCats.find(sc => sc.key === defaultCat.key);
-                    if (savedCat) {
-                        return { ...defaultCat, display: (savedCat.isCustom || (savedCat.isEditable && savedCat.display)) ? savedCat.display : defaultCat.display, order: typeof savedCat.order === 'number' ? savedCat.order : defaultCat.order, isCustom: savedCat.isCustom ?? defaultCat.isCustom, isEditable: savedCat.isEditable ?? defaultCat.isEditable, isDeletable: savedCat.isDeletable ?? defaultCat.isDeletable, };
-                    } return {...defaultCat}; 
-                });
+                const mergedCategories = DEFAULT_CATEGORIES_STRUCTURE.map(defaultCat => { const savedCat = parsedCats.find(sc => sc.key === defaultCat.key); if (savedCat) { return { ...defaultCat, display: (savedCat.isCustom || (savedCat.isEditable && savedCat.display)) ? savedCat.display : defaultCat.display, order: typeof savedCat.order === 'number' ? savedCat.order : defaultCat.order, isCustom: savedCat.isCustom ?? defaultCat.isCustom, isEditable: savedCat.isEditable ?? defaultCat.isEditable, isDeletable: savedCat.isDeletable ?? defaultCat.isDeletable, }; } return {...defaultCat}; });
                 parsedCats.forEach(savedCat => { if (savedCat.isCustom && !mergedCategories.some(mc => mc.key === savedCat.key)) { mergedCategories.push(savedCat); } });
                 appCategories = mergedCategories.sort((a,b) => (a.order ?? Infinity) - (b.order ?? Infinity));
             } else { appCategories = DEFAULT_CATEGORIES_STRUCTURE.map(cat => ({...cat})); }
-        } catch (e) {
-            appCategories = DEFAULT_CATEGORIES_STRUCTURE.map(cat => ({...cat})); 
-            console.error("[Renderer] Error parsing categories from LS", e); localStorage.removeItem(STORAGE_CATEGORIES_KEY); 
-        }
-        if (!Array.isArray(appCategories) || appCategories.length === 0 || !appCategories.find(c => c.key === 'auto_detect')) { 
-            appCategories = DEFAULT_CATEGORIES_STRUCTURE.map(cat => ({...cat}));
-        }
-        loadTodos(); // Load todos after categories
-        populateCategoryDropdown();
-        renderProjectFilesUI();
+        } catch (e) { appCategories = DEFAULT_CATEGORIES_STRUCTURE.map(cat => ({...cat})); console.error("[Renderer] Error parsing categories from LS", e); localStorage.removeItem(STORAGE_CATEGORIES_KEY); }
+        if (!Array.isArray(appCategories) || appCategories.length === 0 || !appCategories.find(c => c.key === 'auto_detect')) { appCategories = DEFAULT_CATEGORIES_STRUCTURE.map(cat => ({...cat})); }
+        loadTodos(); populateCategoryDropdown(); renderProjectFilesUI();
     }
-    
     function setupIpcListeners() {
         if (!ipcRenderer) {
-            console.warn("[Renderer] ipcRenderer not available. File/folder operations will be disabled.");
-            [DOM.selectFilesBtn, DOM.addFolderLinkBtn, DOM.importFromFolderBtn, DOM.pastePathBtn, DOM.addPastedPathButton].forEach(btn => {
-                if(btn) { btn.disabled = true; btn.title = (btn.title || btn.textContent || btn.id) + ' (Desktop app feature only)'; btn.style.opacity = "0.5"; btn.style.cursor = "not-allowed"; }
-            }); return;
+            console.warn("[Renderer] ipcRenderer not available.");
+            [DOM.selectFilesBtn, DOM.addFolderLinkBtn, DOM.importFromFolderBtn, DOM.pastePathBtn, DOM.addPastedPathButton].forEach(btn => { if(btn) { btn.disabled = true; btn.title = (btn.title || btn.textContent || btn.id) + ' (Desktop app feature only)'; btn.style.opacity = "0.5"; btn.style.cursor = "not-allowed"; } }); return;
         }
         ipcRenderer.on('selected-files-for-files', (event, paths) => updateStagedPaths(paths, 'file', 'Files ready: '));
         ipcRenderer.on('selected-folder-for-link', (event, paths) => updateStagedPaths(paths, 'folderLink', 'Folder links ready: '));
-        ipcRenderer.on('selected-folder-for-import', (event, contents) => { 
-            if (contents && Array.isArray(contents) && contents.length > 0) {
-                stagedFilePaths = contents.map(item => ({ ...item, entryType: 'file' })); 
-                let baseName = "Selected folder";
-                if (pathModule && contents[0].path) { 
-                    const parentDir = pathModule.dirname(contents[0].path); baseName = pathModule.basename(parentDir); 
-                     if (!baseName && parentDir) baseName = parentDir; 
-                }
-                DOM.selectedFilesDisplay.textContent = `Files to import from "${baseName}" (${stagedFilePaths.length})`;
-                DOM.pathInput.value = '';
-            } else if (!DOM.pathInput.value.trim()) clearStagedFilesDisplay();
-        });
-        ipcRenderer.on('pasted-path-processed', (event, { items, originalPath }) => { 
-            if (items && Array.isArray(items) && items.length > 0) {
-                stagedFilePaths = items; 
-                DOM.selectedFilesDisplay.textContent = `Processed path. Ready to add: ${items.map(f => f.name).join(', ')}`;
-            } else {
-                clearStagedFilesDisplay();
-                const name = (pathModule && originalPath) ? pathModule.basename(originalPath) : "Pasted path";
-                showAppNotification(`Path "${name}" is invalid, empty, or inaccessible.`, 'error');
-            }
-        });
-        ipcRenderer.on('pasted-path-error', (event, { message, originalPath }) => {
-            const name = (pathModule && originalPath) ? pathModule.basename(originalPath) : "Pasted path";
-            showAppNotification(`Error processing "${name}": ${message}`, 'error');
-            clearStagedFilesDisplay();
-        });
+        ipcRenderer.on('selected-folder-for-import', (event, contents) => { if (contents && Array.isArray(contents) && contents.length > 0) { stagedFilePaths = contents.map(item => ({ ...item, entryType: 'file' })); let baseName = "Selected folder"; if (pathModule && contents[0].path) { const parentDir = pathModule.dirname(contents[0].path); baseName = pathModule.basename(parentDir); if (!baseName && parentDir) baseName = parentDir; } DOM.selectedFilesDisplay.textContent = `Files to import from "${baseName}" (${stagedFilePaths.length})`; DOM.pathInput.value = ''; } else if (!DOM.pathInput.value.trim()) clearStagedFilesDisplay(); });
+        ipcRenderer.on('pasted-path-processed', (event, { items, originalPath }) => { if (items && Array.isArray(items) && items.length > 0) { stagedFilePaths = items; DOM.selectedFilesDisplay.textContent = `Processed path. Ready to add: ${items.map(f => f.name).join(', ')}`; } else { clearStagedFilesDisplay(); const name = (pathModule && originalPath) ? pathModule.basename(originalPath) : "Pasted path"; showAppNotification(`Path "${name}" is invalid, empty, or inaccessible.`, 'error'); } });
+        ipcRenderer.on('pasted-path-error', (event, { message, originalPath }) => { const name = (pathModule && originalPath) ? pathModule.basename(originalPath) : "Pasted path"; showAppNotification(`Error processing "${name}": ${message}`, 'error'); clearStagedFilesDisplay(); });
     }
-
     function handleSelectFilesClick() { if (ipcRenderer) ipcRenderer.send('open-file-dialog-for-files'); else showAppNotification('This feature is available in the desktop app only.', 'warning'); }
     function handleAddFolderLinkClick() { if (ipcRenderer) ipcRenderer.send('open-folder-dialog-for-link'); else showAppNotification('This feature is available in the desktop app only.', 'warning'); }
     function handleImportFromFolderClick() { if (ipcRenderer) ipcRenderer.send('open-folder-dialog-for-import'); else showAppNotification('This feature is available in the desktop app only.', 'warning'); }
     async function handlePastePathClick() {
         let clipboardText = '';
-        try {
-            if (electronClipboard) { clipboardText = electronClipboard.readText(); } 
-            else if (navigator.clipboard && navigator.clipboard.readText) { clipboardText = await navigator.clipboard.readText(); } 
-            else { showAppNotification('Clipboard API not available.', 'warning'); return; }
-            DOM.pathInput.value = clipboardText;
-            showAppNotification(clipboardText ? 'Path pasted.' : 'Clipboard is empty.', clipboardText ? 'success' : 'warning');
+        try { if (electronClipboard) { clipboardText = electronClipboard.readText(); } else if (navigator.clipboard && navigator.clipboard.readText) { clipboardText = await navigator.clipboard.readText(); } else { showAppNotification('Clipboard API not available.', 'warning'); return; } DOM.pathInput.value = clipboardText; showAppNotification(clipboardText ? 'Path pasted.' : 'Clipboard is empty.', clipboardText ? 'success' : 'warning');
         } catch (err) { console.error('[Renderer] Failed to read clipboard: ', err); showAppNotification('Failed to paste from clipboard. Ensure permission if prompted.', 'error'); }
     }
     function handleAddPastedPathClick() {
-        const pathValue = DOM.pathInput.value.trim();
-        if (!pathValue) { showAppNotification('Please enter or paste a path first.', 'warning'); return; }
-        if (ipcRenderer) {
-            stagedFilePaths = []; 
-            DOM.selectedFilesDisplay.textContent = `Processing: ${pathValue.substring(pathValue.lastIndexOf(/[/\\]/) + 1)}`;
-            ipcRenderer.send('process-pasted-path', pathValue);
-        } else { // Handle non-Electron environments for website links
-            if (pathValue.toLowerCase().startsWith('https://')) {
-                updateStagedPaths([pathValue], 'websiteLink', 'Website link ready: ');
-            } else {
-                showAppNotification('This feature (for local paths) is available in the desktop app only.', 'warning');
-            }
-        }
+        const pathValue = DOM.pathInput.value.trim(); if (!pathValue) { showAppNotification('Please enter or paste a path first.', 'warning'); return; }
+        if (ipcRenderer) { stagedFilePaths = []; DOM.selectedFilesDisplay.textContent = `Processing: ${pathValue.substring(pathValue.lastIndexOf(/[/\\]/) + 1)}`; ipcRenderer.send('process-pasted-path', pathValue); } 
+        else { if (pathValue.toLowerCase().startsWith('https://') || pathValue.toLowerCase().startsWith('http://')) { updateStagedPaths([pathValue], 'websiteLink', 'Website link ready: '); } else { showAppNotification('This feature (for local paths) is available in the desktop app only.', 'warning'); } }
     }
     
     document.addEventListener('DOMContentLoaded', () => {
-        // Set HTML direction to LTR
-        document.documentElement.dir = 'ltr';
-        document.documentElement.lang = 'en';
-
-        setupIpcListeners(); 
-        loadData(); // This will also call renderTodos
-        showPage('pathsPage'); 
-        if (window.innerWidth > 768) { 
-            DOM.sidebar.classList.remove('collapsed'); 
-            DOM.mainContent.classList.remove('expanded');
-        } else {
-            DOM.sidebar.classList.add('collapsed'); 
-            DOM.mainContent.classList.add('expanded');
-        }
+        document.documentElement.dir = 'ltr'; document.documentElement.lang = 'en';
+        setupIpcListeners(); loadData(); showPage('pathsPage'); 
+        if (window.innerWidth > 768) { DOM.sidebar.classList.remove('collapsed'); DOM.mainContent.classList.remove('expanded'); } 
+        else { DOM.sidebar.classList.add('collapsed'); DOM.mainContent.classList.add('expanded'); }
         
         DOM.openAllBtn.addEventListener('click', handleOpenAllClick);
         DOM.selectFilesBtn.addEventListener('click', handleSelectFilesClick);
@@ -1585,40 +1080,38 @@
         DOM.importFromFolderBtn.addEventListener('click', handleImportFromFolderClick);
         DOM.pastePathBtn.addEventListener('click', handlePastePathClick);
         DOM.addPastedPathBtn.addEventListener('click', handleAddPastedPathClick);
-        DOM.clearAllDataBtn.addEventListener('click', clearAllData);
+        // DOM.clearAllDataBtn listener is now attached to the button on the Options page
         DOM.addItemsBtn.addEventListener('click', handleProcessStagedItems);
         
-        DOM.manageCategoriesBtn.addEventListener('click', openCategoryManagerModal);
+        // The "Manage Categories" button is now on the Options page.
+        // Ensure the ID 'manageCategoriesBtn' is unique or update if necessary.
+        // If you keep the same ID, this listener will work fine.
+        if(DOM.manageCategoriesBtn) DOM.manageCategoriesBtn.addEventListener('click', openCategoryManagerModal);
+        
         DOM.closeCategoryManagerBtn.addEventListener('click', closeCategoryManagerModal);
         DOM.addManagedCategoryBtn.addEventListener('click', handleAddManagedCategory);
-        
         if(DOM.addTodoBtn) DOM.addTodoBtn.addEventListener('click', addTodo);
         if(DOM.todoInput) DOM.todoInput.addEventListener('keydown', e => { if (e.key === 'Enter') addTodo(); });
-
+        if(DOM.clearAllDataBtnOptionsPage) DOM.clearAllDataBtnOptionsPage.addEventListener('click', clearAllData); // Listener for new button
 
         DOM.filesDisplayContainer.addEventListener('click', e => {
             const btn = e.target.closest('.item-actions-menu button[data-action]');
             if (btn) {
-                const id = parseFloat(btn.dataset.id); 
-                const action = btn.dataset.action;
+                const id = parseFloat(btn.dataset.id); const action = btn.dataset.action;
                 const item = projectFiles.find(pf => pf.id === id); 
-                if (!item) { console.warn(`Item with id ${id} not found for action ${action}`); showAppNotification('Error: Item not found.', 'error'); return; }
-                const menu = btn.closest('.item-actions-menu'); 
-                if(menu) menu.classList.remove('show'); 
-                
-                if (action === 'open') openItem(item.location, item.entryType, item.type); // Pass item.type
+                if (!item) { console.warn(`Item with id ${id} not found`); showAppNotification('Error: Item not found.', 'error'); return; }
+                const menu = btn.closest('.item-actions-menu'); if(menu) menu.classList.remove('show'); 
+                if (action === 'open') openItem(item.location, item.entryType, item.type);
                 else if (action === 'show-location') showItemInFolder(item.location, item.entryType);
                 else if (action === 'delete') deleteItemEntry(item.id);
             }
         });
-
         DOM.projectNameInput.addEventListener('keydown', e => { if (e.key === 'Enter' && stagedFilePaths.length > 0) handleProcessStagedItems(); });
         DOM.pathInput.addEventListener('keydown', e => { if (e.key === 'Enter') handleAddPastedPathClick(); });
         DOM.newManagedCategoryInput.addEventListener('keydown', e => { if (e.key === 'Enter') DOM.addManagedCategoryBtn.click(); }); 
-
     });
-    window.addEventListener('error', e => { console.error('[Renderer] Unhandled Error:', e.error || e.message, e.filename, e.lineno, e.colno, e); showAppNotification('An unexpected error occurred! Check console.', 'error'); });
-    window.addEventListener('unhandledrejection', event => { console.error('[Renderer] Unhandled Rejection:', event.reason); showAppNotification('An unexpected asynchronous error occurred! Check console.', 'error'); });
+    window.addEventListener('error', e => { console.error('[Renderer] Unhandled Error:', e); showAppNotification('An unexpected error occurred!', 'error'); });
+    window.addEventListener('unhandledrejection', event => { console.error('[Renderer] Unhandled Rejection:', event.reason); showAppNotification('An unexpected async error occurred!', 'error'); });
     </script>
 </body>
 </html>
