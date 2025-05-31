@@ -10,7 +10,7 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #0a0a0a, #1a1a2e, #16213e, #0f0f23);
-            min-height: 100vh; color: white; overflow: hidden; /* Changed overflow-x to overflow */
+            min-height: 100vh; color: white; overflow: hidden;
             line-height: 1.6; font-size: 14px;
         }
 
@@ -23,48 +23,28 @@
 
         /* --- Custom Draggable Title Bar --- */
         .custom-title-bar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 38px; /* Increased height slightly for better grab area */
-            background-color: rgba(10, 10, 20, 0.85); /* Slightly more opaque for title bar */
-            backdrop-filter: blur(12px);
+            position: fixed; top: 0; left: 0; width: 100%; height: 38px;
+            background-color: rgba(10, 10, 20, 0.85); backdrop-filter: blur(12px);
             -webkit-app-region: drag; /* Makes the entire bar draggable */
-            z-index: 100000; /* Highest z-index */
-            display: flex;
-            align-items: center;
-            justify-content: space-between; /* To position title and controls */
-            padding: 0 10px 0 15px; /* Padding: top right bottom left */
-            user-select: none;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            z-index: 100000; display: flex; align-items: center;
+            justify-content: space-between; padding: 0 10px 0 15px;
+            user-select: none; border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
-        .window-app-title {
-            color: #b0bec5; /* Lighter title color */
-            font-size: 0.85em;
-            font-weight: 500;
-            -webkit-app-region: no-drag; /* Text itself should not interfere with drag */
-        }
+        .window-app-title { color: #b0bec5; font-size: 0.85em; font-weight: 500; -webkit-app-region: no-drag; }
 
         /* --- Window Controls (Positioned within custom-title-bar) --- */
         .window-controls {
-            position: static; /* No longer fixed, part of the title bar flow */
-            -webkit-app-region: no-drag; /* Crucial: Makes buttons clickable */
-            display: flex;
-            gap: 8px;
-            margin-left: auto; /* Pushes to the right in LTR */
+            position: static; -webkit-app-region: no-drag;
+            display: flex; gap: 8px; margin-left: auto;
         }
         html[dir="rtl"] .window-controls { margin-right: auto; margin-left: initial; }
-
         .window-btn {
             width: 12px; height: 12px; border-radius: 50%; cursor: pointer;
-            transition: all 0.2s ease; border: none; position: relative;
-            -webkit-app-region: no-drag; /* Ensure buttons are clickable */
+            transition: all 0.2s ease; border: none; position: relative; -webkit-app-region: no-drag;
         }
         .window-btn:hover { transform: scale(1.15); box-shadow: 0 0 8px rgba(255, 255, 255, 0.25); }
-        .close-btn { background: linear-gradient(45deg, #ff5f56, #e64a19); } /* Adjusted red */
-        .minimize-btn { background: linear-gradient(45deg, #ffbd2e, #ffa000); } /* Adjusted yellow */
-
+        .close-btn { background: linear-gradient(45deg, #ff5f56, #e64a19); }
+        .minimize-btn { background: linear-gradient(45deg, #ffbd2e, #ffa000); }
         .close-btn:hover::after, .minimize-btn:hover::after {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             font-size: 8px; color: rgba(0,0,0,0.7); font-weight: bold;
@@ -72,11 +52,9 @@
         .close-btn:hover::after { content: '×'; }
         .minimize-btn:hover::after { content: '−'; }
 
-
         /* --- Sidebar --- */
         .sidebar {
-            position: fixed; left: 0; top: 38px; /* Start below custom title bar */
-            width: 250px; height: calc(100vh - 38px); /* Adjust height */
+            position: fixed; left: 0; top: 38px; width: 250px; height: calc(100vh - 38px);
             background: rgba(5, 5, 15, 0.85); backdrop-filter: blur(18px);
             border-right: 1px solid rgba(255, 255, 255, 0.08);
             padding: 15px; transition: all 0.3s ease; z-index: 9999;
@@ -90,35 +68,28 @@
         html[dir="ltr"] .sidebar:not(.collapsed) .nav-text { opacity: 1; transition: opacity 0.2s 0.1s ease-in-out; }
         html[dir="ltr"] .sidebar.collapsed .logo,
         html[dir="ltr"] .sidebar.collapsed .nav-text { opacity: 0; pointer-events: none; }
-
-        .sidebar-header {
-            display: flex; align-items: center; justify-content: space-between;
-            margin-bottom: 25px; padding-top: 10px; /* Reduced top padding */
-        }
+        .sidebar-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 25px; padding-top: 10px; }
         .logo { opacity: 1; transition: opacity 0.3s ease; }
         .sidebar.collapsed .logo { opacity: 0; pointer-events: none; }
         .logo h2 {
-            font-size: 20px; /* Slightly smaller */
-            background: linear-gradient(45deg, #4fc3f7, #29b6f6, #03a9f4, #0288d1);
+            font-size: 20px; background: linear-gradient(45deg, #4fc3f7, #29b6f6, #03a9f4, #0288d1);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             background-clip: text; text-fill-color: transparent; white-space: nowrap;
         }
         .logo p { color: #64b5f6; font-size: 10px; margin-top: -4px; white-space: nowrap; }
         .menu-toggle {
-            background: none; border: none; color: #90a4ae; cursor: pointer;
-            padding: 8px; border-radius: 8px; transition: all 0.3s ease;
-            display: flex; align-items: center; justify-content: center;
-            -webkit-app-region: no-drag; /* Make toggle clickable */
+            background: none; border: none; color: #90a4ae; cursor: pointer; padding: 8px;
+            border-radius: 8px; transition: all 0.3s ease; display: flex;
+            align-items: center; justify-content: center; -webkit-app-region: no-drag;
         }
         .menu-toggle:hover { background: rgba(255, 255, 255, 0.1); color: white; }
         .sidebar.collapsed .menu-toggle { margin-left: auto; margin-right: auto; }
-
         .nav-menu { list-style: none; padding: 0; }
-        .nav-item { margin-bottom: 6px; } /* Reduced margin */
+        .nav-item { margin-bottom: 6px; }
         .nav-link {
-            display: flex; align-items: center; padding: 10px 15px; /* Adjusted padding */
-            color: #90a4ae; text-decoration: none; border-radius: 8px; /* Smaller radius */
-            transition: all 0.2s ease; cursor: pointer; white-space: nowrap;
+            display: flex; align-items: center; padding: 10px 15px; color: #90a4ae;
+            text-decoration: none; border-radius: 8px; transition: all 0.2s ease;
+            cursor: pointer; white-space: nowrap;
         }
         .nav-link:hover, .nav-link.active:hover { background: rgba(255, 255, 255, 0.1); color: white; }
         .nav-link.active {
@@ -132,10 +103,8 @@
         /* --- Main Content Area --- */
         .main-content {
             margin-left: 250px; padding: 20px;
-            padding-top: calc(20px + 38px); /* Account for title bar height */
-            transition: margin-left 0.3s ease; min-height: 100vh;
-            overflow-y: auto; /* Allow scrolling for main content if it overflows */
-            height: calc(100vh - 38px); /* Full height minus title bar */
+            padding-top: calc(20px + 38px); transition: margin-left 0.3s ease; min-height: 100vh;
+            overflow-y: auto; height: calc(100vh - 38px);
         }
         .main-content.expanded { margin-left: 70px; }
         .page { display: none; animation: fadeInContent 0.4s ease-out; }
@@ -144,12 +113,10 @@
         
         .page-header-container {
             display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 25px; /* Adjusted margin */
-            /* padding-top: 0; /* Removed as main-content has top padding */
+            margin-bottom: 25px;
         }
         .page-header-container .page-title {
-            font-size: 1.8rem; /* Adjusted size */
-            font-weight: 700;
+            font-size: 1.8rem; font-weight: 700;
             background: linear-gradient(45deg, #ffffff, #e3f2fd, #bbdefb);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             background-clip: text; text-fill-color: transparent; margin-bottom: 4px;
@@ -472,6 +439,14 @@
             padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1);
         }
         #optionsPage .options-group .btn { margin-top: 5px;}
+        #extensionMappingsContainer { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; max-height: 200px; overflow-y: auto; padding-right: 5px;}
+        .extension-mapping-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 8px 12px; background: rgba(255,255,255,0.05); border-radius: 6px;
+        }
+        .extension-mapping-item span { font-size: 0.85rem; }
+        .extension-mapping-item .btn-icon { padding: 4px; }
+        .extension-mapping-item .btn-icon svg { width: 12px; height: 12px; }
 
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
@@ -575,10 +550,7 @@
                         <button id="openAllBtn" class="btn btn-primary">
                             <svg viewBox="0 0 24 24"><use xlink:href="#icon-rocket"></use></svg>
                             Open All </button>
-                        <button id="clearAllDataBtn" class="btn btn-danger">
-                            <svg viewBox="0 0 24 24"><use xlink:href="#icon-clear-all"></use></svg>
-                            Clear All Data </button>
-                    </div>
+                        </div>
                 </div>
 
                 <div class="add-item-section">
@@ -641,13 +613,29 @@
             </div>
             <div class="glass-card">
                 <div class="options-group">
-                    <h3>Categories</h3>
+                    <h3>Category Management</h3>
                     <p>Organize how your items are grouped.</p>
                     <button id="manageCategoriesBtn" class="btn btn-secondary">
                         <svg viewBox="0 0 24 24"><use xlink:href="#icon-settings"></use></svg>
                         Manage Categories
                     </button>
                 </div>
+
+                <div class="options-group">
+                    <h3>File Extension Mappings</h3>
+                    <p>Automatically assign categories based on file extensions.</p>
+                    <div class="input-row" style="margin-bottom: 10px;">
+                        <input type="text" id="newExtensionInput" class="input-field" placeholder=".example (e.g., .txt, .doc)">
+                        <input type="text" id="newExtensionCategoryNameInput" class="input-field" placeholder="Category Display Name (e.g., Text Files)">
+                    </div>
+                    <button id="addExtensionMappingBtn" class="btn btn-success">
+                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>
+                        Add Extension Mapping
+                    </button>
+                    <div id="extensionMappingsContainer" style="margin-top: 15px;">
+                        </div>
+                </div>
+
                 <div class="options-group">
                     <h3>Data Management</h3>
                      <p>Manage all stored application data.</p>
@@ -668,16 +656,16 @@
             </div>
             <div class="glass-card">
                 <h3>Hemo Paths Manager</h3>
-                <p>Version: 1.4 (Frameless & Enhanced)</p>
+                <p>Version: 1.5 (Frameless & Enhanced Options)</p>
                 <p>Developed to streamline the management of your project file paths, website links, and tasks.</p>
                 <br>
                 <h4>Key Features:</h4>
                 <ul>
                     <li>Easily add and categorize file paths, folder links, and website URLs.</li>
                     <li>Directly open files, folders, and websites from the application.</li>
-                    <li>Manage custom categories for better organization.</li>
+                    <li>Manage custom categories and file extension mappings for better organization.</li>
                     <li>Integrated To-Do list to track your tasks.</li>
-                    <li>Modern and attractive user interface.</li>
+                    <li>Modern and attractive user interface with frameless window.</li>
                 </ul>
             </div>
         </div>
@@ -727,6 +715,8 @@
     } catch (e) { console.warn("[Renderer] Error loading Electron modules.", e); }
 
     let projectFiles = []; let stagedFilePaths = []; let appCategories = []; let todos = [];
+    let customExtensionMappings = []; // To store { extension: '.ext', categoryKey: 'cat_key' }
+
     const DOM = {
         sidebar: document.getElementById('sidebar'), mainContent: document.getElementById('mainContent'),
         selectedFilesDisplay: document.getElementById('selectedFilesDisplay'), projectNameInput: document.getElementById('projectNameInput'),
@@ -735,22 +725,30 @@
         selectFilesBtn: document.getElementById('selectFilesButton'), addFolderLinkBtn: document.getElementById('addFolderLinkButton'),
         importFromFolderBtn: document.getElementById('importFromFolderButton'), pathInput: document.getElementById('pathInput'),
         pastePathBtn: document.getElementById('pastePathButton'), addPastedPathBtn: document.getElementById('addPastedPathButton'),
-        addItemsBtn: document.getElementById('addItemsButton'), clearAllDataBtn: document.getElementById('clearAllDataBtn'),
+        addItemsBtn: document.getElementById('addItemsButton'),
+        // clearAllDataBtn: document.getElementById('clearAllDataBtn'), // Removed from top bar
         loadingOverlay: document.getElementById('loadingOverlay'), notification: document.getElementById('notificationToast'),
         confirmModal: document.getElementById('confirmModalBackdrop'), confirmModalMessage: document.getElementById('confirmModalMessage'),
         confirmModalYesBtn: document.getElementById('confirmModalYesBtn'), confirmModalNoBtn: document.getElementById('confirmModalNoBtn'),
-        manageCategoriesBtn: document.getElementById('manageCategoriesBtn'), // This will be the one in Options page
+        manageCategoriesBtn: document.getElementById('manageCategoriesBtn'), 
         categoryManagerModal: document.getElementById('categoryManagerModal'), categoryListContainer: document.getElementById('categoryListContainer'),
         newManagedCategoryInput: document.getElementById('newManagedCategoryInput'), addManagedCategoryBtn: document.getElementById('addManagedCategoryBtn'),
         closeCategoryManagerBtn: document.getElementById('closeCategoryManagerBtn'),
         todoInput: document.getElementById('todoInput'), addTodoBtn: document.getElementById('addTodoBtn'),
         todosContainer: document.getElementById('todosContainer'),
-        clearAllDataBtnOptionsPage: document.getElementById('clearAllDataBtnOptionsPage') // Button in options
+        clearAllDataBtnOptionsPage: document.getElementById('clearAllDataBtnOptionsPage'),
+        // New DOM elements for extension mapping
+        newExtensionInput: document.getElementById('newExtensionInput'),
+        newExtensionCategoryNameInput: document.getElementById('newExtensionCategoryNameInput'),
+        addExtensionMappingBtn: document.getElementById('addExtensionMappingBtn'),
+        extensionMappingsContainer: document.getElementById('extensionMappingsContainer')
     };
 
     const STORAGE_ITEMS_KEY = 'projectFileManagerData_v1.5_Frameless'; 
     const STORAGE_CATEGORIES_KEY = 'projectFileManagerCategories_v1.5_Frameless';
     const STORAGE_TODOS_KEY = 'projectFileManagerTodos_v1.5_Frameless';
+    const STORAGE_EXTENSION_MAPPINGS_KEY = 'projectFileManagerExtMappings_v1.0';
+
 
     const DEFAULT_CATEGORIES_STRUCTURE = [
         { key: 'auto_detect', display: '--- Auto-Detect Category ---', isCustom: false, isDefaultOption: true, order: 0, isEditable: false, isDeletable: false },
@@ -800,15 +798,46 @@
         const sortedForDropdown = [...appCategories].sort((a,b) => (a.order ?? Infinity) - (b.order ?? Infinity));
         sortedForDropdown.forEach(cat => { const option = document.createElement('option'); option.value = cat.key; option.textContent = cat.display; if (cat.isDefaultOption) option.selected = true; DOM.categorySelectInput.appendChild(option); });
     }
+    
     function getFileType(pathOrName, entryType = 'file') {
+        const lowerPathOrName = typeof pathOrName === 'string' ? pathOrName.toLowerCase() : '';
+        // 1. Check custom extension mappings
+        const fileExtension = lowerPathOrName.startsWith('.') ? lowerPathOrName : (pathModule ? pathModule.extname(lowerPathOrName) : '.' + lowerPathOrName.split('.').pop());
+        const customMapping = customExtensionMappings.find(m => m.extension.toLowerCase() === fileExtension.toLowerCase());
+        if (customMapping) {
+            return customMapping.categoryKey; // Return the category key directly
+        }
+        // 2. Check for website link
+        if (lowerPathOrName.startsWith('https://') || lowerPathOrName.startsWith('http://')) {
+            return 'websiteLink';
+        }
+        // 3. Check for entry type (folderLink)
         if (entryType === 'folderLink') return 'folderLink';
-        if (typeof pathOrName === 'string' && (pathOrName.toLowerCase().startsWith('https://') || pathOrName.toLowerCase().startsWith('http://'))) return 'websiteLink';
+        // 4. Check for hardcoded app extensions
         if (!pathOrName || typeof pathOrName !== 'string') return 'unknown';
         const name = pathModule ? pathModule.basename(pathOrName) : pathOrName.substring(pathOrName.lastIndexOf(/[/\\]/) + 1);
         const ext = name.split('.').pop().toLowerCase();
-        return ext === 'psd' ? 'photoshop' : ext === 'aep' ? 'aftereffects' : ext === 'prproj' ? 'premiere' : 'unknown';
+        if (ext === 'psd') return 'photoshop';
+        if (ext === 'aep') return 'aftereffects';
+        if (ext === 'prproj') return 'premiere';
+        
+        return 'unknown'; // Default
     }
-    function determineItemCategoryKey(fileType, chosenKey) { if (chosenKey && chosenKey !== 'auto_detect') return chosenKey; return FILE_TYPE_TO_DEFAULT_CAT_KEY[fileType] || 'general'; }
+
+    function determineItemCategoryKey(fileTypeOrCatKeyFromGetType, chosenCatKey) {
+        if (chosenCatKey && chosenCatKey !== 'auto_detect') return chosenCatKey;
+        
+        // If getFileType returned a direct categoryKey (from custom mapping)
+        if (appCategories.some(cat => cat.key === fileTypeOrCatKeyFromGetType)) {
+            return fileTypeOrCatKeyFromGetType;
+        }
+        // If getFileType returned a type like 'websiteLink', 'photoshop', etc.
+        if (FILE_TYPE_TO_DEFAULT_CAT_KEY[fileTypeOrCatKeyFromGetType]) {
+            return FILE_TYPE_TO_DEFAULT_CAT_KEY[fileTypeOrCatKeyFromGetType];
+        }
+        return 'general'; // Fallback
+    }
+
     function getCategoryDisplay(key) { const cat = appCategories.find(c => c.key === key); return cat ? cat.display : (key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ')); }
     function openCategoryManagerModal() { renderCategoryManagerList(); DOM.categoryManagerModal.classList.add('show'); DOM.newManagedCategoryInput.value = ''; DOM.newManagedCategoryInput.focus(); }
     function closeCategoryManagerModal() { const activeEditInput = DOM.categoryListContainer.querySelector('.category-name-input-inline'); if (activeEditInput) { cancelInlineEdit(activeEditInput.dataset.key, activeEditInput.closest('.category-manager-item')); } DOM.categoryManagerModal.classList.remove('show'); }
@@ -982,7 +1011,7 @@
         setTimeout(() => { try { if (entryType === 'folderLink') { shell.openPath(itemPath).then(errMessage => { if (errMessage) showAppNotification('❌ Error opening folder location: ' + errMessage.split('\n')[0], 'error'); else showAppNotification('✅ Opened folder location.', 'success'); }).catch(e => showAppNotification('❌ Exception opening folder location: ' + e.message, 'error')); } else { shell.showItemInFolder(itemPath); showAppNotification('✅ Shown file in folder.', 'success'); } } catch (e) { try { shell.openPath(pathModule.dirname(itemPath)).then(errMessage => { if (errMessage) showAppNotification('❌ Error opening containing folder: ' + errMessage.split('\n')[0], 'error'); else showAppNotification('✅ Opened containing folder.', 'success'); }).catch(e2 => showAppNotification('❌ Exception opening containing folder: ' + e2.message, 'error')); } catch (e2) { showAppNotification('❌ Critical error opening location.', 'error');} } showAppLoading(false); }, 100);
     }
     function deleteItemEntry(id) { showAppCustomConfirm('Are you sure you want to remove this entry from the list? (The actual file/folder/website will NOT be deleted).', conf => { if (conf) { projectFiles = projectFiles.filter(i => i.id !== id); saveItemsToStorage(); renderProjectFilesUI(); showAppNotification('🗑️ Entry removed from list.', 'success');} }); }
-    function clearAllData() { showAppCustomConfirm('Are you sure you want to delete all data (all listed items and custom categories)? This action cannot be undone.', conf => { if (conf) { projectFiles = []; appCategories = DEFAULT_CATEGORIES_STRUCTURE.map(cat => ({...cat})); todos = []; saveItemsToStorage(); saveCategoriesToStorage(); saveTodos(); populateCategoryDropdown(); renderProjectFilesUI(); renderTodos(); clearStagedFilesDisplay(); DOM.pathInput.value = ''; showAppNotification('🗑️ All data has been cleared.', 'success'); } }); }
+    function clearAllData() { showAppCustomConfirm('Are you sure you want to delete all data (all listed items, custom categories, and tasks)? This action cannot be undone.', conf => { if (conf) { projectFiles = []; appCategories = DEFAULT_CATEGORIES_STRUCTURE.map(cat => ({...cat})); todos = []; customExtensionMappings = []; saveItemsToStorage(); saveCategoriesToStorage(); saveTodos(); saveCustomExtensionMappings(); populateCategoryDropdown(); renderProjectFilesUI(); renderTodos(); renderCustomExtensionMappingsUI(); clearStagedFilesDisplay(); DOM.pathInput.value = ''; showAppNotification('🗑️ All data has been cleared.', 'success'); } }); }
     function openMultiple(itemsToOpen, itemEntryType, context) {
         if (!shell && itemEntryType !== 'websiteLink') { showAppNotification('This feature is available in the desktop app only.', 'warning'); return; }
         const validItems = itemsToOpen.filter(i => { if (i.entryType === 'websiteLink') return i.location && typeof i.location === 'string' && (i.location.startsWith('https://') || i.location.startsWith('http://')); return i.entryType === itemEntryType && i.location && typeof i.location === 'string'; });
@@ -1027,8 +1056,100 @@
     }
     function toggleTodoComplete(id) { const todo = todos.find(t => t.id === id); if (todo) { todo.completed = !todo.completed; saveTodos(); renderTodos(); } }
     function deleteTodo(id) { showAppCustomConfirm('Are you sure you want to delete this task?', (confirmed) => { if (confirmed) { todos = todos.filter(t => t.id !== id); saveTodos(); renderTodos(); showAppNotification('Task deleted.', 'success'); } }); }
+    
+    // --- Custom Extension Mapping Functions ---
+    function loadCustomExtensionMappings() {
+        try {
+            const storedMappings = localStorage.getItem(STORAGE_EXTENSION_MAPPINGS_KEY);
+            customExtensionMappings = storedMappings ? JSON.parse(storedMappings) : [];
+        } catch (e) {
+            customExtensionMappings = [];
+            console.error("[Renderer] Error parsing custom extension mappings from LS", e);
+            localStorage.removeItem(STORAGE_EXTENSION_MAPPINGS_KEY);
+        }
+        renderCustomExtensionMappingsUI();
+    }
+    function saveCustomExtensionMappings() {
+        try { localStorage.setItem(STORAGE_EXTENSION_MAPPINGS_KEY, JSON.stringify(customExtensionMappings)); }
+        catch (e) { console.error('[Renderer] Error saving custom extension mappings:', e); showAppNotification('Error saving extension mappings!', 'error');}
+    }
+    function renderCustomExtensionMappingsUI() {
+        if (!DOM.extensionMappingsContainer) return;
+        DOM.extensionMappingsContainer.innerHTML = '';
+        if (customExtensionMappings.length === 0) {
+            DOM.extensionMappingsContainer.innerHTML = `<p style="font-size:0.85rem; color:#90a4ae;">No custom extension mappings defined yet.</p>`;
+            return;
+        }
+        customExtensionMappings.forEach((mapping, index) => {
+            const catDisplay = getCategoryDisplay(mapping.categoryKey) || 'Unknown Category';
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'extension-mapping-item';
+            itemDiv.innerHTML = `
+                <span><strong>${escapeHTML(mapping.extension)}</strong> &rarr; ${escapeHTML(catDisplay)}</span>
+                <button class="btn-icon" onclick="handleDeleteCustomExtensionMapping(${index})" title="Delete Mapping">
+                    <svg viewBox="0 0 24 24"><use xlink:href="#icon-delete"></use></svg>
+                </button>
+            `;
+            DOM.extensionMappingsContainer.appendChild(itemDiv);
+        });
+    }
+    function handleAddCustomExtensionMapping() {
+        const extension = DOM.newExtensionInput.value.trim().toLowerCase();
+        const categoryDisplayName = DOM.newExtensionCategoryNameInput.value.trim();
+
+        if (!extension || !categoryDisplayName) {
+            showAppNotification('Extension and Category Name cannot be empty.', 'warning'); return;
+        }
+        if (!extension.startsWith('.')) {
+            showAppNotification('Extension must start with a dot (e.g., .txt).', 'warning'); DOM.newExtensionInput.focus(); return;
+        }
+        if (customExtensionMappings.some(m => m.extension === extension)) {
+            showAppNotification(`Mapping for extension "${extension}" already exists. Delete the old one first.`, 'warning'); return;
+        }
+
+        let categoryKey = '';
+        const existingCategory = appCategories.find(cat => cat.display.toLowerCase() === categoryDisplayName.toLowerCase());
+
+        if (existingCategory) {
+            categoryKey = existingCategory.key;
+        } else {
+            // Create a new custom category
+            const nonAutoDetectCategories = appCategories.filter(c => c.key !== 'auto_detect');
+            const orders = nonAutoDetectCategories.map(c => c.order).filter(o => typeof o === 'number');
+            const maxOrder = orders.length > 0 ? Math.max(0, ...orders) : -1; 
+            categoryKey = `custom_${categoryDisplayName.toLowerCase().replace(/\s+/g, '_')}_${Date.now().toString().slice(-5)}`;
+            appCategories.push({ key: categoryKey, display: categoryDisplayName, isCustom: true, order: maxOrder + 1, isEditable: true, isDeletable: true });
+            saveCategoriesToStorage();
+            populateCategoryDropdown(); // Update dropdown with new category
+            if(document.getElementById('categoryManagerModal').classList.contains('show')) renderCategoryManagerList(); // if modal is open
+            showAppNotification(`New category "${categoryDisplayName}" created.`, 'info');
+        }
+
+        customExtensionMappings.push({ extension: extension, categoryKey: categoryKey });
+        saveCustomExtensionMappings();
+        renderCustomExtensionMappingsUI();
+        DOM.newExtensionInput.value = '';
+        DOM.newExtensionCategoryNameInput.value = '';
+        showAppNotification(`Mapping for "${extension}" to "${categoryDisplayName}" added.`, 'success');
+    }
+    function handleDeleteCustomExtensionMapping(index) {
+        if (index >= 0 && index < customExtensionMappings.length) {
+            const mapping = customExtensionMappings[index];
+            showAppCustomConfirm(`Are you sure you want to delete the mapping for "${mapping.extension}"?`, (confirmed) => {
+                if (confirmed) {
+                    customExtensionMappings.splice(index, 1);
+                    saveCustomExtensionMappings();
+                    renderCustomExtensionMappingsUI();
+                    showAppNotification(`Mapping for "${mapping.extension}" deleted.`, 'success');
+                }
+            });
+        }
+    }
+
+
     function saveItemsToStorage() { try { localStorage.setItem(STORAGE_ITEMS_KEY, JSON.stringify(projectFiles)); } catch (e) { console.error('[Renderer] Error saving items:', e); showAppNotification('Error saving items!', 'error');}}
     function saveCategoriesToStorage() { try { localStorage.setItem(STORAGE_CATEGORIES_KEY, JSON.stringify(appCategories)); } catch (e) { console.error('[Renderer] Error saving categories:', e); showAppNotification('Error saving categories!', 'error');}}
+    
     function loadData() {
         try { const storedItems = localStorage.getItem(STORAGE_ITEMS_KEY); projectFiles = storedItems ? JSON.parse(storedItems).filter(i => i.location && i.name && i.id) : []; } catch (e) { projectFiles = []; console.error("[Renderer] Error parsing items from LS", e); localStorage.removeItem(STORAGE_ITEMS_KEY); }
         try {
@@ -1041,8 +1162,13 @@
             } else { appCategories = DEFAULT_CATEGORIES_STRUCTURE.map(cat => ({...cat})); }
         } catch (e) { appCategories = DEFAULT_CATEGORIES_STRUCTURE.map(cat => ({...cat})); console.error("[Renderer] Error parsing categories from LS", e); localStorage.removeItem(STORAGE_CATEGORIES_KEY); }
         if (!Array.isArray(appCategories) || appCategories.length === 0 || !appCategories.find(c => c.key === 'auto_detect')) { appCategories = DEFAULT_CATEGORIES_STRUCTURE.map(cat => ({...cat})); }
-        loadTodos(); populateCategoryDropdown(); renderProjectFilesUI();
+        
+        loadTodos(); 
+        loadCustomExtensionMappings(); // Load custom mappings
+        populateCategoryDropdown();
+        renderProjectFilesUI();
     }
+    
     function setupIpcListeners() {
         if (!ipcRenderer) {
             console.warn("[Renderer] ipcRenderer not available.");
@@ -1074,25 +1200,26 @@
         if (window.innerWidth > 768) { DOM.sidebar.classList.remove('collapsed'); DOM.mainContent.classList.remove('expanded'); } 
         else { DOM.sidebar.classList.add('collapsed'); DOM.mainContent.classList.add('expanded'); }
         
+        // Remove the original clearAllDataBtn listener if it exists, as it's moved to options
+        if(DOM.clearAllDataBtn) DOM.clearAllDataBtn.removeEventListener('click', clearAllData);
+
+
         DOM.openAllBtn.addEventListener('click', handleOpenAllClick);
         DOM.selectFilesBtn.addEventListener('click', handleSelectFilesClick);
         DOM.addFolderLinkBtn.addEventListener('click', handleAddFolderLinkClick);
         DOM.importFromFolderBtn.addEventListener('click', handleImportFromFolderClick);
         DOM.pastePathBtn.addEventListener('click', handlePastePathClick);
         DOM.addPastedPathBtn.addEventListener('click', handleAddPastedPathClick);
-        // DOM.clearAllDataBtn listener is now attached to the button on the Options page
         DOM.addItemsBtn.addEventListener('click', handleProcessStagedItems);
         
-        // The "Manage Categories" button is now on the Options page.
-        // Ensure the ID 'manageCategoriesBtn' is unique or update if necessary.
-        // If you keep the same ID, this listener will work fine.
         if(DOM.manageCategoriesBtn) DOM.manageCategoriesBtn.addEventListener('click', openCategoryManagerModal);
-        
         DOM.closeCategoryManagerBtn.addEventListener('click', closeCategoryManagerModal);
         DOM.addManagedCategoryBtn.addEventListener('click', handleAddManagedCategory);
         if(DOM.addTodoBtn) DOM.addTodoBtn.addEventListener('click', addTodo);
         if(DOM.todoInput) DOM.todoInput.addEventListener('keydown', e => { if (e.key === 'Enter') addTodo(); });
-        if(DOM.clearAllDataBtnOptionsPage) DOM.clearAllDataBtnOptionsPage.addEventListener('click', clearAllData); // Listener for new button
+        if(DOM.clearAllDataBtnOptionsPage) DOM.clearAllDataBtnOptionsPage.addEventListener('click', clearAllData);
+        if(DOM.addExtensionMappingBtn) DOM.addExtensionMappingBtn.addEventListener('click', handleAddCustomExtensionMapping);
+
 
         DOM.filesDisplayContainer.addEventListener('click', e => {
             const btn = e.target.closest('.item-actions-menu button[data-action]');
