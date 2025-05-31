@@ -24,14 +24,14 @@
         /* --- Custom Draggable Title Bar --- */
         .custom-title-bar {
             position: fixed; top: 0; left: 0; width: 100%; height: 38px;
-            background-color: rgba(18, 20, 30, 0.85); 
-            backdrop-filter: blur(10px);
+            background-color: rgba(18, 20, 30, 0.9); /* Slightly more opaque */
+            backdrop-filter: blur(12px);
             -webkit-app-region: drag; 
             z-index: 100000; display: flex; align-items: center;
             justify-content: space-between; padding: 0 10px 0 15px;
-            user-select: none; border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            user-select: none; border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .window-app-title { color: #b0bec5; font-size: 0.85em; font-weight: 500; -webkit-app-region: no-drag; }
+        .window-app-title { color: #b0bec5; font-size: 0.9em; font-weight: 500; -webkit-app-region: no-drag; }
 
         /* --- Window Controls --- */
         .window-controls {
@@ -56,7 +56,7 @@
         /* --- Sidebar --- */
         .sidebar {
             position: fixed; left: 0; top: 38px; width: 250px; height: calc(100vh - 38px);
-            background: rgba(5, 5, 15, 0.88); backdrop-filter: blur(18px); /* Slightly increased opacity */
+            background: rgba(10, 12, 28, 0.88); backdrop-filter: blur(18px); 
             border-right: 1px solid rgba(255, 255, 255, 0.08);
             padding: 15px; transition: all 0.3s ease; z-index: 9999;
             display: flex; flex-direction: column;
@@ -187,7 +187,6 @@
         .btn-icon:disabled { color: #5f6770 !important; background-color: transparent !important; cursor: not-allowed;}
         .btn-icon:disabled svg { fill: #5f6770 !important; }
 
-        /* Add Item Button (Replaces .add-item-section) */
         .add-item-fab {
             position: fixed; bottom: 25px; right: 25px; 
             background: linear-gradient(45deg, #1e88e5, #2196f3, #42a5f5); color: white;
@@ -200,8 +199,6 @@
         .add-item-fab:hover { transform: scale(1.05) translateY(-2px); box-shadow: 0 6px 20px rgba(33, 150, 243, 0.5); }
         .add-item-fab svg { width: 24px; height: 24px; }
 
-
-        /* Add Item Modal (Replaces .add-item-section content) */
         #addItemModal { z-index: 100001; } 
         .add-item-modal-content {
             background: rgba(15, 15, 35, 0.95); backdrop-filter: blur(25px);
@@ -220,7 +217,7 @@
         .add-item-modal-content .input-group { display: flex; flex-direction: column; gap: 15px; } 
         .add-item-modal-content .input-row { display: flex; gap: 12px; flex-wrap: wrap; }
         
-        /* Improved Input Field Styles for Modal and General Use */
+        /* Corrected Input Field Styles */
         .input-field, 
         #categorySelectInputModal, 
         .category-name-input-inline, 
@@ -230,12 +227,12 @@
         #newExtensionCategoryNameInput {
             flex: 1; 
             padding: 12px 15px; 
-            border: 1px solid rgba(100, 110, 130, 0.4); /* Darker, less prominent border */
+            border: 1px solid rgba(100, 110, 130, 0.5); /* Darker, more visible border */
             border-radius: 8px; 
             font-size: 0.9rem; 
             min-width: 150px; 
-            background-color: rgba(20, 22, 38, 0.7); /* Darker background for inputs */
-            color: #e0e0e0; 
+            background-color: rgba(25, 28, 48, 0.75); /* Darker background */
+            color: #e8eaf6; /* Lighter text for better contrast */
             transition: all 0.25s ease;
             outline: none; 
         }
@@ -243,8 +240,8 @@
         #todoInput::placeholder, 
         #newExtensionInput::placeholder, 
         #newExtensionCategoryNameInput::placeholder { 
-            color: #788aa0; 
-            opacity: 0.8; 
+            color: #8a9bb8; 
+            opacity: 0.9; 
         }
         .input-field:focus, 
         #categorySelectInputModal:focus, 
@@ -253,9 +250,9 @@
         #todoInput:focus, 
         #newExtensionInput:focus, 
         #newExtensionCategoryNameInput:focus {
-            border-color: #2196f3; 
-            background-color: rgba(30, 32, 50, 0.8); 
-            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.25); 
+            border-color: #42a5f5; /* Brighter blue on focus */
+            background-color: rgba(35, 38, 60, 0.85); 
+            box-shadow: 0 0 0 3px rgba(66, 165, 245, 0.3); 
         }
 
         #categorySelectInputModal { 
@@ -338,7 +335,15 @@
             padding-top: 8px; border-top: 1px solid rgba(255, 255, 255, 0.07);
         }
         .item-card-date { font-size: 0.65rem; color: #78828c; }
+        .item-card-actions-trigger { /* For the ... button */
+             -webkit-app-region: no-drag; /* Ensure options button is clickable */
+        }
         .item-card-actions-trigger svg { width: 16px; height: 16px; }
+        .item-card-direct-open { /* New style for direct open button */
+            -webkit-app-region: no-drag;
+            margin-right: 8px; /* Spacing from options button */
+        }
+
 
         .item-actions-menu {
             display: none; position: absolute; background-color: rgba(20, 20, 40, 0.88); 
@@ -502,26 +507,25 @@
         /* Options Page Specific Styles */
         #optionsPage .glass-card { padding: 25px; }
         #optionsPage .options-group {
-            margin-bottom: 30px; /* Increased spacing */
-            padding-bottom: 20px; /* Padding for separation */
-            border-bottom: 1px solid rgba(255,255,255,0.05); /* Softer separator */
+            margin-bottom: 30px; 
+            padding-bottom: 20px; 
+            border-bottom: 1px solid rgba(255,255,255,0.05); 
         }
         #optionsPage .options-group:last-child { border-bottom: none; margin-bottom: 0; }
         #optionsPage .options-group h3 {
-            font-size: 1.3rem; /* Slightly larger heading */
-            color: #81c784; /* Greenish accent for option titles */
+            font-size: 1.3rem; 
+            color: #81c784; 
             margin-bottom: 12px;
             padding-bottom: 8px;
-            /* border-bottom: 1px solid rgba(255,255,255,0.1); */
         }
         #optionsPage .options-group p {
             font-size: 0.85rem;
-            color: #b0bec5; /* Lighter secondary text */
-            margin-bottom: 15px; /* Spacing below paragraph */
+            color: #b0bec5; 
+            margin-bottom: 15px; 
             line-height: 1.5;
         }
-        #optionsPage .options-group .btn { margin-top: 8px;} /* Spacing above buttons */
-        #optionsPage .input-row { margin-bottom: 12px;} /* Spacing for input rows in options */
+        #optionsPage .options-group .btn { margin-top: 8px;} 
+        #optionsPage .input-row { margin-bottom: 12px;} 
 
         #extensionMappingsContainer { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; max-height: 220px; overflow-y: auto; padding:10px; background: rgba(0,0,0,0.1); border-radius: 6px;}
         .extension-mapping-item {
@@ -537,11 +541,11 @@
 
         /* About Page Centering */
         #aboutPage .glass-card {
-            max-width: 700px; /* Limit width for better readability */
+            max-width: 700px; 
             margin-left: auto;
             margin-right: auto;
             padding: 30px;
-            text-align: center; /* Center text content */
+            text-align: center; 
         }
         #aboutPage h3 {
             font-size: 1.6rem; color: #64b5f6; margin-bottom: 15px;
@@ -638,8 +642,7 @@
             </li>
             <li class="nav-item">
                 <a href="#" class="nav-link" onclick="showPage('optionsPage')"> 
-                    <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"> <path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.08-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38 2.65c.61-.25 1.17-.59-1.69-.98l2.49 1c.23.08.49 0 .61.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5S15.73 15.5 12 15.5z"/></svg>
-                    <span class="nav-text">Options</span>
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"> <use xlink:href="#icon-settings-alt"></use></svg> <span class="nav-text">Options</span>
                 </a>
             </li>
             <li class="nav-item">
@@ -741,8 +744,7 @@
                     <h3>Category Management</h3>
                     <p>Organize how your items are grouped.</p>
                     <button id="manageCategoriesBtn" class="btn btn-secondary">
-                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-settings"></use></svg>
-                        Manage Categories
+                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-settings-alt"></use></svg> Manage Categories
                     </button>
                 </div>
 
@@ -805,7 +807,8 @@
         <symbol id="icon-aftereffects" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 15l-4-4h2.5v-3h3v3H16l-4 4zM8.5 9.5L12 6l3.5 3.5h-2v3h-3v-3h-2z"/></symbol>
         <symbol id="icon-premiere" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM9.5 16.5L14.5 12L9.5 7.5v9zM15 16h-2V8h2v8z"/></symbol>
         <symbol id="icon-options" viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></symbol>
-        <symbol id="icon-edit" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.39.39 0 00-.55 0l-1.83 1.83 3.75 3.75 1.83-1.83zM3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 000-1.41l-2.34-2.34a.996.996 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></symbol> <symbol id="icon-delete" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></symbol>
+        <symbol id="icon-edit" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.39.39 0 00-.55 0l-1.83 1.83 3.75 3.75 1.83-1.83zM3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 000-1.41l-2.34-2.34a.996.996 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></symbol> 
+        <symbol id="icon-delete" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></symbol>
         <symbol id="icon-open" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></symbol>
         <symbol id="icon-show-location" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></symbol>
         <symbol id="icon-add" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></symbol>
@@ -1108,14 +1111,17 @@
         if (addedCount > 0) {
             saveItemsToStorage(); renderProjectFilesUI();
             showAppNotification(`✨ Added ${addedCount} item(s)!`, 'success');
-            // No automatic save to active file here, user must explicitly save.
         }
         DOM.projectNameInputModal.value = ''; clearStagedFilesDisplayModal();
         DOM.categorySelectInputModal.value = 'auto_detect'; 
-        if (addedCount > 0) DOM.projectNameInputModal.focus(); 
+        if (addedCount > 0 && DOM.projectNameInputModal) DOM.projectNameInputModal.focus(); 
         closeAddItemModal(); 
     }
     function renderProjectFilesUI() {
+        if(!DOM.fileCountDisplay || !DOM.openAllBtn || !DOM.filesDisplayContainer) {
+            console.warn("Path Manager UI elements not found, skipping render.");
+            return;
+        }
         DOM.fileCountDisplay.textContent = projectFiles.length; DOM.openAllBtn.disabled = projectFiles.length === 0; DOM.filesDisplayContainer.innerHTML = '';
         if (projectFiles.length === 0) { DOM.filesDisplayContainer.innerHTML = `<div class="empty-placeholder"><div class="icon"><svg viewBox="0 0 24 24"><use xlink:href="#icon-empty-folder"></use></svg></div><h3>List is empty.</h3><p>Start by adding files, folders, or website links.</p></div>`; return; }
         const grouped = projectFiles.reduce((acc, item) => { const key = item.category || 'general'; if (!acc[key]) acc[key] = []; acc[key].push(item); return acc; }, {});
@@ -1139,10 +1145,44 @@
             items.forEach((item, idx) => { const cardHTML = createFileCardHTML(item, idx); const tempDiv = document.createElement('div'); tempDiv.innerHTML = cardHTML.trim(); const cardElement = tempDiv.firstChild; if (cardElement) { cardElement.classList.add('fade-in-item'); grid.appendChild(cardElement); } });
             section.appendChild(header); section.appendChild(grid); DOM.filesDisplayContainer.appendChild(section);
         });
-        DOM.filesDisplayContainer.querySelectorAll('.path-card-options-btn').forEach(btn => btn.addEventListener('click', handleOptionsMenu));
+        DOM.filesDisplayContainer.querySelectorAll('.path-card-options-btn, .item-card-direct-open').forEach(btn => btn.addEventListener('click', handleItemCardButton));
     }
-    function handleOptionsMenu(event) {
-        event.stopPropagation(); const itemId = event.currentTarget.dataset.itemId; const menuId = `options-menu-${itemId}`; const currentMenu = document.getElementById(menuId);
+    
+    function handleItemCardButton(event) {
+        const button = event.currentTarget;
+        const action = button.dataset.action;
+        const itemId = button.dataset.itemId || button.closest('.item-card').querySelector('.path-card-options-btn')?.dataset.itemId; // Get itemId from options btn if direct open
+        
+        if (!itemId) return;
+
+        const item = projectFiles.find(pf => pf.id === parseFloat(itemId));
+        if (!item) { console.warn(`Item with id ${itemId} not found`); showAppNotification('Error: Item not found.', 'error'); return; }
+
+        if (action === 'options') {
+            handleOptionsMenu(event);
+        } else if (action === 'open') {
+            openItem(item.location, item.entryType, item.type);
+        } else if (action === 'show-location') {
+            showItemInFolder(item.location, item.entryType);
+        } else if (action === 'delete') {
+            deleteItemEntry(item.id);
+        }
+        // Close any open menus if the action was not 'options' itself
+        if (action !== 'options') {
+            const menu = button.closest('.item-actions-menu');
+            if (menu) menu.classList.remove('show');
+            else { // For direct open button, close its associated options menu if open
+                const optionsMenu = document.getElementById(`options-menu-${itemId}`);
+                if (optionsMenu) optionsMenu.classList.remove('show');
+            }
+        }
+    }
+
+
+    function handleOptionsMenu(event) { // This function is now only for toggling the options menu
+        event.stopPropagation(); 
+        const itemId = event.currentTarget.dataset.itemId; const menuId = `options-menu-${itemId}`; 
+        const currentMenu = document.getElementById(menuId);
         document.querySelectorAll('.item-actions-menu.show').forEach(m => { if (m.id !== menuId) { m.classList.remove('show'); } });
         if (currentMenu) {
             currentMenu.classList.toggle('show'); 
@@ -1158,7 +1198,8 @@
             }
         }
     }
-    document.addEventListener('click', e => { if (!e.target.closest('.path-card-options-btn') && !e.target.closest('.item-actions-menu')) { document.querySelectorAll('.item-actions-menu.show').forEach(m => m.classList.remove('show')); } });
+    document.addEventListener('click', e => { if (!e.target.closest('.path-card-options-btn') && !e.target.closest('.item-actions-menu') && !e.target.closest('.item-card-direct-open')) { document.querySelectorAll('.item-actions-menu.show').forEach(m => m.classList.remove('show')); } });
+    
     function createFileCardHTML(item, index) {
         let typeDisplay = 'File'; let iconId = 'icon-file';
         if (item.entryType === 'folderLink') { typeDisplay = 'Folder Link'; iconId = 'icon-folder'; } 
@@ -1166,8 +1207,31 @@
         else if (FILE_TYPE_TO_DEFAULT_CAT_KEY[item.type]) { typeDisplay = getCategoryDisplay(FILE_TYPE_TO_DEFAULT_CAT_KEY[item.type]); if (item.type === 'photoshop') iconId = 'icon-photoshop'; else if (item.type === 'aftereffects') iconId = 'icon-aftereffects'; else if (item.type === 'premiere') iconId = 'icon-premiere'; }
         const openActionText = item.type === 'websiteLink' ? 'Open Website' : 'Open';
         const openIcon = item.type === 'websiteLink' ? 'icon-website' : (item.entryType === 'folderLink' ? 'icon-folder' : 'icon-open');
-        return `<div class="item-card" style="--card-index: ${index};"><div class="item-card-main"><span class="item-card-icon"><svg viewBox="0 0 24 24"><use xlink:href="#${iconId}"></use></svg></span><div class="item-card-info"><div class="item-card-name" title="${escapeAttr(item.name)}">${escapeHTML(item.name)}</div><div class="item-card-filetype">${escapeHTML(typeDisplay)}</div></div></div><div class="item-card-path" title="${escapeAttr(item.location)}">${escapeHTML(item.location)}</div><div class="item-card-footer"><span class="item-card-date">Added: ${item.dateAdded}</span><button class="btn btn-icon path-card-options-btn" data-item-id="${item.id}" title="Options"><svg viewBox="0 0 24 24"><use xlink:href="#icon-options"></use></svg></button></div><div class="item-actions-menu" id="options-menu-${item.id}"><button data-action="open" data-id="${item.id}"><svg viewBox="0 0 24 24"><use xlink:href="#${openIcon}"></use></svg>${openActionText}</button>${item.type !== 'websiteLink' ? `<button data-action="show-location" data-id="${item.id}"><svg viewBox="0 0 24 24"><use xlink:href="#icon-show-location"></use></svg>Open File Location</button>` : ''}<button data-action="delete" data-id="${item.id}"><svg viewBox="0 0 24 24"><use xlink:href="#icon-delete"></use></svg>Delete from List</button></div></div>`;
+        return `<div class="item-card" style="--card-index: ${index};">
+                <div class="item-card-main">
+                    <span class="item-card-icon"><svg viewBox="0 0 24 24"><use xlink:href="#${iconId}"></use></svg></span>
+                    <div class="item-card-info">
+                        <div class="item-card-name" title="${escapeAttr(item.name)}">${escapeHTML(item.name)}</div>
+                        <div class="item-card-filetype">${escapeHTML(typeDisplay)}</div>
+                    </div>
+                    <button class="btn btn-icon item-card-direct-open" data-action="open" data-item-id="${item.id}" title="${openActionText}">
+                        <svg viewBox="0 0 24 24"><use xlink:href="#${openIcon}"></use></svg>
+                    </button>
+                </div>
+                <div class="item-card-path" title="${escapeAttr(item.location)}">${escapeHTML(item.location)}</div>
+                <div class="item-card-footer">
+                    <span class="item-card-date">Added: ${item.dateAdded}</span>
+                    <button class="btn btn-icon path-card-options-btn" data-action="options" data-item-id="${item.id}" title="Options">
+                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-options"></use></svg>
+                    </button>
+                </div>
+                <div class="item-actions-menu" id="options-menu-${item.id}">
+                    ${item.type !== 'websiteLink' ? `<button data-action="show-location" data-id="${item.id}"><svg viewBox="0 0 24 24"><use xlink:href="#icon-show-location"></use></svg>Open File Location</button>` : ''}
+                    <button data-action="delete" data-id="${item.id}"><svg viewBox="0 0 24 24"><use xlink:href="#icon-delete"></use></svg>Delete from List</button>
+                </div>
+            </div>`;
     }
+
     function openItem(location, entryType = 'file', itemType = 'unknown') {
         if (!shell && itemType !== 'websiteLink') { showAppNotification('This feature is available in the desktop app only.', 'warning'); return; }
         if (!location || typeof location !== 'string') { showAppNotification('❌ Invalid path/URL.', 'error'); return; }
@@ -1240,15 +1304,8 @@
                     </button>
                 </div>`;
             DOM.todosContainer.appendChild(todoItemDiv);
-            // Add keydown listener for edit input
             const editInput = todoItemDiv.querySelector(`#todo-edit-input-${todo.id}`);
-            editInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    saveEditedTodo(todo.id);
-                } else if (e.key === 'Escape') {
-                    cancelEditTodo(todo.id);
-                }
-            });
+            editInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { saveEditedTodo(todo.id); } else if (e.key === 'Escape') { cancelEditTodo(todo.id); } });
         });
     }
     function addTodo() {
@@ -1261,49 +1318,20 @@
     function deleteTodo(id) { showAppCustomConfirm('Are you sure you want to delete this task?', (confirmed) => { if (confirmed) { todos = todos.filter(t => t.id !== id); saveTodos(); renderTodos(); showAppNotification('Task deleted.', 'success'); } }); }
     
     function handleEditTodo(id) {
-        const textSpan = document.getElementById(`todo-text-${id}`);
-        const editInput = document.getElementById(`todo-edit-input-${id}`);
-        const editBtn = document.getElementById(`btn-edit-todo-${id}`);
-        const saveBtn = document.getElementById(`btn-save-todo-${id}`);
-        const cancelBtn = document.getElementById(`btn-cancel-todo-${id}`);
-        const deleteBtn = textSpan.closest('.todo-item').querySelector('.btn-delete-todo');
-
-
+        const textSpan = document.getElementById(`todo-text-${id}`); const editInput = document.getElementById(`todo-edit-input-${id}`);
+        const editBtn = document.getElementById(`btn-edit-todo-${id}`); const saveBtn = document.getElementById(`btn-save-todo-${id}`);
+        const cancelBtn = document.getElementById(`btn-cancel-todo-${id}`); const deleteBtn = textSpan.closest('.todo-item').querySelector('.btn-delete-todo');
         if (textSpan && editInput && editBtn && saveBtn && cancelBtn && deleteBtn) {
-            textSpan.style.display = 'none';
-            editInput.style.display = 'block';
-            editInput.value = textSpan.textContent; // Ensure current value
-            editInput.focus();
-            editInput.select();
-
-            editBtn.style.display = 'none';
-            deleteBtn.style.display = 'none';
-            saveBtn.style.display = 'inline-flex';
-            cancelBtn.style.display = 'inline-flex';
+            textSpan.style.display = 'none'; editInput.style.display = 'block'; editInput.value = textSpan.textContent; editInput.focus(); editInput.select();
+            editBtn.style.display = 'none'; deleteBtn.style.display = 'none'; saveBtn.style.display = 'inline-flex'; cancelBtn.style.display = 'inline-flex';
         }
     }
-
     function saveEditedTodo(id) {
-        const editInput = document.getElementById(`todo-edit-input-${id}`);
-        const newText = editInput.value.trim();
-        if (!newText) {
-            showAppNotification('Task text cannot be empty.', 'warning');
-            editInput.focus();
-            return;
-        }
-        const todo = todos.find(t => t.id === id);
-        if (todo) {
-            todo.text = newText;
-            saveTodos();
-            renderTodos(); // This will re-render the item in its normal state
-            showAppNotification('Task updated!', 'success');
-        }
+        const editInput = document.getElementById(`todo-edit-input-${id}`); const newText = editInput.value.trim();
+        if (!newText) { showAppNotification('Task text cannot be empty.', 'warning'); editInput.focus(); return; }
+        const todo = todos.find(t => t.id === id); if (todo) { todo.text = newText; saveTodos(); renderTodos(); showAppNotification('Task updated!', 'success'); }
     }
-    function cancelEditTodo(id) {
-        // Simply re-render to revert to normal display
-        renderTodos();
-    }
-
+    function cancelEditTodo(id) { renderTodos(); }
 
     function loadCustomExtensionMappings() { try { const storedMappings = localStorage.getItem(STORAGE_EXTENSION_MAPPINGS_KEY); customExtensionMappings = storedMappings ? JSON.parse(storedMappings) : []; } catch (e) { customExtensionMappings = []; console.error("[Renderer] Error parsing custom extension mappings from LS", e); localStorage.removeItem(STORAGE_EXTENSION_MAPPINGS_KEY); } renderCustomExtensionMappingsUI(); }
     function saveCustomExtensionMappings() { try { localStorage.setItem(STORAGE_EXTENSION_MAPPINGS_KEY, JSON.stringify(customExtensionMappings)); } catch (e) { console.error('[Renderer] Error saving custom extension mappings:', e); showAppNotification('Error saving extension mappings!', 'error');} /* Removed auto-save */ }
@@ -1436,23 +1464,58 @@
         ipcRenderer.on('selected-files-for-files', (event, paths) => updateStagedPathsModal(paths, 'file', 'Files ready: '));
         ipcRenderer.on('selected-folder-for-link', (event, paths) => updateStagedPathsModal(paths, 'folderLink', 'Folder links ready: '));
         ipcRenderer.on('selected-folder-for-import', (event, contents) => { if (contents && Array.isArray(contents) && contents.length > 0) { stagedFilePaths = contents.map(item => ({ ...item, entryType: 'file' })); let baseName = "Selected folder"; if (pathModule && contents[0].path) { const parentDir = pathModule.dirname(contents[0].path); baseName = pathModule.basename(parentDir); if (!baseName && parentDir) baseName = parentDir; } DOM.selectedFilesDisplayModal.textContent = `Files to import from "${baseName}" (${stagedFilePaths.length})`; DOM.pathInputModal.value = ''; } else if (DOM.pathInputModal && !DOM.pathInputModal.value.trim()) clearStagedFilesDisplayModal(); });
-        ipcRenderer.on('pasted-path-processed', (event, { items, originalPath }) => { if (items && Array.isArray(items) && items.length > 0) { if (items[0].entryType === 'websiteLink') { updateStagedPathsModal(items.map(i => i.path), 'websiteLink', 'Website link ready: '); } else { stagedFilePaths = items; DOM.selectedFilesDisplayModal.textContent = `Processed path. Ready to add: ${items.map(f => f.name).join(', ')}`; } } else { clearStagedFilesDisplayModal(); const name = (pathModule && originalPath) ? pathModule.basename(originalPath) : "Pasted path"; showAppNotification(`Path "${name}" is invalid, empty, or inaccessible.`, 'error'); } });
+        ipcRenderer.on('pasted-path-processed', (event, { items, originalPath }) => { 
+            if (items && Array.isArray(items) && items.length > 0) {
+                 if (items[0].entryType === 'websiteLink') { // Check if main process identified it as a website
+                     updateStagedPathsModal(items.map(i => i.path), 'websiteLink', 'Website link ready: ');
+                 } else {
+                    stagedFilePaths = items; 
+                    DOM.selectedFilesDisplayModal.textContent = `Processed path. Ready to add: ${items.map(f => f.name).join(', ')}`;
+                 }
+            } else { 
+                clearStagedFilesDisplayModal(); 
+                const name = (pathModule && originalPath) ? pathModule.basename(originalPath) : "Pasted path"; 
+                showAppNotification(`Path "${name}" is invalid, empty, or inaccessible.`, 'error'); 
+            } 
+        });
         ipcRenderer.on('pasted-path-error', (event, { message, originalPath }) => { const name = (pathModule && originalPath) ? pathModule.basename(originalPath) : "Pasted path"; showAppNotification(`Error processing "${name}": ${message}`, 'error'); clearStagedFilesDisplayModal(); });
     }
-    function handleSelectFilesClickFromModal() { if (ipcRenderer) ipcRenderer.send('open-file-dialog-for-files'); else showAppNotification('This feature is available in the desktop app only.', 'warning'); }
-    function handleAddFolderLinkClickFromModal() { if (ipcRenderer) ipcRenderer.send('open-folder-dialog-for-link'); else showAppNotification('This feature is available in the desktop app only.', 'warning'); }
-    function handleImportFromFolderClickFromModal() { if (ipcRenderer) ipcRenderer.send('open-folder-dialog-for-import'); else showAppNotification('This feature is available in the desktop app only.', 'warning'); }
-    async function handlePastePathClickFromModal() {
+    
+    // --- Add Item Modal Logic ---
+    function openAddItemModal() {
+        populateCategoryDropdown(DOM.categorySelectInputModal); 
+        clearStagedFilesDisplayModal(); 
+        if(DOM.projectNameInputModal) DOM.projectNameInputModal.value = ''; 
+        if(DOM.pathInputModal) DOM.pathInputModal.value = ''; 
+        if(DOM.addItemModal) DOM.addItemModal.classList.add('show');
+    }
+    function closeAddItemModal() {
+        if(DOM.addItemModal) DOM.addItemModal.classList.remove('show');
+    }
+
+    // --- Event Listeners for Modal ---
+    if(DOM.addItemFab) DOM.addItemFab.addEventListener('click', openAddItemModal);
+    if(DOM.closeAddItemModalBtn) DOM.closeAddItemModalBtn.addEventListener('click', closeAddItemModal);
+    if(DOM.selectFilesButtonModal) DOM.selectFilesButtonModal.addEventListener('click', () => { if (ipcRenderer) ipcRenderer.send('open-file-dialog-for-files'); else showAppNotification('This feature is available in the desktop app only.', 'warning'); });
+    if(DOM.addFolderLinkButtonModal) DOM.addFolderLinkButtonModal.addEventListener('click', () => { if (ipcRenderer) ipcRenderer.send('open-folder-dialog-for-link'); else showAppNotification('This feature is available in the desktop app only.', 'warning'); });
+    if(DOM.importFromFolderButtonModal) DOM.importFromFolderButtonModal.addEventListener('click', () => { if (ipcRenderer) ipcRenderer.send('open-folder-dialog-for-import'); else showAppNotification('This feature is available in the desktop app only.', 'warning'); });
+    if(DOM.pastePathButtonModal) DOM.pastePathButtonModal.addEventListener('click', async () => {
         let clipboardText = '';
         try { if (electronClipboard) { clipboardText = electronClipboard.readText(); } else if (navigator.clipboard && navigator.clipboard.readText) { clipboardText = await navigator.clipboard.readText(); } else { showAppNotification('Clipboard API not available.', 'warning'); return; } DOM.pathInputModal.value = clipboardText; showAppNotification(clipboardText ? 'Path pasted.' : 'Clipboard is empty.', clipboardText ? 'success' : 'warning');
         } catch (err) { console.error('[Renderer] Failed to read clipboard: ', err); showAppNotification('Failed to paste from clipboard. Ensure permission if prompted.', 'error'); }
-    }
-    function handleAddPastedPathClickFromModal() {
+    });
+    if(DOM.addPastedPathButtonModal) DOM.addPastedPathButtonModal.addEventListener('click', () => {
         const pathValue = DOM.pathInputModal.value.trim(); if (!pathValue) { showAppNotification('Please enter or paste a path first.', 'warning'); return; }
-        if (pathValue.toLowerCase().startsWith('http://') || pathValue.toLowerCase().startsWith('https://')) { updateStagedPathsModal([pathValue], 'websiteLink', 'Website link ready: '); }
+        if (pathValue.toLowerCase().startsWith('http://') || pathValue.toLowerCase().startsWith('https://')) { 
+            updateStagedPathsModal([pathValue], 'websiteLink', 'Website link ready: '); 
+        }
         else if (ipcRenderer) { stagedFilePaths = []; DOM.selectedFilesDisplayModal.textContent = `Processing: ${pathValue.substring(pathValue.lastIndexOf(/[/\\]/) + 1)}`; ipcRenderer.send('process-pasted-path', pathValue); } 
         else { showAppNotification('Adding local paths is available in the desktop app only.', 'warning'); }
-    }
+    });
+    if(DOM.addItemsButtonModal) DOM.addItemsButtonModal.addEventListener('click', handleProcessStagedItemsFromModal);
+    if(DOM.projectNameInputModal) DOM.projectNameInputModal.addEventListener('keydown', e => { if (e.key === 'Enter' && stagedFilePaths.length > 0) handleProcessStagedItemsFromModal(); });
+    if(DOM.pathInputModal) DOM.pathInputModal.addEventListener('keydown', e => { if (e.key === 'Enter') DOM.addPastedPathButtonModal.click(); });
+
     
     document.addEventListener('DOMContentLoaded', () => {
         document.documentElement.dir = 'ltr'; document.documentElement.lang = 'en';
@@ -1460,21 +1523,11 @@
         if (window.innerWidth > 768) { DOM.sidebar.classList.remove('collapsed'); DOM.mainContent.classList.remove('expanded'); } 
         else { DOM.sidebar.classList.add('collapsed'); DOM.mainContent.classList.add('expanded'); }
         
-        DOM.openAllBtn.addEventListener('click', handleOpenAllClick);
-        if(DOM.addItemFab) DOM.addItemFab.addEventListener('click', openAddItemModal);
-        if(DOM.closeAddItemModalBtn) DOM.closeAddItemModalBtn.addEventListener('click', closeAddItemModal);
-        if(DOM.selectFilesButtonModal) DOM.selectFilesButtonModal.addEventListener('click', handleSelectFilesClickFromModal);
-        if(DOM.addFolderLinkButtonModal) DOM.addFolderLinkButtonModal.addEventListener('click', handleAddFolderLinkClickFromModal);
-        if(DOM.importFromFolderButtonModal) DOM.importFromFolderButtonModal.addEventListener('click', handleImportFromFolderClickFromModal);
-        if(DOM.pastePathButtonModal) DOM.pastePathButtonModal.addEventListener('click', handlePastePathClickFromModal);
-        if(DOM.addPastedPathButtonModal) DOM.addPastedPathButtonModal.addEventListener('click', handleAddPastedPathClickFromModal);
-        if(DOM.addItemsButtonModal) DOM.addItemsButtonModal.addEventListener('click', handleProcessStagedItemsFromModal);
-        if(DOM.projectNameInputModal) DOM.projectNameInputModal.addEventListener('keydown', e => { if (e.key === 'Enter' && stagedFilePaths.length > 0) handleProcessStagedItemsFromModal(); });
-        if(DOM.pathInputModal) DOM.pathInputModal.addEventListener('keydown', e => { if (e.key === 'Enter') DOM.addPastedPathButtonModal.click(); });
+        if(DOM.openAllBtn) DOM.openAllBtn.addEventListener('click', handleOpenAllClick);
         
         if(DOM.manageCategoriesBtn) DOM.manageCategoriesBtn.addEventListener('click', openCategoryManagerModal);
-        DOM.closeCategoryManagerBtn.addEventListener('click', closeCategoryManagerModal);
-        DOM.addManagedCategoryBtn.addEventListener('click', handleAddManagedCategory);
+        if(DOM.closeCategoryManagerBtn) DOM.closeCategoryManagerBtn.addEventListener('click', closeCategoryManagerModal);
+        if(DOM.addManagedCategoryBtn) DOM.addManagedCategoryBtn.addEventListener('click', handleAddManagedCategory);
         if(DOM.addTodoBtn) DOM.addTodoBtn.addEventListener('click', addTodo);
         if(DOM.todoInput) DOM.todoInput.addEventListener('keydown', e => { if (e.key === 'Enter') addTodo(); });
         if(DOM.clearAllDataBtnOptionsPage) DOM.clearAllDataBtnOptionsPage.addEventListener('click', clearAllData);
@@ -1483,23 +1536,34 @@
         if(DOM.importProjectBtn) DOM.importProjectBtn.addEventListener('click', handleImportProject);
         if(DOM.saveActiveProjectBtn) DOM.saveActiveProjectBtn.addEventListener('click', () => handleSaveActiveProject(true));
 
-        DOM.filesDisplayContainer.addEventListener('click', e => {
-            const btn = e.target.closest('.item-actions-menu button[data-action]');
-            if (btn) {
-                const id = parseFloat(btn.dataset.id); const action = btn.dataset.action;
+        if(DOM.filesDisplayContainer) DOM.filesDisplayContainer.addEventListener('click', e => {
+            const button = e.target.closest('.item-actions-menu button[data-action], .item-card-direct-open[data-action]');
+            if (button) {
+                const id = parseFloat(button.dataset.id || button.closest('.item-card').querySelector('.path-card-options-btn')?.dataset.itemId);
+                const action = button.dataset.action;
                 const item = projectFiles.find(pf => pf.id === id); 
                 if (!item) { console.warn(`Item with id ${id} not found`); showAppNotification('Error: Item not found.', 'error'); return; }
-                const menu = btn.closest('.item-actions-menu'); if(menu) menu.classList.remove('show'); 
-                if (action === 'open') openItem(item.location, item.entryType, item.type);
-                else if (action === 'show-location') showItemInFolder(item.location, item.entryType);
-                else if (action === 'delete') deleteItemEntry(item.id);
+                
+                if (action === 'options') { // This is for the "..." button itself
+                     handleOptionsMenu(e); // Pass the original event
+                } else { // For actions within the menu or direct open button
+                    const menu = button.closest('.item-actions-menu'); 
+                    if(menu) menu.classList.remove('show'); 
+                    else { // If it's a direct open button, close its associated options menu if open
+                        const optionsMenu = document.getElementById(`options-menu-${id}`);
+                        if (optionsMenu) optionsMenu.classList.remove('show');
+                    }
+
+                    if (action === 'open') openItem(item.location, item.entryType, item.type);
+                    else if (action === 'show-location') showItemInFolder(item.location, item.entryType);
+                    else if (action === 'delete') deleteItemEntry(item.id);
+                }
             }
         });
-        DOM.newManagedCategoryInput.addEventListener('keydown', e => { if (e.key === 'Enter') DOM.addManagedCategoryBtn.click(); }); 
+        if(DOM.newManagedCategoryInput) DOM.newManagedCategoryInput.addEventListener('keydown', e => { if (e.key === 'Enter') DOM.addManagedCategoryBtn.click(); }); 
     });
     window.addEventListener('error', e => { console.error('[Renderer] Unhandled Error:', e); showAppNotification('An unexpected error occurred!', 'error'); });
     window.addEventListener('unhandledrejection', event => { console.error('[Renderer] Unhandled Rejection:', event.reason); showAppNotification('An unexpected async error occurred!', 'error'); });
     </script>
 </body>
 </html>
-
