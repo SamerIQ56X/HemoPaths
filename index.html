@@ -24,7 +24,8 @@
         /* --- Custom Draggable Title Bar --- */
         .custom-title-bar {
             position: fixed; top: 0; left: 0; width: 100%; height: 38px;
-            background-color: rgba(10, 10, 20, 0.85); backdrop-filter: blur(12px);
+            background-color: rgba(18, 20, 30, 0.85); 
+            backdrop-filter: blur(10px);
             -webkit-app-region: drag; 
             z-index: 100000; display: flex; align-items: center;
             justify-content: space-between; padding: 0 10px 0 15px;
@@ -188,22 +189,12 @@
 
         /* Add Item Button (Replaces .add-item-section) */
         .add-item-fab {
-            position: fixed;
-            bottom: 25px;
-            right: 25px; /* LTR */
-            background: linear-gradient(45deg, #1e88e5, #2196f3, #42a5f5);
-            color: white;
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.4);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            z-index: 9990;
+            position: fixed; bottom: 25px; right: 25px; 
+            background: linear-gradient(45deg, #1e88e5, #2196f3, #42a5f5); color: white;
+            width: 56px; height: 56px; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; font-size: 24px;
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.4); cursor: pointer;
+            transition: all 0.3s ease; z-index: 9990;
         }
         html[dir="rtl"] .add-item-fab { left: 25px; right: auto; }
         .add-item-fab:hover { transform: scale(1.05) translateY(-2px); box-shadow: 0 6px 20px rgba(33, 150, 243, 0.5); }
@@ -211,10 +202,10 @@
 
 
         /* Add Item Modal (Replaces .add-item-section content) */
-        #addItemModal { z-index: 100000; } /* Ensure it's above other modals */
+        #addItemModal { z-index: 100001; } 
         .add-item-modal-content {
             background: rgba(15, 15, 35, 0.95); backdrop-filter: blur(25px);
-            padding: 25px; border-radius: 16px; width: 90%; max-width: 650px; /* Wider for more inputs */
+            padding: 25px; border-radius: 16px; width: 90%; max-width: 650px;
             border: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 10px 40px rgba(0,0,0,0.5);
             transform: scale(0.95) translateY(10px);
             transition: transform 0.3s ease-out, opacity 0.3s ease-out; opacity: 0;
@@ -228,27 +219,37 @@
         }
         .add-item-modal-content .input-group { display: flex; flex-direction: column; gap: 15px; } 
         .add-item-modal-content .input-row { display: flex; gap: 12px; flex-wrap: wrap; }
-        .add-item-modal-content .input-field, 
-        .add-item-modal-content #categorySelectInputModal { /* Specific ID for modal select */
-            flex: 1; padding: 10px 14px; border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 7px; font-size: 0.85rem; min-width: 140px; 
-            background-color: rgba(255, 255, 255, 0.04); color: white; transition: all 0.25s ease;
+        
+        /* Improved Input Field Styles for Modal and General Use */
+        .input-field, #categorySelectInputModal, .category-name-input-inline, #newManagedCategoryInput, #todoInput, #newExtensionInput, #newExtensionCategoryNameInput {
+            flex: 1; padding: 12px 15px; /* Consistent padding */
+            border: 1px solid rgba(255, 255, 255, 0.2); /* Visible border */
+            border-radius: 8px; /* Consistent radius */
+            font-size: 0.9rem; /* Consistent font size */
+            min-width: 150px; 
+            background-color: rgba(20, 22, 38, 0.7); /* Darker, less transparent background */
+            color: #e0e0e0; /* Lighter text color for better contrast */
+            transition: all 0.25s ease;
+            outline: none; /* Remove default outline */
         }
-        .add-item-modal-content .input-field::placeholder { color: #64b5f6; opacity: 0.7; }
-        .add-item-modal-content .input-field:focus, 
-        .add-item-modal-content #categorySelectInputModal:focus {
-            outline: none; border-color: #2196f3; background-color: rgba(255, 255, 255, 0.08);
-            box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.15);
+        .input-field::placeholder, #todoInput::placeholder, #newExtensionInput::placeholder, #newExtensionCategoryNameInput::placeholder { 
+            color: #788aa0; /* Softer placeholder color */
+            opacity: 0.8; 
         }
-        .add-item-modal-content #categorySelectInputModal {
+        .input-field:focus, #categorySelectInputModal:focus, .category-name-input-inline:focus, #newManagedCategoryInput:focus, #todoInput:focus, #newExtensionInput:focus, #newExtensionCategoryNameInput:focus {
+            border-color: #2196f3; /* Accent color on focus */
+            background-color: rgba(30, 32, 50, 0.8); /* Slightly lighter on focus */
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.25); /* Focus ring */
+        }
+        #categorySelectInputModal { /* Specific styling for select in modal */
             appearance: none; -webkit-appearance: none; -moz-appearance: none;
             background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2364b5f6%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
             background-repeat: no-repeat; background-size: 11px; 
         }
-        html[dir="ltr"] .add-item-modal-content #categorySelectInputModal { background-position: right 12px center; padding-right: 35px; }
-        html[dir="rtl"] .add-item-modal-content #categorySelectInputModal { background-position: left 12px center; padding-left: 35px; }
-        .add-item-modal-content #categorySelectInputModal option { background: #1a1a2e; color: white; }
-        .add-item-modal-actions { text-align: right; margin-top:20px; display:flex; justify-content: flex-end; gap: 10px;} /* RTL: text-align: left */
+        html[dir="ltr"] #categorySelectInputModal { background-position: right 12px center; padding-right: 35px; }
+        html[dir="rtl"] #categorySelectInputModal { background-position: left 12px center; padding-left: 35px; }
+        #categorySelectInputModal option { background: #1a1a2e; color: white; }
+        .add-item-modal-actions { text-align: right; margin-top:20px; display:flex; justify-content: flex-end; gap: 10px;}
         html[dir="rtl"] .add-item-modal-actions { text-align: left; justify-content: flex-start;}
 
 
@@ -372,7 +373,7 @@
             z-index: 99998; opacity: 0; visibility: hidden;
             transition: opacity 0.25s ease-out, visibility 0s 0.25s linear;
         }
-        #confirmModalBackdrop, #addItemModal { z-index: 100001; } /* Ensure modals are on top */
+        #confirmModalBackdrop, #addItemModal { z-index: 100001; } 
         .loading-indicator.show, .modal-backdrop.show { opacity: 1; visibility: visible; transition-delay: 0s; }
         .spinner {
             width: 32px; height: 32px; border: 3.5px solid rgba(255, 255, 255, 0.18); 
@@ -1298,8 +1299,7 @@
         try {
             await ipcRenderer.invoke('save-file', {filePath: activeFilePath, data: JSON.stringify(projectData) });
             if (showNotification) showAppNotification(`Project "${pathModule ? pathModule.basename(activeFilePath) : activeFilePath}" saved.`, 'success');
-            // Update timestamp in history if needed, or just rely on it being at the top
-            addToProjectHistory(activeFilePath); // This will move it to top and update timestamp
+            addToProjectHistory(activeFilePath); 
         } catch (error) {
             console.error('Error saving active project:', error);
             if (showNotification) showAppNotification(`Error saving project: ${error.message}`, 'error');
@@ -1331,15 +1331,14 @@
             if (content) {
                 loadProjectData(JSON.parse(content));
                 activeFilePath = filePath;
-                addToProjectHistory(filePath); // Moves to top and updates timestamp
+                addToProjectHistory(filePath); 
                 updateActiveProjectInfo();
                 showAppNotification(`Project "${pathModule ? pathModule.basename(filePath) : filePath}" loaded.`, 'success');
-                showPage('pathsPage'); // Switch to path manager after loading
+                showPage('pathsPage'); 
             }
         } catch (error) {
             console.error(`Error loading project from path "${filePath}":`, error);
             showAppNotification(`Error loading project: ${error.message}`, 'error');
-            // Remove from history if it's invalid
             projectHistory = projectHistory.filter(item => item.path !== filePath);
             saveProjectHistory();
             renderProjectHistoryUI();
@@ -1348,40 +1347,19 @@
 
 
     function loadProjectData(data) {
-        // Basic validation
-        if (!data || typeof data !== 'object') {
-            showAppNotification('Invalid project file format.', 'error');
-            return;
-        }
+        if (!data || typeof data !== 'object') { showAppNotification('Invalid project file format.', 'error'); return; }
         projectFiles = Array.isArray(data.projectFiles) ? data.projectFiles : [];
-        // Merge categories carefully, preserving defaults if possible
         if (Array.isArray(data.appCategories)) {
             const loadedCats = data.appCategories;
-            const mergedCategories = DEFAULT_CATEGORIES_STRUCTURE.map(defaultCat => {
-                const savedCat = loadedCats.find(sc => sc.key === defaultCat.key && !sc.isCustom); // Match non-custom defaults
-                if (savedCat) return { ...defaultCat, ...savedCat, isCustom: false }; // Ensure isCustom is false for defaults
-                return {...defaultCat};
-            });
-            loadedCats.forEach(savedCat => { // Add custom categories from file
-                if (savedCat.isCustom && !mergedCategories.some(mc => mc.key === savedCat.key)) {
-                    mergedCategories.push(savedCat);
-                }
-            });
+            const mergedCategories = DEFAULT_CATEGORIES_STRUCTURE.map(defaultCat => { const savedCat = loadedCats.find(sc => sc.key === defaultCat.key && !sc.isCustom); if (savedCat) return { ...defaultCat, ...savedCat, isCustom: false }; return {...defaultCat}; });
+            loadedCats.forEach(savedCat => { if (savedCat.isCustom && !mergedCategories.some(mc => mc.key === savedCat.key)) { mergedCategories.push(savedCat); } });
             appCategories = mergedCategories.sort((a,b) => (a.order ?? Infinity) - (b.order ?? Infinity));
-        } else {
-            appCategories = DEFAULT_CATEGORIES_STRUCTURE.map(cat => ({...cat}));
-        }
+        } else { appCategories = DEFAULT_CATEGORIES_STRUCTURE.map(cat => ({...cat})); }
         todos = Array.isArray(data.todos) ? data.todos : [];
         customExtensionMappings = Array.isArray(data.customExtensionMappings) ? data.customExtensionMappings : [];
-
-        // Refresh UI
         populateCategoryDropdown(DOM.categorySelectInputModal);
-        renderProjectFilesUI();
-        renderTodos();
-        renderCustomExtensionMappingsUI();
-        if (document.getElementById('categoryManagerModal').classList.contains('show')) {
-             renderCategoryManagerList(); // Update if modal is open
-        }
+        renderProjectFilesUI(); renderTodos(); renderCustomExtensionMappingsUI();
+        if (document.getElementById('categoryManagerModal').classList.contains('show')) { renderCategoryManagerList(); }
     }
 
 
@@ -1423,10 +1401,10 @@
     
     // --- Add Item Modal Logic ---
     function openAddItemModal() {
-        populateCategoryDropdown(DOM.categorySelectInputModal); // Ensure dropdown is up-to-date
-        clearStagedFilesDisplayModal(); // Clear any previous selections
-        DOM.projectNameInputModal.value = ''; // Clear project name
-        DOM.pathInputModal.value = ''; // Clear path input
+        populateCategoryDropdown(DOM.categorySelectInputModal); 
+        clearStagedFilesDisplayModal(); 
+        DOM.projectNameInputModal.value = ''; 
+        DOM.pathInputModal.value = ''; 
         DOM.addItemModal.classList.add('show');
     }
     function closeAddItemModal() {
@@ -1461,7 +1439,6 @@
         else { DOM.sidebar.classList.add('collapsed'); DOM.mainContent.classList.add('expanded'); }
         
         DOM.openAllBtn.addEventListener('click', handleOpenAllClick);
-        // Removed listeners for old add item section buttons
         
         if(DOM.manageCategoriesBtn) DOM.manageCategoriesBtn.addEventListener('click', openCategoryManagerModal);
         DOM.closeCategoryManagerBtn.addEventListener('click', closeCategoryManagerModal);
@@ -1494,3 +1471,4 @@
     </script>
 </body>
 </html>
+
