@@ -23,39 +23,71 @@
 
         /* --- Custom Draggable Title Bar --- */
         .custom-title-bar {
-            position: fixed; top: 0; left: 0; width: 100%; height: 38px;
-            background-color: rgba(18, 20, 30, 0.9); 
-            backdrop-filter: blur(12px);
+            position: fixed; top: 0; left: 0; width: 100%; height: 32px; /* Reduced height for Windows feel */
+            background-color: #0d0e1a; /* Solid, darker color for title bar */
             -webkit-app-region: drag; 
             z-index: 100000; display: flex; align-items: center;
-            justify-content: space-between; padding: 0 10px 0 15px;
-            user-select: none; border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            justify-content: space-between; padding: 0 0 0 10px; /* Adjust padding for LTR */
+            user-select: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12); /* Slightly more visible border */
         }
-        .window-app-title { color: #b0bec5; font-size: 0.9em; font-weight: 500; -webkit-app-region: no-drag; }
+        .window-app-title { 
+            color: #c5c6c7; 
+            font-size: 0.8rem; 
+            font-weight: 400; 
+            -webkit-app-region: no-drag;
+            padding-left: 5px;
+            line-height: 32px; /* Vertically center title */
+        }
 
-        /* --- Window Controls --- */
+        /* --- Window Controls (Windows Style) --- */
         .window-controls {
             position: static; -webkit-app-region: no-drag;
-            display: flex; gap: 8px; margin-left: auto;
+            display: flex; height: 100%; /* Make controls fill title bar height */
+            margin-left: auto; /* Pushes to the right in LTR */
         }
         html[dir="rtl"] .window-controls { margin-right: auto; margin-left: initial; }
+        
         .window-btn {
-            width: 12px; height: 12px; border-radius: 50%; cursor: pointer;
-            transition: all 0.2s ease; border: none; position: relative; -webkit-app-region: no-drag;
+            width: 46px; /* Standard width for Windows buttons */
+            height: 100%; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: transparent;
+            border: none;
+            color: #c5c6c7; /* Icon color */
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+            -webkit-app-region: no-drag;
+            padding: 0;
+            border-radius: 0; /* Square buttons */
         }
-        .window-btn:hover { transform: scale(1.15); box-shadow: 0 0 8px rgba(255, 255, 255, 0.25); }
-        .close-btn { background: linear-gradient(45deg, #ff5f56, #e64a19); }
-        .minimize-btn { background: linear-gradient(45deg, #ffbd2e, #ffa000); }
-        .close-btn:hover::after, .minimize-btn:hover::after {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            font-size: 8px; color: rgba(0,0,0,0.7); font-weight: bold;
+        .window-btn svg {
+            width: 10px;
+            height: 10px;
+            fill: currentColor;
         }
-        .close-btn:hover::after { content: '×'; }
-        .minimize-btn:hover::after { content: '−'; }
+        .window-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        .close-btn:hover {
+            background-color: #e81123; /* Windows red for close hover */
+            color: white;
+        }
+        .minimize-btn:active, .close-btn:active {
+             background-color: rgba(255, 255, 255, 0.2);
+        }
+        .close-btn:active {
+            background-color: #f1707a; /* Darker red on active */
+        }
+
 
         /* --- Sidebar --- */
         .sidebar {
-            position: fixed; left: 0; top: 38px; width: 250px; height: calc(100vh - 38px);
+            position: fixed; left: 0; top: 32px; /* Start below custom title bar */
+            width: 250px; height: calc(100vh - 32px); /* Adjust height */
             background: rgba(10, 12, 28, 0.88); backdrop-filter: blur(18px); 
             border-right: 1px solid rgba(255, 255, 255, 0.08);
             padding: 15px; transition: all 0.3s ease; z-index: 9999;
@@ -104,8 +136,9 @@
         /* --- Main Content Area --- */
         .main-content {
             margin-left: 250px; padding: 20px;
-            padding-top: calc(20px + 38px); transition: margin-left 0.3s ease; min-height: 100vh;
-            overflow-y: auto; height: calc(100vh - 38px);
+            padding-top: calc(20px + 32px); /* Adjusted for new title bar height */
+            transition: margin-left 0.3s ease; min-height: 100vh;
+            overflow-y: auto; height: calc(100vh - 32px); /* Adjusted for new title bar height */
         }
         .main-content.expanded { margin-left: 70px; }
         .page { display: none; animation: fadeInContent 0.4s ease-out; }
@@ -225,7 +258,7 @@
         #todoInput, 
         #newExtensionInput, 
         #newExtensionCategoryNameInput,
-        #openIntervalInput { /* Added for new input */
+        #openIntervalInput { 
             flex: 1; 
             padding: 12px 15px; 
             border: 1px solid rgba(100, 110, 130, 0.5); 
@@ -325,7 +358,7 @@
         }
         .item-card-main { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
         .item-card-icon svg { width: 28px; height: 28px; fill: #64b5f6; flex-shrink: 0; }
-        .item-card-info { overflow: hidden; }
+        .item-card-info { overflow: hidden; flex-grow: 1; /* Allow info to take space */ }
         .item-card-name { font-size: 0.95rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: white; }
         .item-card-filetype { font-size: 0.75rem; color: #90a4ae; } 
         .item-card-path {
@@ -344,8 +377,10 @@
         .item-card-actions-trigger svg { width: 16px; height: 16px; }
         .item-card-direct-open { /* New style for direct open button */
             -webkit-app-region: no-drag;
-            margin-right: 8px; /* Spacing from options button */
+            margin-left: 8px; /* Spacing from info block */
+            flex-shrink: 0; /* Prevent shrinking */
         }
+        html[dir="rtl"] .item-card-direct-open { margin-right: 8px; margin-left: 0; }
 
 
         .item-actions-menu {
@@ -634,8 +669,12 @@
     <div class="custom-title-bar">
         <span class="window-app-title">Hemo Paths Manager</span>
         <div class="window-controls">
-            <button class="window-btn minimize-btn" onclick="handleMinimizeWindow()" title="Minimize"></button>
-            <button class="window-btn close-btn" onclick="handleCloseWindow()" title="Close"></button>
+            <button class="window-btn minimize-btn" onclick="handleMinimizeWindow()" title="Minimize">
+                 <svg viewBox="0 0 10 10"><path d="M0 4h10v2H0z"/></svg>
+            </button>
+            <button class="window-btn close-btn" onclick="handleCloseWindow()" title="Close">
+                <svg viewBox="0 0 10 10"><path d="M0 0l10 10M10 0l-10 10" stroke="currentColor" stroke-width="1.5" /></svg>
+            </button>
         </div>
     </div>
 
@@ -1448,7 +1487,7 @@
     }
     async function handleSaveProjectAs() {
         if (!ipcRenderer) { showAppNotification('File operations are available in the desktop app only.', 'warning'); return; }
-        const projectData = { projectFiles, appCategories, todos, customExtensionMappings, version: "1.0" };
+        const projectData = { projectFiles, appCategories, todos, customExtensionMappings, openInterval, version: "1.0" };
         try {
             const filePath = await ipcRenderer.invoke('save-dialog', JSON.stringify(projectData));
             if (filePath) { activeFilePath = filePath; addToProjectHistory(filePath); updateActiveProjectInfo(); showAppNotification(`Project saved to: ${pathModule ? pathModule.basename(filePath) : filePath}`, 'success'); }
@@ -1457,7 +1496,7 @@
     async function handleSaveActiveProject(showNotification = true) {
         if (!activeFilePath) { if (showNotification) showAppNotification('No active project to save. Use "Save Project As..." first.', 'warning'); return; }
         if (!ipcRenderer) { showAppNotification('File operations are available in the desktop app only.', 'warning'); return; }
-        const projectData = { projectFiles, appCategories, todos, customExtensionMappings, version: "1.0" };
+        const projectData = { projectFiles, appCategories, todos, customExtensionMappings, openInterval, version: "1.0" };
         try {
             await ipcRenderer.invoke('save-file', {filePath: activeFilePath, data: JSON.stringify(projectData) });
             if (showNotification) showAppNotification(`Project "${pathModule ? pathModule.basename(activeFilePath) : activeFilePath}" saved.`, 'success');
@@ -1521,7 +1560,7 @@
                 showAppNotification('Open interval saved!', 'success');
             } else {
                 showAppNotification('Invalid interval value. Must be at least 0.05.', 'warning');
-                DOM.openIntervalInput.value = openInterval; // Revert to old value
+                DOM.openIntervalInput.value = openInterval; 
             }
         }
     }
@@ -1647,7 +1686,7 @@
                 }
             }
         });
-        if(DOM.newManagedCategoryInput) DOM.newManagedCategoryInput.addEventListener('keydown', e => { if (e.key === 'Enter') DOM.addManagedCategoryBtn.click(); }); 
+        if(DOM.newManagedCategoryInput) DOM.newManagedCategoryInput.addEventListener('keydown', e => { if (e.key === 'Enter' && DOM.addManagedCategoryBtn) DOM.addManagedCategoryBtn.click(); }); 
     });
     window.addEventListener('error', e => { console.error('[Renderer] Unhandled Error:', e); showAppNotification('An unexpected error occurred!', 'error'); });
     window.addEventListener('unhandledrejection', event => { console.error('[Renderer] Unhandled Rejection:', event.reason); showAppNotification('An unexpected async error occurred!', 'error'); });
