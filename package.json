@@ -1,0 +1,49 @@
+{
+    "name": "HemoPaths",
+    "version": "1.0.0",
+    "description": "App to easly rich your folders and files with your favorite paths.",
+    "main": "main.js",
+    "scripts": {
+        "start": "electron .",
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "package-win": "electron-packager . hemopathmanager --platform=win32 --arch=x64 --icon=icon.ico --out=release-builds --overwrite",
+        "dist": "electron-builder"
+    },
+    "keywords": [
+        "electron",
+        "folder",
+        "path",
+        "manager"
+    ],
+    "author": "Sam",
+    "license": "ISC",
+    "devDependencies": {
+        "electron": "^30.0.0",
+        "electron-builder": "^24.9.1",
+        "electron-packager": "^17.1.2"
+    },
+    "build": {
+        "appId": "com.sam.hemopathmanager",
+        "productName": "HemoPath Manager",
+        "win": {
+            "icon": "icon.ico",
+            "target": [
+                {
+                    "target": "nsis",
+                    "arch": [
+                        "x64"
+                    ]
+                }
+            ]
+        },
+        "nsis": {
+            "oneClick": false,
+            "allowToChangeInstallationDirectory": true,
+            "perMachine": false
+        }
+    },
+    "dependencies": {
+        "electron-log": "^5.4.0",
+        "electron-updater": "^6.6.2"
+    }
+}

@@ -2,26 +2,27 @@
 
 const { app, BrowserWindow, Menu, net, ipcMain, dialog } = require('electron');
 const fs = require('fs').promises;
-const fsSync = require('fs');
+const fsSync = require('fs'); // For synchronous operations like existsSync
 const path = require('path');
 const crypto = require('crypto');
-const { autoUpdater } = require("electron-updater"); // For auto-updates
-const log = require('electron-log'); // For logging, especially for auto-updater
+const { autoUpdater } = require("electron-updater"); 
+const log = require('electron-log'); 
 
-// Configure electron-log
+// Configure electron-log: Options: error, warn, info, verbose, debug, silly. Default: info
 log.transports.file.level = "info";
+log.transports.file.resolvePathFn = () => path.join(app.getPath('userData'), 'logs/main.log'); // Updated for new electron-log version
 autoUpdater.logger = log;
-autoUpdater.autoDownload = false; // Optional: set to true to auto-download updates
+autoUpdater.autoDownload = false; // User will be prompted or it will download after 'update-available'
+                                 // Set to true if you want silent auto-download
 
 let mainWindow;
-const liveUrl = 'https://hemopaths.vercel.app'; // Your live site URL (if any)
+const liveUrl = 'https://hemopaths.vercel.app'; // Your live site URL
 const localCacheFileName = 'cached_index.html';
 const localCacheDirPath = app.getPath('userData');
 const localCachePath = path.join(localCacheDirPath, localCacheFileName);
 const defaultErrorPageFileName = 'error_page.html';
 const defaultErrorPagePath = path.join(__dirname, defaultErrorPageFileName);
 
-// Ensure userData directory exists
 if (!fsSync.existsSync(localCacheDirPath)) {
     try {
         fsSync.mkdirSync(localCacheDirPath, { recursive: true });
@@ -42,21 +43,22 @@ async function createDefaultErrorPageIfMissing() {
             <!DOCTYPE html>
             <html lang="en" dir="ltr">
             <head>
-                <meta charset="UTF-8">
-                <title>Application Offline</title>
+                <meta charset="UTF-8"><title>Application Offline</title>
                 <style>
-                    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif; text-align: center; padding: 40px; color: #333; background-color: #f8f9fa; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-                    .container { max-width: 600px; margin: auto; background-color: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-                    h1 { color: #d9534f; margin-bottom: 15px; font-size: 1.8em;}
-                    p { font-size: 1.1em; line-height: 1.6; color: #555; margin-bottom: 10px;}
-                    .suggestion { margin-top: 20px; font-size: 0.95em; color: #777;}
+                    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; padding: 50px; background-color: #12121a; color: #e0e0e0; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+                    .container { max-width: 500px; background-color: #1e1e2f; padding: 30px 40px; border-radius: 12px; box-shadow: 0 5px 25px rgba(0,0,0,0.3); }
+                    h1 { color: #ff6b6b; margin-bottom: 20px; font-size: 1.8em;}
+                    p { font-size: 1.1em; line-height: 1.6; color: #b0b8c0; margin-bottom: 15px;}
+                    .suggestion { margin-top: 25px; font-size: 0.9em; color: #8892a0;}
+                    a { color: #4fc3f7; text-decoration: none; }
+                    a:hover { text-decoration: underline; }
                 </style>
             </head>
             <body>
                 <div class="container">
                     <h1>Oops, Content Could Not Be Loaded</h1>
-                    <p>It seems the application is currently offline or encountered an issue retrieving the latest data.</p>
-                    <p class="suggestion">Please check your internet connection and try again. If you've used the application before while online, a cached version of the content might be displayed if available.</p>
+                    <p>The application is currently offline or had trouble fetching the latest data from the server.</p>
+                    <p class="suggestion">Please check your internet connection. If you've used the app online before, a cached version might be available.</p>
                 </div>
             </body>
             </html>`;
@@ -73,30 +75,48 @@ async function loadInitialContent() {
     let isEffectivelyOnline = false;
     try {
         const { hostname } = new URL(liveUrl);
-        const hostResolved = await new Promise(resolve => require('dns').lookup(hostname, err => resolve(!err)));
+        const hostResolved = await new Promise(resolve => {
+            require('dns').lookup(hostname, (err) => {
+                if (err && err.code === 'ENOTFOUND') { // Explicitly check for ENOTFOUND
+                    log.warn(`[Main Process] DNS lookup for ${hostname} failed (ENOTFOUND).`);
+                    resolve(false);
+                } else if (err) {
+                    log.warn(`[Main Process] DNS lookup for ${hostname} failed with other error: ${err.message}.`);
+                    resolve(false);
+                }
+                 else {
+                    log.info(`[Main Process] Successfully resolved ${hostname}.`);
+                    resolve(true);
+                }
+            });
+        });
         
         if (hostResolved) {
-            log.info(`[Main Process] Successfully resolved ${hostname}. Assuming online.`);
             isEffectivelyOnline = true;
         } else {
-            log.warn(`[Main Process] DNS lookup for ${hostname} failed. Checking general internet connection...`);
-            isEffectivelyOnline = await new Promise(resolve => require('dns').lookup('google.com', err => resolve(!err)));
-            if(isEffectivelyOnline) {
-                 log.info('[Main Process] General internet connection detected, but live URL host might be down.');
-            } else {
-                 log.warn('[Main Process] General internet connection also failed.');
-            }
+            log.warn(`[Main Process] Host-specific DNS lookup failed for ${hostname}. Checking general internet connection...`);
+            isEffectivelyOnline = await new Promise(resolve => {
+                require('dns').lookup('google.com', (err) => {
+                    if (err) {
+                        log.warn('[Main Process] General internet connection check (google.com) failed.');
+                        resolve(false);
+                    } else {
+                        log.info('[Main Process] General internet connection detected.');
+                        resolve(true);
+                    }
+                });
+            });
         }
     } catch (e) {
-        log.error('[Main Process] Error during initial connectivity check:', e.message);
+        log.error('[Main Process] Error during initial connectivity check (URL parsing or DNS module issue):', e.message);
         isEffectivelyOnline = false;
     }
 
     if (isEffectivelyOnline) {
-        log.info('[Main Process] Internet connection detected. Attempting to fetch live site and update cache.');
+        log.info('[Main Process] Attempting to fetch live site and update cache.');
         try {
             const response = await new Promise((resolve, reject) => {
-                const request = net.request({ method: 'GET', url: liveUrl, useSessionCookies: true });
+                const request = net.request({ method: 'GET', url: liveUrl, useSessionCookies: true, timeout: 15000 });
                 let newContentBuffer = Buffer.alloc(0);
                 request.on('response', (res) => {
                     log.info(`[Main Process] Live site response status: ${res.statusCode}`);
@@ -108,9 +128,10 @@ async function loadInitialContent() {
                             reject(new Error(`Failed to fetch live content. Status: ${res.statusCode}`));
                         }
                     });
-                    res.on('error', (err) => reject(err));
+                    res.on('error', (err) => { log.error('[Main Process] Response error from live site:', err); reject(err);});
                 });
-                request.on('error', (err) => reject(err));
+                request.on('error', (err) => { log.error('[Main Process] Request error for live content:', err); reject(err); });
+                request.on('timeout', () => { log.error('[Main Process] Request for live content timed out.'); reject(new Error('Request timed out')); });
                 request.end();
             });
 
@@ -170,68 +191,55 @@ async function loadFromCacheOrErrorPage() {
 }
 
 function setupAutoUpdater(windowInstance) {
-    log.info('Setting up auto-updater...');
+    if (!windowInstance) {
+        log.error('[AutoUpdater] Cannot setup: mainWindow is not defined.');
+        return;
+    }
+    log.info('[AutoUpdater] Setting up auto-updater...');
     
-    // Check for updates immediately if you want, or wait for user action
-    // autoUpdater.checkForUpdatesAndNotify(); 
-
     ipcMain.on('check-for-updates', () => {
-        log.info('Renderer requested update check.');
-        if (windowInstance) {
-             windowInstance.webContents.send('update-status-message', 'Checking for updates...');
-        }
+        log.info('[AutoUpdater] Renderer requested update check.');
+        windowInstance.webContents.send('update-status-message', 'Checking for updates...');
         autoUpdater.checkForUpdates();
     });
 
     autoUpdater.on('update-available', (info) => {
-        log.info('Update available.', info);
-        if (windowInstance) {
-            windowInstance.webContents.send('update-status-message', `Update available (v${info.version}). Downloading...`);
-            // If autoDownload is false, you might want to ask the user if they want to download
-            // For now, assuming autoDownload = true or you trigger download here
-            autoUpdater.downloadUpdate(); 
-        }
+        log.info('[AutoUpdater] Update available.', info);
+        windowInstance.webContents.send('update-status-message', `Update available (v${info.version}). Downloading...`);
+        autoUpdater.downloadUpdate(); 
     });
 
     autoUpdater.on('update-not-available', (info) => {
-        log.info('Update not available.', info);
-        if (windowInstance) {
-            windowInstance.webContents.send('update-status-message', 'You are on the latest version.');
-        }
+        log.info('[AutoUpdater] Update not available.', info);
+        windowInstance.webContents.send('update-status-message', 'You are on the latest version.');
     });
 
     autoUpdater.on('error', (err) => {
-        log.error('Error in auto-updater. ' + err);
-        if (windowInstance) {
-            windowInstance.webContents.send('update-status-message', `Error checking for updates: ${err.message}`);
-        }
+        log.error('[AutoUpdater] Error: ' + (err.message || err));
+        windowInstance.webContents.send('update-status-message', `Error checking for updates: ${err.message || 'Unknown error'}`);
     });
 
     autoUpdater.on('download-progress', (progressObj) => {
         let log_message = "Download speed: " + Math.round(progressObj.bytesPerSecond / 1024) + " KB/s";
-        log_message = log_message + ' - Downloaded ' + Math.round(progressObj.percent) + '%';
-        log_message = log_message + ' (' + Math.round(progressObj.transferred / (1024*1024)) + "MB/" + Math.round(progressObj.total / (1024*1024)) + 'MB)';
+        log_message += ' - Downloaded ' + Math.round(progressObj.percent) + '%';
+        log_message += ' (' + Math.round(progressObj.transferred / (1024*1024)) + "MB/" + Math.round(progressObj.total / (1024*1024)) + 'MB)';
         log.info(log_message);
-        if (windowInstance) {
-            windowInstance.webContents.send('update-status-message', `Downloading update: ${Math.round(progressObj.percent)}%`);
-        }
+        windowInstance.webContents.send('update-status-message', `Downloading update: ${Math.round(progressObj.percent)}%`);
     });
 
     autoUpdater.on('update-downloaded', (info) => {
-        log.info('Update downloaded.', info);
-        if (windowInstance) {
-            windowInstance.webContents.send('update-status-message', 'Update downloaded. Restart the app to install.');
-            dialog.showMessageBox(windowInstance, {
-                type: 'info',
-                title: 'Update Ready',
-                message: 'A new version has been downloaded. Restart the application to apply the updates.',
-                buttons: ['Restart Now', 'Later']
-            }).then(({response}) => { // Destructure to get response
-                if (response === 0) { // Restart Now button
-                    autoUpdater.quitAndInstall(true, true); // true for isSilent, true for isForceRunAfter
-                }
-            });
-        }
+        log.info('[AutoUpdater] Update downloaded.', info);
+        windowInstance.webContents.send('update-status-message', 'Update downloaded. Restart the app to install.');
+        dialog.showMessageBox(windowInstance, {
+            type: 'info',
+            title: 'Update Ready',
+            message: 'A new version has been downloaded. Restart the application to apply the updates.',
+            buttons: ['Restart Now', 'Later']
+        }).then(({response}) => { 
+            if (response === 0) { 
+                autoUpdater.quitAndInstall(true, true); 
+            }
+        });
     });
 }
 
@@ -252,7 +260,7 @@ async function createWindow() {
  await createDefaultErrorPageIfMissing();
  await loadInitialContent();
 
- // After window is created and content loaded, setup auto-updater
+ // Setup auto-updater after the window is created and content is potentially loaded
  setupAutoUpdater(mainWindow);
 
 
