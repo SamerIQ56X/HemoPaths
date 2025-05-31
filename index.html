@@ -23,13 +23,13 @@
 
         /* --- Custom Draggable Title Bar --- */
         .custom-title-bar {
-            position: fixed; top: 0; left: 0; width: 100%; height: 32px; /* Reduced height for Windows feel */
-            background-color: #0d0e1a; /* Solid, darker color for title bar */
+            position: fixed; top: 0; left: 0; width: 100%; height: 32px; 
+            background-color: #1c1e2b; /* Slightly different, more solid color for title bar */
             -webkit-app-region: drag; 
             z-index: 100000; display: flex; align-items: center;
-            justify-content: space-between; padding: 0 0 0 10px; /* Adjust padding for LTR */
+            justify-content: space-between; padding: 0 0 0 10px; 
             user-select: none;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.12); /* Slightly more visible border */
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
         }
         .window-app-title { 
             color: #c5c6c7; 
@@ -37,31 +37,31 @@
             font-weight: 400; 
             -webkit-app-region: no-drag;
             padding-left: 5px;
-            line-height: 32px; /* Vertically center title */
+            line-height: 32px; 
         }
 
         /* --- Window Controls (Windows Style) --- */
         .window-controls {
             position: static; -webkit-app-region: no-drag;
-            display: flex; height: 100%; /* Make controls fill title bar height */
-            margin-left: auto; /* Pushes to the right in LTR */
+            display: flex; height: 100%; 
+            margin-left: auto; 
         }
         html[dir="rtl"] .window-controls { margin-right: auto; margin-left: initial; }
         
         .window-btn {
-            width: 46px; /* Standard width for Windows buttons */
+            width: 46px; 
             height: 100%; 
             display: flex;
             align-items: center;
             justify-content: center;
             background-color: transparent;
             border: none;
-            color: #c5c6c7; /* Icon color */
+            color: #c5c6c7; 
             cursor: pointer;
-            transition: background-color 0.15s ease;
+            transition: background-color 0.15s ease, color 0.15s ease; /* Added color transition */
             -webkit-app-region: no-drag;
             padding: 0;
-            border-radius: 0; /* Square buttons */
+            border-radius: 0; 
         }
         .window-btn svg {
             width: 10px;
@@ -69,25 +69,26 @@
             fill: currentColor;
         }
         .window-btn:hover {
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: rgba(255, 255, 255, 0.12); /* Lighter hover for all buttons */
             color: white;
         }
         .close-btn:hover {
-            background-color: #e81123; /* Windows red for close hover */
+            background-color: #e81123; 
             color: white;
         }
         .minimize-btn:active, .close-btn:active {
              background-color: rgba(255, 255, 255, 0.2);
         }
         .close-btn:active {
-            background-color: #f1707a; /* Darker red on active */
+            background-color: #f1707a; 
+            color: white; /* Ensure icon stays white on active red */
         }
 
 
         /* --- Sidebar --- */
         .sidebar {
-            position: fixed; left: 0; top: 32px; /* Start below custom title bar */
-            width: 250px; height: calc(100vh - 32px); /* Adjust height */
+            position: fixed; left: 0; top: 32px; 
+            width: 250px; height: calc(100vh - 32px); 
             background: rgba(10, 12, 28, 0.88); backdrop-filter: blur(18px); 
             border-right: 1px solid rgba(255, 255, 255, 0.08);
             padding: 15px; transition: all 0.3s ease; z-index: 9999;
@@ -136,9 +137,8 @@
         /* --- Main Content Area --- */
         .main-content {
             margin-left: 250px; padding: 20px;
-            padding-top: calc(20px + 32px); /* Adjusted for new title bar height */
-            transition: margin-left 0.3s ease; min-height: 100vh;
-            overflow-y: auto; height: calc(100vh - 32px); /* Adjusted for new title bar height */
+            padding-top: calc(20px + 32px); transition: margin-left 0.3s ease; min-height: 100vh;
+            overflow-y: auto; height: calc(100vh - 32px);
         }
         .main-content.expanded { margin-left: 70px; }
         .page { display: none; animation: fadeInContent 0.4s ease-out; }
@@ -358,7 +358,7 @@
         }
         .item-card-main { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
         .item-card-icon svg { width: 28px; height: 28px; fill: #64b5f6; flex-shrink: 0; }
-        .item-card-info { overflow: hidden; flex-grow: 1; /* Allow info to take space */ }
+        .item-card-info { overflow: hidden; flex-grow: 1; }
         .item-card-name { font-size: 0.95rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: white; }
         .item-card-filetype { font-size: 0.75rem; color: #90a4ae; } 
         .item-card-path {
@@ -371,15 +371,9 @@
             padding-top: 8px; border-top: 1px solid rgba(255, 255, 255, 0.07);
         }
         .item-card-date { font-size: 0.65rem; color: #78828c; }
-        .item-card-actions-trigger { /* For the ... button */
-             -webkit-app-region: no-drag; /* Ensure options button is clickable */
-        }
+        .item-card-actions-trigger { -webkit-app-region: no-drag; }
         .item-card-actions-trigger svg { width: 16px; height: 16px; }
-        .item-card-direct-open { /* New style for direct open button */
-            -webkit-app-region: no-drag;
-            margin-left: 8px; /* Spacing from info block */
-            flex-shrink: 0; /* Prevent shrinking */
-        }
+        .item-card-direct-open { -webkit-app-region: no-drag; margin-left: 8px; flex-shrink: 0; }
         html[dir="rtl"] .item-card-direct-open { margin-right: 8px; margin-left: 0; }
 
 
@@ -629,14 +623,14 @@
 
         @media (max-width: 768px) {
             body { padding: 0; font-size:13px; }
-            .main-content { margin-left: 0; margin-right:0; padding:10px; padding-top: calc(10px + 38px); }
+            .main-content { margin-left: 0; margin-right:0; padding:10px; padding-top: calc(10px + 32px); } /* Adjusted for title bar */
             .main-content.expanded { margin-left: 0; margin-right:0; } 
-            .sidebar { transform: translateX(-100%); box-shadow: 3px 0 12px rgba(0,0,0,0.15); } 
+            .sidebar { transform: translateX(-100%); box-shadow: 3px 0 12px rgba(0,0,0,0.15); top: 32px; height: calc(100vh - 32px);} 
             html[dir="rtl"] .sidebar { transform: translateX(100%); box-shadow: -3px 0 12px rgba(0,0,0,0.15); }
             .sidebar.show { transform: translateX(0); }
             .container { margin: 8px; width:auto; }
             .header { padding: 18px 12px; } .header h1 { font-size: 1.7rem; }
-            .top-actions-bar, #addItemModal .add-item-section { padding: 12px; } /* Adjusted for modal */
+            .top-actions-bar, #addItemModal .add-item-section { padding: 12px; } 
             .top-actions-bar { flex-direction: column; align-items: stretch; }
             .top-actions-bar .btn { width: 100%; margin-bottom: 8px; }
             .input-row { flex-direction: column; gap: 12px; }
@@ -648,9 +642,9 @@
             #optionsPage .options-group { padding-bottom: 15px; margin-bottom: 20px; }
         }
         @media (max-width: 480px) {
-            .custom-title-bar { height: 32px; padding: 0 8px 0 10px; }
-            .sidebar { top: 32px; height: calc(100vh - 32px); }
-            .main-content { padding-top: calc(10px + 32px); height: calc(100vh - 32px); }
+            .custom-title-bar { height: 30px; padding: 0 6px 0 8px; } /* Even smaller title bar */
+            .sidebar { top: 30px; height: calc(100vh - 30px); }
+            .main-content { padding-top: calc(10px + 30px); height: calc(100vh - 30px); }
             .header h1 { font-size: 1.5rem; } .header p { font-size: 0.8rem; }
             .btn { font-size: 0.8rem; padding: 8px 14px; } .btn-primary { padding: 9px 18px; }
             .category-title { font-size: 1rem; }
@@ -909,7 +903,7 @@
         <symbol id="icon-paste" viewBox="0 0 24 24"><path d="M19 2h-4.18C14.4.84 13.3 0 12 0S9.6.84 9.18 2H5c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm7 18H5V4h2v2h10V4h2v16z"/></symbol>
         <symbol id="icon-arrow-up" viewBox="0 0 24 24"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/></symbol>
         <symbol id="icon-arrow-down" viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></symbol>
-        <symbol id="icon-settings-alt" viewBox="0 0 24 24"><path fill="currentColor" d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.39-0.29-0.61-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.28C14.38,2.11,14.21,2,14,2h-4 c-0.21,0-0.38,0.11-0.4,0.28L9.34,4.34c-0.59,0.24-1.13,0.57-1.62,0.94l-2.39-0.96c-0.22-0.08-0.49,0-0.61,0.22l-1.92,3.32 c-0.12,0.22-0.07,0.49,0.12,0.61l2.03,1.58C4.02,11.36,4,11.68,4,12c0,0.32,0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.39,0.29,0.61,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94L9.6,21.72 C9.62,21.89,9.79,22,10,22h4c0.21,0,0.38-0.11,0.4-0.28l0.26-2.04c0.59-0.24,1.13-0.57,1.62-0.94l2.39,0.96 c0.22,0.08,0.49,0,0.61-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></symbol>
+        <symbol id="icon-settings-alt" viewBox="0 0 24 24"><path fill="currentColor" d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17-.59-1.69-.98l-2.49-1c-.23-.08-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12-.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69-.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38 2.65c.61-.25 1.17-.59-1.69-.98l2.49 1c.23.08.49 0 .61.22l2-3.46c.12-.22-.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></symbol>
         <symbol id="icon-close" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></symbol>
         <symbol id="icon-check" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></symbol>
         <symbol id="icon-history" viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7v2c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.25 2.52.77-1.28-3.52-2.09V8H12z"/></symbol>
@@ -974,7 +968,7 @@
     let customExtensionMappings = []; 
     let projectHistory = [];
     let activeFilePath = null;
-    let openInterval = 0.3; // Default open interval in seconds
+    let openInterval = 0.3; 
 
     const DOM = {
         sidebar: document.getElementById('sidebar'), mainContent: document.getElementById('mainContent'),
@@ -1024,7 +1018,7 @@
     const STORAGE_EXTENSION_MAPPINGS_KEY = 'projectFileManagerExtMappings_v1.2_FinalUI';
     const STORAGE_PROJECT_HISTORY_KEY = 'projectFileManagerHistory_v1.1_FinalUI';
     const STORAGE_OPEN_INTERVAL_KEY = 'projectFileManagerOpenInterval_v1.0';
-    const DEFAULT_OPEN_INTERVAL = 0.3; // Default interval in seconds
+    const DEFAULT_OPEN_INTERVAL = 0.3; 
     const MAX_HISTORY_ITEMS = 10;
 
 
@@ -1040,24 +1034,30 @@
     const FILE_TYPE_TO_DEFAULT_CAT_KEY = { 'photoshop': 'photoshop', 'aftereffects': 'aftereffects', 'premiere': 'premiere', 'folderLink': 'folder', 'websiteLink': 'website' };
     
     function toggleSidebar() {
-        DOM.sidebar.classList.toggle('collapsed'); DOM.mainContent.classList.toggle('expanded');
-        if (window.innerWidth <= 768 && !DOM.sidebar.classList.contains('collapsed')) { DOM.sidebar.classList.add('show'); } 
-        else if (window.innerWidth <= 768 && DOM.sidebar.classList.contains('collapsed')) { DOM.sidebar.classList.remove('show'); }
+        if (DOM.sidebar) DOM.sidebar.classList.toggle('collapsed'); 
+        if (DOM.mainContent) DOM.mainContent.classList.toggle('expanded');
+        if (window.innerWidth <= 768 && DOM.sidebar && !DOM.sidebar.classList.contains('collapsed')) { DOM.sidebar.classList.add('show'); } 
+        else if (window.innerWidth <= 768 && DOM.sidebar && DOM.sidebar.classList.contains('collapsed')) { DOM.sidebar.classList.remove('show'); }
     }
     function showPage(pageId) {
         document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
         const targetPage = document.getElementById(pageId); if (targetPage) targetPage.classList.add('active');
         document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
         const activeLink = document.querySelector(`.nav-link[onclick="showPage('${pageId}')"]`); if (activeLink) activeLink.classList.add('active');
-        if (window.innerWidth <= 768) { DOM.sidebar.classList.add('collapsed'); DOM.sidebar.classList.remove('show'); DOM.mainContent.classList.add('expanded'); }
+        if (window.innerWidth <= 768 && DOM.sidebar) { DOM.sidebar.classList.add('collapsed'); DOM.sidebar.classList.remove('show'); if(DOM.mainContent) DOM.mainContent.classList.add('expanded'); }
     }
     function handleMinimizeWindow() { if (ipcRenderer) ipcRenderer.send('minimize-window'); else showAppNotification('Minimize feature is available in the desktop app only.', 'warning'); }
     function handleCloseWindow() { if (ipcRenderer) ipcRenderer.send('close-window'); else showAppCustomConfirm("Are you sure you want to close this tab?", (confirmed) => { if (confirmed) window.close(); }); }
     function escapeHTML(str) { return typeof str === 'string' ? str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'})[m]) : String(str); }
     function escapeAttr(str) { return typeof str === 'string' ? str.replace(/"/g, '&quot;') : String(str); }
-    function showAppNotification(message, type = 'success') { const el = DOM.notification; el.textContent = message; el.className = `notification-toast ${type} show`; if (el.timeoutId) clearTimeout(el.timeoutId); el.timeoutId = setTimeout(() => el.classList.remove('show'), 3500); }
-    function showAppLoading(isLoading) { DOM.loadingOverlay.classList.toggle('show', isLoading); }
+    function showAppNotification(message, type = 'success') { const el = DOM.notification; if(el){ el.textContent = message; el.className = `notification-toast ${type} show`; if (el.timeoutId) clearTimeout(el.timeoutId); el.timeoutId = setTimeout(() => el.classList.remove('show'), 3500); } else { console.warn("Notification element not found for:", message); } }
+    function showAppLoading(isLoading) { if(DOM.loadingOverlay) DOM.loadingOverlay.classList.toggle('show', isLoading); }
     function showAppCustomConfirm(message, callback) {
+        if(!DOM.confirmModal || !DOM.confirmModalMessage || !DOM.confirmModalYesBtn || !DOM.confirmModalNoBtn) {
+            console.error("Confirm modal elements not found.");
+            callback(false); // Assume "No" if modal elements are missing
+            return;
+        }
         DOM.confirmModalMessage.textContent = message; DOM.confirmModal.classList.add('show');
         const newYes = DOM.confirmModalYesBtn.cloneNode(true); DOM.confirmModalYesBtn.parentNode.replaceChild(newYes, DOM.confirmModalYesBtn); DOM.confirmModalYesBtn = newYes;
         const newNo = DOM.confirmModalNoBtn.cloneNode(true); DOM.confirmModalNoBtn.parentNode.replaceChild(newNo, DOM.confirmModalNoBtn); DOM.confirmModalNoBtn = newNo;
@@ -1101,9 +1101,10 @@
         return 'general';
     }
     function getCategoryDisplay(key) { const cat = appCategories.find(c => c.key === key); return cat ? cat.display : (key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ')); }
-    function openCategoryManagerModal() { renderCategoryManagerList(); DOM.categoryManagerModal.classList.add('show'); DOM.newManagedCategoryInput.value = ''; DOM.newManagedCategoryInput.focus(); }
-    function closeCategoryManagerModal() { const activeEditInput = DOM.categoryListContainer.querySelector('.category-name-input-inline'); if (activeEditInput) { cancelInlineEdit(activeEditInput.dataset.key, activeEditInput.closest('.category-manager-item')); } DOM.categoryManagerModal.classList.remove('show'); }
+    function openCategoryManagerModal() { if(DOM.categoryManagerModal && DOM.newManagedCategoryInput) {renderCategoryManagerList(); DOM.categoryManagerModal.classList.add('show'); DOM.newManagedCategoryInput.value = ''; DOM.newManagedCategoryInput.focus();} else { console.error("Category manager modal elements not found.");}}
+    function closeCategoryManagerModal() { const activeEditInput = DOM.categoryListContainer.querySelector('.category-name-input-inline'); if (activeEditInput) { cancelInlineEdit(activeEditInput.dataset.key, activeEditInput.closest('.category-manager-item')); } if(DOM.categoryManagerModal) DOM.categoryManagerModal.classList.remove('show'); }
     function renderCategoryManagerList() {
+        if(!DOM.categoryListContainer) return;
         DOM.categoryListContainer.innerHTML = '';
         const manageableCategories = appCategories.filter(c => c.key !== 'auto_detect').sort((a,b) => (a.order ?? Infinity) - (b.order ?? Infinity));
         const orders = manageableCategories.map(c => c.order).filter(o => typeof o === 'number');
@@ -1611,7 +1612,7 @@
     
     // --- Add Item Modal Logic ---
     function openAddItemModal() {
-        populateCategoryDropdown(DOM.categorySelectInputModal); 
+        if(DOM.categorySelectInputModal) populateCategoryDropdown(DOM.categorySelectInputModal); 
         clearStagedFilesDisplayModal(); 
         if(DOM.projectNameInputModal) DOM.projectNameInputModal.value = ''; 
         if(DOM.pathInputModal) DOM.pathInputModal.value = ''; 
