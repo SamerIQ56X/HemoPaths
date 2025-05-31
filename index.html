@@ -18,592 +18,627 @@
             min-height: 100vh;
             color: white;
             overflow-x: hidden;
-            padding: 15px;
             line-height: 1.6;
             font-size: 14px;
         }
 
-        /* Custom Scrollbar Styling (Adapted for New Theme) */
+        /* Custom Scrollbar Styling */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #0f0f23; border-radius: 12px; }
         ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 12px; border: 2px solid #0f0f23; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.25); }
         html { scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.15) #0f0f23; }
 
-        /* --- Main Container (Glass Card Style) --- */
-        .container {
-            max-width: 1000px;
-            margin: 20px auto;
-            background: rgba(10, 10, 30, 0.5); /* Darker glass */
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px; /* New theme's border radius */
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-            overflow: hidden;
-        }
-
-        /* --- Header (Page Title Style) --- */
-        .header {
-            padding: 25px 20px; /* Increased padding */
-            text-align: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .header h1 {
-            font-size: 2.2rem; /* Larger like new theme's page-title */
-            font-weight: 700;
-            background: linear-gradient(45deg, #ffffff, #e3f2fd, #bbdefb);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-fill-color: transparent; /* Standard property */
-            margin-bottom: 8px;
-            text-transform: capitalize;
-        }
-        .header p {
-            color: #64b5f6; /* New theme's subtitle color */
-            font-size: 0.95rem; /* Slightly larger */
-        }
-
-        /* --- Top Actions Bar (Subtle Glass) --- */
-        .top-actions-bar {
+        /* --- Window Controls --- */
+        .window-controls {
+            position: fixed;
+            top: 10px;
+            right: 15px; /* Adjusted for LTR */
+            left: auto;
+            z-index: 10000;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 20px;
-            background: rgba(15, 15, 35, 0.4); /* Subtle glass */
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-        .stats {
-            font-size: 0.9rem; /* Slightly larger */
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            color: #90a4ae; /* New theme's secondary text */
-        }
-        .stats svg {
-            margin-right: 8px;
-            width: 18px; /* Slightly larger */
-            height: 18px;
-            vertical-align: middle;
-            fill: #64b5f6; /* New theme's accent blue */
-        }
-
-        /* --- Buttons (Adapted from New Theme) --- */
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 10px;
-            font-size: 0.9rem; /* Standardized font size */
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
             gap: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-            text-transform: none;
+        }
+
+        .window-btn {
+            width: 12px; height: 12px; border-radius: 50%; cursor: pointer;
+            transition: all 0.3s ease; border: none; position: relative;
+        }
+        .window-btn:hover { transform: scale(1.2); box-shadow: 0 0 10px rgba(255, 255, 255, 0.3); }
+        .close-btn { background: linear-gradient(45deg, #ff5f56, #ff3b30); }
+        .minimize-btn { background: linear-gradient(45deg, #ffbd2e, #ffa500); }
+        .close-btn:hover::after {
+            content: '×'; position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); font-size: 8px; color: #000; font-weight: bold;
+        }
+        .minimize-btn:hover::after {
+            content: '−'; position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); font-size: 8px; color: #000; font-weight: bold;
+        }
+
+        /* --- Sidebar --- */
+        .sidebar {
+            position: fixed;
+            left: 0; /* Adjusted for LTR */
+            right: auto;
+            top: 0; width: 250px; height: 100vh;
+            background: rgba(5, 5, 15, 0.9); backdrop-filter: blur(15px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1); /* Adjusted for LTR */
+            border-left: none;
+            padding: 20px; transition: all 0.3s ease; z-index: 9999;
+            display: flex; flex-direction: column;
+        }
+        .sidebar.collapsed { width: 70px; transform: translateX(0); }
+
+        html[dir="ltr"] .sidebar.collapsed .nav-text,
+        html[dir="ltr"] .sidebar.collapsed .logo h2,
+        html[dir="ltr"] .sidebar.collapsed .logo p { display: none; }
+
+        html[dir="ltr"] .sidebar:not(.collapsed) .logo,
+        html[dir="ltr"] .sidebar:not(.collapsed) .nav-text {
+            opacity: 1; transition: opacity 0.2s 0.1s ease-in-out;
+        }
+        html[dir="ltr"] .sidebar.collapsed .logo,
+        html[dir="ltr"] .sidebar.collapsed .nav-text { opacity: 0; pointer-events: none; }
+
+        .sidebar-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 30px; padding-top: 35px;
+        }
+        .logo { opacity: 1; transition: opacity 0.3s ease; }
+        .sidebar.collapsed .logo { opacity: 0; pointer-events: none; }
+        .logo h2 {
+            font-size: 22px;
+            background: linear-gradient(45deg, #4fc3f7, #29b6f6, #03a9f4, #0288d1);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; text-fill-color: transparent; white-space: nowrap;
+        }
+        .logo p { color: #64b5f6; font-size: 11px; margin-top: -5px; white-space: nowrap; }
+        .menu-toggle {
+            background: none; border: none; color: #90a4ae; cursor: pointer;
+            padding: 8px; border-radius: 8px; transition: all 0.3s ease;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .menu-toggle:hover { background: rgba(255, 255, 255, 0.1); color: white; }
+        .sidebar.collapsed .menu-toggle { margin-left: auto; margin-right: auto; } /* Centered when collapsed */
+
+        .nav-menu { list-style: none; padding: 0; }
+        .nav-item { margin-bottom: 8px; }
+        .nav-link {
+            display: flex; align-items: center; padding: 12px 15px; color: #90a4ae;
+            text-decoration: none; border-radius: 10px; transition: all 0.3s ease;
+            cursor: pointer; white-space: nowrap;
+        }
+        .nav-link:hover, .nav-link.active:hover { background: rgba(255, 255, 255, 0.08); color: white; }
+        .nav-link.active {
+            background: linear-gradient(90deg, #1e3a8a, #3b82f6, #6366f1); color: white;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.25);
+        }
+        .nav-icon {
+            margin-right: 15px; /* Adjusted for LTR */
+            margin-left: 0;
+            width: 20px; height: 20px; flex-shrink: 0;
+        }
+        .sidebar.collapsed .nav-link { justify-content: center; }
+        .sidebar.collapsed .nav-icon { margin-right: 0; }
+
+        /* --- Main Content Area --- */
+        .main-content {
+            margin-left: 250px; /* Adjusted for LTR */
+            margin-right: 0;
+            padding: 20px; transition: margin-left 0.3s ease; min-height: 100vh;
+        }
+        .main-content.expanded { margin-left: 70px; /* Adjusted for LTR */ }
+        .page { display: none; animation: fadeInContent 0.5s ease-out; }
+        .page.active { display: block; }
+        @keyframes fadeInContent { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .page-header-container {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 30px; padding-top: 20px;
+        }
+        .page-header-container .page-title {
+            font-size: 2rem; font-weight: 700;
+            background: linear-gradient(45deg, #ffffff, #e3f2fd, #bbdefb);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; text-fill-color: transparent; margin-bottom: 5px;
+        }
+        .page-header-container .page-subtitle { color: #64b5f6; font-size: 1rem; }
+
+        .container {
+            max-width: 100%; margin: 0 auto; background: rgba(10, 10, 30, 0.5); 
+            backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); overflow: hidden;
+        }
+        .header { padding: 25px 20px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        .header h1 {
+            font-size: 2.2rem; font-weight: 700;
+            background: linear-gradient(45deg, #ffffff, #e3f2fd, #bbdefb);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; text-fill-color: transparent;
+            margin-bottom: 8px; text-transform: capitalize;
+        }
+        .header p { color: #64b5f6; font-size: 0.95rem; }
+        .top-actions-bar {
+            display: flex; justify-content: space-between; align-items: center; padding: 15px 20px;
+            background: rgba(15, 15, 35, 0.4); border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            flex-wrap: wrap; gap: 12px;
+        }
+        .stats { font-size: 0.9rem; font-weight: 500; display: flex; align-items: center; color: #90a4ae; }
+        .stats svg { margin-right: 8px; margin-left: 0; width: 18px; height: 18px; vertical-align: middle; fill: #64b5f6; }
+
+        .btn {
+            padding: 10px 20px; border: none; border-radius: 10px; font-size: 0.9rem; font-weight: 600;
+            cursor: pointer; transition: all 0.3s ease; text-decoration: none; display: inline-flex;
+            align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); text-transform: none;
         }
         .btn svg { width: 16px; height: 16px; fill: currentColor; }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); }
         .btn:active { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
         .btn:disabled {
-            background: rgba(120, 120, 120, 0.2) !important; /* Ensure override */
-            border-color: rgba(120, 120, 120, 0.2) !important;
-            color: #78828c !important;
-            cursor: not-allowed;
-            opacity: 0.6;
-            transform: translateY(0);
-            box-shadow: none;
+            background: rgba(120, 120, 120, 0.2) !important; border-color: rgba(120, 120, 120, 0.2) !important;
+            color: #78828c !important; cursor: not-allowed; opacity: 0.6; transform: translateY(0); box-shadow: none;
         }
-
-        .btn-primary { /* For "Open All", "Add Path", "No" in confirm */
-            background: linear-gradient(45deg, #1565c0, #1976d2, #1e88e5, #2196f3);
-            color: white;
-            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
-            padding: 12px 24px; /* Match new theme primary */
-            border-radius: 12px; /* Match new theme primary */
+        .btn-primary {
+            background: linear-gradient(45deg, #1565c0, #1976d2, #1e88e5, #2196f3); color: white;
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3); padding: 12px 24px; border-radius: 12px;
         }
-        .btn-primary:hover {
-            box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
+        .btn-primary:hover { box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4); }
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1); color: #90a4ae; border: 1px solid rgba(255, 255, 255, 0.2);
         }
-
-        .btn-secondary { /* For "Manage Categories", "Add Files", "Paste", "Close" */
-            background: rgba(255, 255, 255, 0.1);
-            color: #90a4ae;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.15);
-            color: white;
-        }
-
-        .btn-danger { /* For "Clear All Data", "Yes" in confirm */
-            background: linear-gradient(45deg, #d32f2f, #e53935, #f44336); /* Darker red gradient */
-            color: white;
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); color: white; }
+        .btn-danger {
+            background: linear-gradient(45deg, #d32f2f, #e53935, #f44336); color: white;
             box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
         }
-        .btn-danger:hover {
-            background: linear-gradient(45deg, #c62828, #d32f2f, #e53935); /* Slightly darker on hover */
-            box-shadow: 0 6px 20px rgba(244, 67, 54, 0.4);
-        }
-
-        .btn-success { /* For "Add to List", "Add Category" */
-            background: linear-gradient(45deg, #2e7d32, #388e3c, #43a047, #4caf50); /* Green gradient */
-            color: white;
+        .btn-danger:hover { background: linear-gradient(45deg, #c62828, #d32f2f, #e53935); box-shadow: 0 6px 20px rgba(244, 67, 54, 0.4); }
+        .btn-success {
+            background: linear-gradient(45deg, #2e7d32, #388e3c, #43a047, #4caf50); color: white;
             box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
         }
-        .btn-success:hover {
-            background: linear-gradient(45deg, #1b5e20, #2e7d32, #388e3c); /* Darker green on hover */
-            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
-        }
-        
+        .btn-success:hover { background: linear-gradient(45deg, #1b5e20, #2e7d32, #388e3c); box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4); }
         .btn-icon {
-            background: transparent;
-            border: none;
-            color: #90a4ae; /* New theme secondary text */
-            padding: 8px;
-            line-height: 1;
-            border-radius: 8px; /* New theme's radius */
-            transition: all 0.3s ease;
+            background: transparent; border: none; color: #90a4ae; padding: 8px; line-height: 1;
+            border-radius: 8px; transition: all 0.3s ease;
         }
-        .btn-icon:hover {
-            color: white;
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-        .btn-icon svg { width: 18px; height: 18px; } /* Slightly larger */
+        .btn-icon:hover { color: white; background-color: rgba(255, 255, 255, 0.1); }
+        .btn-icon svg { width: 18px; height: 18px; }
         .btn-icon:disabled { color: #5f6770 !important; background-color: transparent !important; cursor: not-allowed;}
         .btn-icon:disabled svg { fill: #5f6770 !important; }
 
-        /* --- Add Item Section (Glass Card Style) --- */
-        .add-item-section {
-            padding: 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            background: rgba(10, 10, 25, 0.4); /* Subtle glass */
-        }
-        .input-group { display: flex; flex-direction: column; gap: 15px; } /* Increased gap */
+        .add-item-section { padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); background: rgba(10, 10, 25, 0.4); }
+        .input-group { display: flex; flex-direction: column; gap: 15px; } 
         .input-row { display: flex; gap: 15px; flex-wrap: wrap; }
-
-        /* --- Input Fields & Select (Form Input Style) --- */
         .input-field, #categorySelectInput, .category-name-input-inline {
-            flex: 1;
-            padding: 12px 15px; /* New theme padding */
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px; /* New theme radius */
-            font-size: 0.9rem;
-            min-width: 150px; /* Adjusted min-width */
-            background-color: rgba(255, 255, 255, 0.05); /* Lighter glass for inputs */
-            color: white;
-            transition: all 0.3s ease;
+            flex: 1; padding: 12px 15px; border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px; font-size: 0.9rem; min-width: 150px; 
+            background-color: rgba(255, 255, 255, 0.05); color: white; transition: all 0.3s ease;
         }
         .input-field::placeholder { color: #64b5f6; opacity: 0.8; }
         .input-field:focus, #categorySelectInput:focus, .category-name-input-inline:focus {
-            outline: none;
-            border-color: #2196f3; /* New theme accent */
-            background-color: rgba(255, 255, 255, 0.1);
+            outline: none; border-color: #2196f3; background-color: rgba(255, 255, 255, 0.1);
             box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
         }
         #categorySelectInput {
             appearance: none; -webkit-appearance: none; -moz-appearance: none;
             background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2364b5f6%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
-            background-repeat: no-repeat;
-            background-size: 12px; /* Adjusted size */
+            background-repeat: no-repeat; background-size: 12px; 
         }
         html[dir="ltr"] #categorySelectInput { background-position: right 15px center; padding-right: 40px; }
         html[dir="rtl"] #categorySelectInput { background-position: left 15px center; padding-left: 40px; }
         #categorySelectInput option { background: #1a1a2e; color: white; }
 
-
         #selectedFilesDisplay { margin-top: 12px; font-size: 0.8rem; color: #90a4ae; }
         #itemsDisplayArea { padding: 20px; }
 
-        /* --- Category Section (Glass Card Style) --- */
         .category-section {
-            margin-bottom: 25px;
-            background: rgba(5, 5, 20, 0.5); /* Darker glass for sections */
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px; /* New theme radius */
-            box-shadow: 0 4px 20px rgba(0,0,0,0.25);
-            transition: all 0.3s ease;
+            margin-bottom: 25px; background: rgba(5, 5, 20, 0.5); 
+            backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.25); transition: all 0.3s ease;
         }
-        .category-section:hover {
-            background: rgba(10, 10, 25, 0.6);
-            border-color: rgba(255, 255, 255, 0.12);
-        }
-
+        .category-section:hover { background: rgba(10, 10, 25, 0.6); border-color: rgba(255, 255, 255, 0.12); }
         .category-header {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 15px 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            cursor: pointer; user-select: none;
-            background-color: rgba(20, 20, 40, 0.5); /* Slightly different header bg */
-            border-top-left-radius: 12px;
-            border-top-right-radius: 12px;
-            transition: background-color 0.3s ease;
+            padding: 15px 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            cursor: pointer; user-select: none; background-color: rgba(20, 20, 40, 0.5); 
+            border-top-left-radius: 12px; border-top-right-radius: 12px; transition: background-color 0.3s ease;
         }
         .category-header:hover { background-color: rgba(25, 25, 45, 0.6); }
-        .category-header:hover .category-title { color: #64b5f6; } /* New theme accent */
-
+        .category-header:hover .category-title { color: #64b5f6; } 
         .category-title-container { display: flex; align-items: center; gap: 12px; flex-grow: 1; }
-        .category-toggle-icon svg {
-            width: 12px; height: 12px; fill: #90a4ae;
-            transition: transform 0.3s ease-in-out;
-        }
-        .category-section:not(.collapsed) .category-toggle-icon svg { transform: rotate(90deg); }
+        .category-toggle-icon svg { width: 12px; height: 12px; fill: #90a4ae; transition: transform 0.3s ease-in-out; }
+        html[dir="ltr"] .category-section:not(.collapsed) .category-toggle-icon svg { transform: rotate(90deg); }
+        html[dir="rtl"] .category-section:not(.collapsed) .category-toggle-icon svg { transform: rotate(-90deg); }
         .category-title { font-size: 1.15rem; font-weight: 600; color: white; text-transform: capitalize;}
         .category-item-count {
-            background: rgba(255, 255, 255, 0.1);
-            color: #64b5f6;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            margin-left: 10px;
+            background: rgba(255, 255, 255, 0.1); color: #64b5f6; padding: 3px 10px;
+            border-radius: 20px; font-size: 0.75rem; margin-left: 10px; /* Adjusted for LTR */
         }
+        html[dir="rtl"] .category-item-count { margin-right: 10px; margin-left: 0; }
         
         .category-controls { display: flex; align-items: center; gap: 10px; }
         .category-controls .btn-icon { padding: 7px; }
         .category-controls .btn-icon svg { width: 15px; height: 15px; }
-        .category-controls .btn-open-all-in-category {
-            padding: 7px 14px; font-size: 0.8rem;
-        }
+        .category-controls .btn-open-all-in-category { padding: 7px 14px; font-size: 0.8rem; }
         .category-controls .btn-open-all-in-category svg { width: 14px; height: 14px;}
 
         .items-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Wider cards */
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
             gap: 20px; padding: 20px; max-height: 1200px; overflow-y: auto; opacity: 1;
             transition: max-height 0.3s ease-out, opacity 0.3s ease-out, padding 0.3s ease-out;
         }
         .category-section.collapsed .items-grid { max-height: 0; opacity: 0; padding-top: 0; padding-bottom: 0; margin-top:0; overflow: hidden; }
-        .category-section.collapsed .category-header {
-            border-bottom-color: transparent;
-            border-bottom-left-radius: 12px;
-            border-bottom-right-radius: 12px;
-        }
+        .category-section.collapsed .category-header { border-bottom-color: transparent; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; }
 
-        /* --- Item Card (Path Card Style) --- */
         .item-card {
-            background: rgba(5, 5, 20, 0.7); /* Darker glass for cards */
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px; /* New theme radius */
-            padding: 18px; /* More padding */
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
-            display: flex; flex-direction: column; justify-content: space-between;
-            position: relative; min-height: 140px; /* Taller cards */
+            background: rgba(5, 5, 20, 0.7); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; 
+            padding: 18px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease; display: flex; flex-direction: column;
+            justify-content: space-between; position: relative; min-height: 140px; 
         }
         .item-card:hover {
-            background: rgba(10, 10, 25, 0.8);
-            border-color: rgba(255, 255, 255, 0.15);
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            background: rgba(10, 10, 25, 0.8); border-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.3);
         }
-        /* Removed specific LTR/RTL border hover, new theme is more subtle */
-
         .item-card-main { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
-        .item-card-icon svg {
-            width: 30px; height: 30px; /* Larger icons */
-            fill: #64b5f6; /* New theme accent */
-            flex-shrink: 0;
-        }
+        .item-card-icon svg { width: 30px; height: 30px; fill: #64b5f6; flex-shrink: 0; }
         .item-card-info { overflow: hidden; }
-        .item-card-name {
-            font-size: 1rem; /* Larger name */
-            font-weight: 600; white-space: nowrap;
-            overflow: hidden; text-overflow: ellipsis; color: white;
-        }
-        .item-card-filetype { font-size: 0.8rem; color: #90a4ae; } /* Secondary text color */
+        .item-card-name { font-size: 1rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: white; }
+        .item-card-filetype { font-size: 0.8rem; color: #90a4ae; } 
         .item-card-path {
-            font-size: 0.75rem; color: #64b5f6; /* Accent for path */
-            margin: 8px 0; word-break: break-all;
-            max-height: 3em; /* Allow more lines */
-            overflow: hidden; text-overflow: ellipsis;
+            font-size: 0.75rem; color: #64b5f6; margin: 8px 0; word-break: break-all;
+            max-height: 3em; overflow: hidden; text-overflow: ellipsis;
             display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
         }
-
         .item-card-footer {
-            margin-top: auto; display: flex; justify-content: space-between;
-            align-items: center; padding-top: 10px;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            margin-top: auto; display: flex; justify-content: space-between; align-items: center;
+            padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.08);
         }
         .item-card-date { font-size: 0.7rem; color: #78828c; }
         .item-card-actions-trigger svg { width: 18px; height: 18px; }
 
-        /* --- Item Actions Menu (Glassy Dropdown) --- */
         .item-actions-menu {
-            display: none;
-            position: absolute;
-            background-color: rgba(20, 20, 40, 0.9); /* Darker, more solid glass */
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 10px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-            z-index: 500; min-width: 200px; /* Wider menu */
-            overflow: hidden;
-            padding: 8px; /* Padding around buttons */
+            display: none; position: absolute; background-color: rgba(20, 20, 40, 0.9); 
+            backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px; box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            z-index: 500; min-width: 200px; overflow: hidden; padding: 8px; 
         }
         .item-actions-menu.show { display: block; animation: fadeIn 0.2s ease-out; }
-        html[dir="ltr"] .item-actions-menu { left: 10px; right:auto; }
-        html[dir="rtl"] .item-actions-menu { right: 10px; left:auto; }
-
+        html[dir="ltr"] .item-actions-menu { left: 10px; right:auto; } 
+        html[dir="rtl"] .item-actions-menu { right: 10px; left:auto; } 
         .item-actions-menu button {
-            display: flex; align-items: center; gap: 10px;
-            width: 100%; padding: 10px 15px;
-            background: none; border: none;
-            cursor: pointer;
-            font-size: 0.85rem;
-            color: #b0bec5; /* Lighter secondary text */
-            transition: all 0.2s ease;
-            text-align: left;
-            border-radius: 8px; /* Rounded menu items */
-            margin: 0; /* Removed individual margins */
+            display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 15px;
+            background: none; border: none; cursor: pointer; font-size: 0.85rem;
+            color: #b0bec5; transition: all 0.2s ease; text-align: left; /* LTR default */
+            border-radius: 8px; margin: 0; 
         }
         html[dir="rtl"] .item-actions-menu button { text-align: right; }
-
-        .item-actions-menu button svg { width: 15px; height: 15px; fill: currentColor; margin-right: 10px; }
+        .item-actions-menu button svg { width: 15px; height: 15px; fill: currentColor; margin-right: 10px; margin-left:0; } /* LTR */
         html[dir="rtl"] .item-actions-menu button svg { margin-left: 10px; margin-right: 0; }
-
-        .item-actions-menu button:hover {
-            background-color: rgba(33, 150, 243, 0.2); /* Accent hover from new theme */
-            color: #64b5f6;
-        }
+        .item-actions-menu button:hover { background-color: rgba(33, 150, 243, 0.2); color: #64b5f6; }
         .item-actions-menu button:hover svg { fill: #64b5f6; }
-
-        .item-actions-menu button[data-action="delete"]:hover {
-            background-color: rgba(244, 67, 54, 0.2); /* Danger hover from new theme */
-            color: #f44336;
-        }
+        .item-actions-menu button[data-action="delete"]:hover { background-color: rgba(244, 67, 54, 0.2); color: #f44336; }
         .item-actions-menu button[data-action="delete"]:hover svg { fill: #f44336; }
 
-
-        /* --- Empty Placeholder --- */
         .empty-placeholder { text-align: center; padding: 40px 20px; color: #90a4ae; }
         .empty-placeholder .icon svg { width: 50px; height: 50px; fill: rgba(255,255,255,0.2); margin-bottom: 15px; }
         .empty-placeholder h3 { font-size: 1.4rem; margin-bottom: 8px; color: white;}
         .empty-placeholder p { font-size: 1rem; }
 
-        /* --- Notification Toast (Glassy) --- */
         .notification-toast {
-            position: fixed; bottom: 20px;
-            background-color: rgba(20, 20, 40, 0.85); /* Glassy */
-            backdrop-filter: blur(10px);
-            color: white; padding: 15px 22px;
-            border-radius: 12px; /* New theme radius */
-            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-            z-index: 1000; opacity: 0; transform: translateY(20px) scale(0.95);
+            position: fixed; bottom: 20px; background-color: rgba(20, 20, 40, 0.85); 
+            backdrop-filter: blur(10px); color: white; padding: 15px 22px;
+            border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            z-index: 10000; opacity: 0; transform: translateY(20px) scale(0.95);
             transition: opacity 0.3s ease-out, transform 0.3s ease-out;
             max-width: 350px; font-size: 0.9rem;
-            border-left: 4px solid transparent; /* Base border */
+            border-left: 4px solid transparent; border-right:none; /* LTR */
         }
-        html[dir="ltr"] .notification-toast { left: 20px; right: auto; }
-        html[dir="rtl"] .notification-toast { right: 20px; left: auto; border-left: none; border-right: 4px solid transparent; }
-
+        html[dir="rtl"] .notification-toast { right: 20px; left: auto; border-right: 4px solid transparent; border-left:none; }
         .notification-toast.show { opacity: 1; transform: translateY(0) scale(1); }
-        .notification-toast.success { border-color: #4caf50; /* Green from new theme */ }
-        .notification-toast.error { border-color: #f44336; /* Red from new theme */ }
-        .notification-toast.warning { border-color: #ffc107; /* Yellow from new theme */ }
-        html[dir="rtl"] .notification-toast.success { border-right-color: #4caf50; }
-        html[dir="rtl"] .notification-toast.error { border-right-color: #f44336; }
-        html[dir="rtl"] .notification-toast.warning { border-right-color: #ffc107; }
-
-
-        /* --- Loading Indicator & Modal Backdrop (Glassy) --- */
+        .notification-toast.success { border-color: #4caf50; } 
+        .notification-toast.error { border-color: #f44336; } 
+        .notification-toast.warning { border-color: #ffc107; } 
+        
         .loading-indicator, .modal-backdrop {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.7); /* Darker overlay */
-            backdrop-filter: blur(10px);
+            background-color: rgba(0, 0, 0, 0.7); backdrop-filter: blur(10px);
             display: flex; justify-content: center; align-items: center;
-            z-index: 9998; opacity: 0; visibility: hidden;
+            z-index: 99998; opacity: 0; visibility: hidden;
             transition: opacity 0.3s ease-out, visibility 0s 0.3s linear;
         }
-        #confirmModalBackdrop { z-index: 10001; } /* Ensure confirm is on top */
-        .loading-indicator.show, .modal-backdrop.show {
-            opacity: 1; visibility: visible; transition-delay: 0s;
-        }
+        #confirmModalBackdrop { z-index: 100001; } 
+        .loading-indicator.show, .modal-backdrop.show { opacity: 1; visibility: visible; transition-delay: 0s; }
         .spinner {
-            width: 35px; height: 35px;
-            border: 4px solid rgba(255, 255, 255, 0.2); /* Lighter border */
-            border-top-color: #2196f3; /* New theme accent */
-            border-radius: 50%; animation: spin 0.7s linear infinite;
+            width: 35px; height: 35px; border: 4px solid rgba(255, 255, 255, 0.2); 
+            border-top-color: #2196f3; border-radius: 50%; animation: spin 0.7s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* --- Modal Dialog (Glass Card Style) --- */
-        .modal-dialog { /* For confirm modal */
-            background: rgba(10, 10, 30, 0.9); /* Darker glass for modal */
-            backdrop-filter: blur(20px);
-            padding: 25px 30px;
-            border-radius: 16px; /* New theme radius */
-            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-            text-align: center; max-width: 400px; /* Wider confirm modal */
+        .modal-dialog { 
+            background: rgba(10, 10, 30, 0.9); backdrop-filter: blur(20px);
+            padding: 25px 30px; border-radius: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            text-align: center; max-width: 400px; 
             transform: scale(0.95) translateY(10px);
             transition: transform 0.3s ease-out, opacity 0.3s ease-out;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            opacity: 0;
+            border: 1px solid rgba(255, 255, 255, 0.15); opacity: 0;
         }
         .modal-backdrop.show .modal-dialog { transform: scale(1) translateY(0); opacity: 1; }
         .modal-dialog p { margin-bottom: 20px; font-size: 1rem; color: white; }
         .modal-dialog-actions { display: flex; justify-content: center; gap: 15px; }
         .modal-dialog-actions button { min-width: 100px; }
 
-
-        /* --- Category Management Modal (Glass Card Style) --- */
-        #categoryManagerModal { z-index: 10000; }
+        #categoryManagerModal { z-index: 100000; } 
         .category-manager-content {
-            background: rgba(15, 15, 35, 0.95); /* Very dark glass */
-            backdrop-filter: blur(25px);
-            padding: 25px;
-            border-radius: 16px;
-            width: 90%; max-width: 600px; /* Wider modal */
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            background: rgba(15, 15, 35, 0.95); backdrop-filter: blur(25px);
+            padding: 25px; border-radius: 16px; width: 90%; max-width: 600px; 
+            border: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 10px 40px rgba(0,0,0,0.5);
             transform: scale(0.95) translateY(10px);
-            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
-            opacity: 0;
+            transition: transform 0.3s ease-out, opacity 0.3s ease-out; opacity: 0;
         }
         .modal-backdrop.show .category-manager-content { transform: scale(1) translateY(0); opacity: 1; }
-
         .category-manager-content h2 {
-            text-align: center;
-            font-size: 1.8rem; /* Larger title */
-            font-weight: 700;
-            margin-bottom: 25px;
-            background: linear-gradient(45deg, #4fc3f7, #29b6f6, #03a9f4); /* Blue gradient from new theme */
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-fill-color: transparent;
+            text-align: center; font-size: 1.8rem; font-weight: 700; margin-bottom: 25px;
+            background: linear-gradient(45deg, #4fc3f7, #29b6f6, #03a9f4); 
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; text-fill-color: transparent;
         }
         #categoryListContainer {
-            max-height: 350px; /* More height */
-            overflow-y: auto;
-            margin-bottom: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 10px; /* Padding inside list */
-            background-color: rgba(5, 5, 20, 0.5); /* Inner glass */
+            max-height: 350px; overflow-y: auto; margin-bottom: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px;
+            padding: 10px; background-color: rgba(5, 5, 20, 0.5); 
         }
         .category-manager-item {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 12px 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            font-size: 0.95rem; color: white;
-            transition: background-color 0.2s ease;
-            border-radius: 8px; /* Rounded items */
-            margin-bottom: 5px; /* Spacing */
+            padding: 12px 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            font-size: 0.95rem; color: white; transition: background-color 0.2s ease;
+            border-radius: 8px; margin-bottom: 5px; 
         }
         .category-manager-item:hover { background-color: rgba(255,255,255,0.07); }
         .category-manager-item:last-child { border-bottom: none; margin-bottom: 0; }
-
         .category-manager-item-name-container { flex-grow: 1; display: flex; align-items: center; min-width: 0; gap: 10px; }
-        .category-manager-item-name {
-            flex-grow: 1; white-space: nowrap;
-            overflow: hidden; text-overflow: ellipsis; padding: 3px 0;
-        }
-        .category-name-input-inline { /* Already styled by .input-field */
-            font-size: 0.95rem; padding: 8px 12px; margin: 0;
-            height: auto; line-height: 1.5; width: 100%;
-        }
-
+        .category-manager-item-name { flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 3px 0; }
+        .category-name-input-inline { font-size: 0.95rem; padding: 8px 12px; margin: 0; height: auto; line-height: 1.5; width: 100%; }
         .category-manager-item-controls { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
         .category-manager-item .btn-icon { margin-left: 0; margin-right: 0; padding: 8px; }
-        
-        /* Specific icon colors for category manager actions */
-        .category-manager-item .btn-icon.btn-edit-managed-category { color: #64b5f6; } /* Accent blue */
+        .category-manager-item .btn-icon.btn-edit-managed-category { color: #64b5f6; } 
         .category-manager-item .btn-icon.btn-edit-managed-category:hover { background-color: rgba(33, 150, 243, 0.15); }
-        .category-manager-item .btn-icon.btn-delete-managed-category { color: #f44336; } /* Accent red */
+        .category-manager-item .btn-icon.btn-delete-managed-category { color: #f44336; } 
         .category-manager-item .btn-icon.btn-delete-managed-category:hover { background-color: rgba(244, 67, 54, 0.15); }
-        .category-manager-item .btn-icon.btn-save-inline-edit { color: #4caf50; } /* Accent green */
+        .category-manager-item .btn-icon.btn-save-inline-edit { color: #4caf50; } 
         .category-manager-item .btn-icon.btn-save-inline-edit:hover { background-color: rgba(76, 175, 80, 0.15); }
         .category-manager-item .btn-icon.btn-cancel-inline-edit { color: #90a4ae; }
         .category-manager-item .btn-icon.btn-cancel-inline-edit:hover { background-color: rgba(144, 164, 174, 0.15); }
-
         .category-manager-item .btn-icon svg { width: 16px; height: 16px; }
         .category-tag {
-            font-size: 0.7rem; padding: 4px 10px;
-            border-radius: 20px; /* Pill shape */
-            color: white;
-            background-color: rgba(255, 255, 255, 0.1);
-            font-weight: 500;
-            flex-shrink: 0;
+            font-size: 0.7rem; padding: 4px 10px; border-radius: 20px; 
+            color: white; background-color: rgba(255, 255, 255, 0.1);
+            font-weight: 500; flex-shrink: 0;
         }
-        .category-tag.custom { background-color: rgba(33, 150, 243, 0.3); color: #e3f2fd; } /* Accent for custom */
-
-        .add-category-form {
-            display: flex; gap: 15px; margin-top: 20px;
-            padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        #newManagedCategoryInput { /* Already styled by .input-field */
-            margin-bottom: 0; width: 100%;
-        }
-        #addManagedCategoryBtn { /* Already styled by .btn .btn-success */
-             flex-shrink: 0;
-        }
+        .category-tag.custom { background-color: rgba(33, 150, 243, 0.3); color: #e3f2fd; } 
+        .add-category-form { display: flex; gap: 15px; margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+        #newManagedCategoryInput { margin-bottom: 0; width: 100%; }
+        #addManagedCategoryBtn { flex-shrink: 0; }
         .category-manager-actions { text-align: center; margin-top:30px;}
 
-
-        /* --- Animations --- */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px) scale(0.98); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
+        /* --- To-Do List Specific Styles --- */
+        .todo-input-container { display: flex; gap: 12px; margin-bottom: 20px; }
+        .todo-input { /* Uses .input-field styles */ flex: 1; }
+        #todosContainer { display: flex; flex-direction: column; gap: 10px; }
+        .todo-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 15px; background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px;
+            transition: all 0.3s ease;
         }
-        .fade-in-item { /* For item cards specifically */
-             animation: fadeIn 0.3s ease-out forwards;
-             animation-delay: calc(var(--card-index, 0) * 0.05s); /* Stagger animation */
-             opacity: 0; /* Start hidden for animation */
-        }
+        .todo-item:hover { background: rgba(255, 255, 255, 0.1); }
+        .todo-item.completed { background: rgba(76, 175, 80, 0.1); border-left-color: #4caf50; }
+        html[dir="rtl"] .todo-item.completed { border-right-color: #4caf50; border-left-color: rgba(255,255,255,0.1); }
 
+
+        .todo-item-left { display: flex; align-items: center; gap: 10px; flex-grow: 1; }
+        .todo-checkbox {
+            width: 20px; height: 20px; border: 2px solid #64b5f6; border-radius: 6px;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            transition: all 0.3s ease; flex-shrink: 0;
+        }
+        .todo-checkbox svg { width: 12px; height: 12px; fill: white; opacity: 0; transition: opacity 0.2s; }
+        .todo-item.completed .todo-checkbox { background: #4caf50; border-color: #4caf50; }
+        .todo-item.completed .todo-checkbox svg { opacity: 1; }
+        .todo-text { color: white; transition: all 0.3s ease; word-break: break-word; }
+        .todo-item.completed .todo-text { text-decoration: line-through; opacity: 0.7; }
+        .todo-date { font-size: 0.75rem; color: #90a4ae; margin-left: auto; padding-left: 10px; flex-shrink: 0;} /* LTR */
+        html[dir="rtl"] .todo-date { margin-right: auto; padding-right: 10px; margin-left:0; padding-left:0;}
+
+        .todo-item .btn-icon { padding: 6px; } /* Smaller padding for todo delete */
+        .todo-item .btn-icon svg { width: 14px; height: 14px; }
+
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .fade-in-item { animation: fadeIn 0.3s ease-out forwards; animation-delay: calc(var(--card-index, 0) * 0.05s); opacity: 0; }
 
         /* --- Responsive Adjustments --- */
         @media (max-width: 768px) {
-            body { padding: 10px; font-size:13.5px; }
-            .container { margin: 10px auto; }
+            body { padding: 0; font-size:13.5px; }
+            .main-content { margin-left: 0; margin-right:0; padding:10px; } /* Sidebar overlays on mobile */
+            .main-content.expanded { margin-left: 0; margin-right:0; } 
+            
+            .sidebar { transform: translateX(-100%); box-shadow: 5px 0 15px rgba(0,0,0,0.2); } /* LTR default */
+            html[dir="rtl"] .sidebar { transform: translateX(100%); box-shadow: -5px 0 15px rgba(0,0,0,0.2); }
+            .sidebar.show { transform: translateX(0); }
+
+            .container { margin: 10px; width:auto; }
             .header { padding: 20px 15px; } .header h1 { font-size: 1.8rem; }
             .top-actions-bar, .add-item-section, #itemsDisplayArea { padding: 15px; }
             .top-actions-bar { flex-direction: column; align-items: stretch; }
             .top-actions-bar .btn { width: 100%; margin-bottom: 10px; }
             .input-row { flex-direction: column; gap: 15px; }
-            .input-field, #categorySelectInput, #newManagedCategoryInput, .category-name-input-inline { font-size: 0.9rem; padding: 12px 15px;}
-            .items-grid { grid-template-columns: 1fr; gap: 15px;} /* Single column on mobile */
-            .item-card { min-height: auto; padding: 15px; } /* Auto height, more padding */
-            .item-card-icon svg { width: 28px; height: 28px; }
-            .item-card-name { font-size: 0.95rem; }
-            .item-card-filetype { font-size: 0.75rem;}
-            .item-card-path { font-size: 0.7rem;}
-            .item-actions-menu { font-size: 0.9rem; min-width: 180px; }
-            .item-actions-menu button { padding: 10px 15px; font-size: 0.85rem;}
-            .notification-toast { max-width: calc(100% - 24px); font-size: 0.9rem; padding: 14px 20px; bottom: 10px;}
-            html[dir="ltr"] .notification-toast { left: 12px; right: auto; } /* Ensure it doesn't stretch full width */
-            html[dir="rtl"] .notification-toast { right: 12px; left: auto; }
+            .items-grid { grid-template-columns: 1fr; gap: 15px;} 
+            .item-card { min-height: auto; padding: 15px; } 
+            .notification-toast { max-width: calc(100% - 24px); bottom: 10px; left:12px; right:12px;}
             .category-manager-content { max-width: 95%; padding: 20px;}
-            .add-category-form { flex-direction: column;}
-            #newManagedCategoryInput { width: 100%; margin-bottom: 12px; }
             .modal-dialog { max-width: 90%; padding: 20px; }
         }
         @media (max-width: 480px) {
-            .header h1 { font-size: 1.6rem; }
-            .header p { font-size: 0.85rem; }
-            .btn { font-size: 0.85rem; padding: 10px 15px; }
-            .btn-primary { padding: 10px 20px; }
+            .header h1 { font-size: 1.6rem; } .header p { font-size: 0.85rem; }
+            .btn { font-size: 0.85rem; padding: 10px 15px; } .btn-primary { padding: 10px 20px; }
             .category-title { font-size: 1.05rem; }
             .category-item-count { font-size: 0.7rem; padding: 2px 8px;}
             .category-controls .btn-open-all-in-category { font-size: 0.75rem; padding: 6px 10px;}
             .category-manager-content h2 { font-size: 1.5rem; }
+            .sidebar.collapsed { width: 60px; } 
+            .main-content.expanded { margin-left: 60px; } /* LTR */
+            html[dir="rtl"] .main-content.expanded { margin-right: 60px; }
         }
 
     </style>
 </head>
 <body>
+    <div class="window-controls">
+        <button class="window-btn minimize-btn" onclick="handleMinimizeWindow()" title="Minimize"></button>
+        <button class="window-btn close-btn" onclick="handleCloseWindow()" title="Close"></button>
+    </div>
+
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <h2>Hemo Paths</h2>
+                <p>Manager</p>
+            </div>
+            <button class="menu-toggle" onclick="toggleSidebar()" title="Toggle Menu">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                </svg>
+            </button>
+        </div>
+        
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="#" class="nav-link active" onclick="showPage('pathsPage')">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><use xlink:href="#icon-folder"></use></svg>
+                    <span class="nav-text">Path Manager</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" onclick="showPage('todosPage')">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"> <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/> </svg>
+                    <span class="nav-text">To-Do List</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" onclick="showPage('aboutPage')">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"> <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/> </svg>
+                    <span class="nav-text">About</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <main class="main-content" id="mainContent">
+        <div id="pathsPage" class="page active">
+            <div class="container">
+                <div class="header">
+                    <h1>Project File Manager</h1> <p>Efficiently organize and manage your project files</p> </div>
+
+                <div class="top-actions-bar">
+                    <div class="stats">
+                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-folder"></use></svg>
+                        Total Items: <span id="fileCount">0</span> </div>
+                    <div>
+                        <button id="manageCategoriesBtn" class="btn btn-secondary">
+                            <svg viewBox="0 0 24 24"><use xlink:href="#icon-settings"></use></svg>
+                            Manage Categories </button>
+                        <button id="openAllBtn" class="btn btn-primary">
+                            <svg viewBox="0 0 24 24"><use xlink:href="#icon-rocket"></use></svg>
+                            Open All </button>
+                        <button id="clearAllDataBtn" class="btn btn-danger">
+                            <svg viewBox="0 0 24 24"><use xlink:href="#icon-clear-all"></use></svg>
+                            Clear All Data </button>
+                    </div>
+                </div>
+
+                <div class="add-item-section">
+                    <div class="input-group">
+                        <div class="input-row">
+                            <button id="selectFilesButton" class="btn btn-secondary">
+                                <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>Add Files </button>
+                            <button id="addFolderLinkButton" class="btn btn-secondary">
+                                <svg viewBox="0 0 24 24"><use xlink:href="#icon-folder"></use></svg>Add Folder Link </button>
+                            <button id="importFromFolderButton" class="btn btn-secondary">
+                                <svg viewBox="0 0 24 24"><use xlink:href="#icon-folder"></use></svg>Import From Folder </button>
+                        </div>
+                        <div class="input-row paste-path-group">
+                            <input type="text" id="pathInput" class="input-field" placeholder="Or paste a file/folder/website path here"> <button id="pastePathButton" class="btn btn-secondary" style="flex-shrink: 0;">
+                                <svg viewBox="0 0 24 24"><use xlink:href="#icon-paste"></use></svg>Paste </button>
+                            <button id="addPastedPathButton" class="btn btn-primary" style="flex-shrink: 0;">
+                                <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>Add Path </button>
+                        </div>
+                        <div class="input-row">
+                            <input type="text" id="projectNameInput" class="input-field" placeholder="Descriptive name for the item(s) (optional)"> <select id="categorySelectInput" class="input-field"></select>
+                        </div>
+                        <button id="addItemsButton" class="btn btn-success" style="align-self: flex-start;">
+                            <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>Add to List </button>
+                    </div>
+                    <div id="selectedFilesDisplay"></div>
+                </div>
+
+                <div id="itemsDisplayArea">
+                    </div>
+            </div>
+        </div>
+
+        <div id="todosPage" class="page">
+            <div class="page-header-container">
+                <div>
+                    <h1 class="page-title">To-Do List</h1>
+                    <p class="page-subtitle">Keep track of your tasks and projects</p>
+                </div>
+            </div>
+            <div class="glass-card">
+                <div class="todo-input-container">
+                    <input type="text" id="todoInput" class="input-field todo-input" placeholder="Add a new task...">
+                    <button id="addTodoBtn" class="btn btn-primary">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;">
+                            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                        </svg>
+                        Add Task
+                    </button>
+                </div>
+                <div id="todosContainer">
+                    </div>
+            </div>
+        </div>
+
+        <div id="aboutPage" class="page">
+             <div class="page-header-container">
+                <div>
+                    <h1 class="page-title">About Hemo Paths Manager</h1>
+                    <p class="page-subtitle">Your ultimate project file organization tool</p>
+                </div>
+            </div>
+            <div class="glass-card">
+                <h3>Hemo Paths Manager</h3>
+                <p>Version: 1.3 (Glass Theme & Features)</p>
+                <p>Developed to streamline the management of your project file paths, website links, and tasks.</p>
+                <br>
+                <h4>Key Features:</h4>
+                <ul>
+                    <li>Easily add and categorize file paths, folder links, and website URLs.</li>
+                    <li>Directly open files, folders, and websites from the application.</li>
+                    <li>Manage custom categories for better organization.</li>
+                    <li>Integrated To-Do list to track your tasks.</li>
+                    <li>Modern and attractive user interface.</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+    
     <svg width="0" height="0" style="display:none;">
         <symbol id="icon-folder" viewBox="0 0 24 24"><path d="M10 4H4c-1.11 0-2 .89-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></symbol>
         <symbol id="icon-file" viewBox="0 0 24 24"><path d="M13 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V9l-7-7zm4 18H7V4h5v5h5v11z"/></symbol>
+        <symbol id="icon-website" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93s3.05-7.44 7-7.93v15.86zm2-15.86c1.03.13 2 .45 2.87.93L15 8h-3V4.07zm0 5.93H15l.8 2H12V10zm0 4h3l.87 2.07c-.87.48-1.84.8-2.87.93V14zm5.96-2H18v-2h1.96c.03.33.04.66.04 1s-.01.67-.04 1z"/></symbol>
         <symbol id="icon-photoshop" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1.5 14.5V7.5h3V10l2.5-2.5L18.5 10l-2.5 2.5L18.5 15l-2.5 2.5-2.5-2.5V16.5h-3zM9 14.5v-5l-2.5 2.5L9 14.5z"/></symbol>
         <symbol id="icon-aftereffects" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 15l-4-4h2.5v-3h3v3H16l-4 4zM8.5 9.5L12 6l3.5 3.5h-2v3h-3v-3h-2z"/></symbol>
         <symbol id="icon-premiere" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM9.5 16.5L14.5 12L9.5 7.5v9zM15 16h-2V8h2v8z"/></symbol>
@@ -615,83 +650,19 @@
         <symbol id="icon-add" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></symbol>
         <symbol id="icon-save" viewBox="0 0 24 24"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></symbol>
         <symbol id="icon-cancel" viewBox="0 0 24 24"><path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></symbol>
-        <symbol id="icon-chevron-right" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></symbol>
-        <symbol id="icon-empty-folder" viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 10H6V8h12v8z"/></symbol> <symbol id="icon-rocket" viewBox="0 0 24 24"><path d="M13.12,2.25a1.5,1.5,0,0,0-2.24,0L3.54,9.59A4.48,4.48,0,0,0,3,12a4.48,4.48,0,0,0,.54,2.41L10.88,21.75a1.5,1.5,0,0,0,2.24,0l7.34-7.34A4.48,4.48,0,0,0,21,12a4.48,4.48,0,0,0-.54-2.41ZM12,14a2,2,0,1,1,2-2A2,2,0,0,1,12,14Z"/></symbol>
+        <symbol id="icon-chevron-right" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></symbol> 
+        <symbol id="icon-chevron-left" viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></symbol>
+        <symbol id="icon-empty-folder" viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 10H6V8h12v8z"/></symbol>
+        <symbol id="icon-rocket" viewBox="0 0 24 24"><path d="M13.12,2.25a1.5,1.5,0,0,0-2.24,0L3.54,9.59A4.48,4.48,0,0,0,3,12a4.48,4.48,0,0,0,.54,2.41L10.88,21.75a1.5,1.5,0,0,0,2.24,0l7.34-7.34A4.48,4.48,0,0,0,21,12a4.48,4.48,0,0,0-.54-2.41ZM12,14a2,2,0,1,1,2-2A2,2,0,0,1,12,14Z"/></symbol>
         <symbol id="icon-clear-all" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM8 9h8v10H8V9zm7.5-5l-1-1h-5l-1 1H5v2h14V4z"/></symbol>
         <symbol id="icon-paste" viewBox="0 0 24 24"><path d="M19 2h-4.18C14.4.84 13.3 0 12 0S9.6.84 9.18 2H5c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm7 18H5V4h2v2h10V4h2v16z"/></symbol>
         <symbol id="icon-arrow-up" viewBox="0 0 24 24"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/></symbol>
         <symbol id="icon-arrow-down" viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></symbol>
-        <symbol id="icon-settings" viewBox="0 0 24 24"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17-.59-1.69-.98l-2.49-1c-.23-.08-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69-.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l-.38-2.65c.61-.25 1.17-.59-1.69-.98l2.49 1c.23.08.49 0 .61.22l2-3.46c.12-.22-.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></symbol>
+        <symbol id="icon-settings" viewBox="0 0 24 24"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17-.59-1.69-.98l-2.49-1c-.23-.08-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12-.64l2 3.46c.12.22.39.3.61-.22l2.49-1c.52.4 1.08.73 1.69-.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l-.38-2.65c.61-.25 1.17-.59-1.69-.98l2.49 1c.23.08.49 0 .61.22l2-3.46c.12-.22-.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></symbol>
         <symbol id="icon-close" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></symbol>
+        <symbol id="icon-check" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></symbol>
+
     </svg>
-
-    <div class="loading-indicator" id="loadingOverlay">
-        <div class="spinner"></div>
-    </div>
-
-    <div class="container">
-        <div class="header">
-            <h1>Project File Manager</h1>
-            <p>Efficiently organize and manage your project files</p>
-        </div>
-
-        <div class="top-actions-bar">
-            <div class="stats">
-                <svg viewBox="0 0 24 24"><use xlink:href="#icon-folder"></use></svg>
-                Total Items: <span id="fileCount">0</span>
-            </div>
-            <div>
-                <button id="manageCategoriesBtn" class="btn btn-secondary">
-                    <svg viewBox="0 0 24 24"><use xlink:href="#icon-settings"></use></svg>
-                    Manage Categories
-                </button>
-                <button id="openAllBtn" class="btn btn-primary">
-                    <svg viewBox="0 0 24 24"><use xlink:href="#icon-rocket"></use></svg>
-                    Open All
-                </button>
-                <button id="clearAllDataBtn" class="btn btn-danger">
-                    <svg viewBox="0 0 24 24"><use xlink:href="#icon-clear-all"></use></svg>
-                    Clear All Data
-                </button>
-            </div>
-        </div>
-
-        <div class="add-item-section">
-            <div class="input-group">
-                <div class="input-row">
-                    <button id="selectFilesButton" class="btn btn-secondary">
-                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>Add Files
-                    </button>
-                    <button id="addFolderLinkButton" class="btn btn-secondary">
-                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-folder"></use></svg>Add Folder Link
-                    </button>
-                    <button id="importFromFolderButton" class="btn btn-secondary">
-                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-folder"></use></svg>Import From Folder
-                    </button>
-                </div>
-                <div class="input-row paste-path-group">
-                    <input type="text" id="pathInput" class="input-field" placeholder="Or paste a file/folder path here">
-                    <button id="pastePathButton" class="btn btn-secondary" style="flex-shrink: 0;">
-                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-paste"></use></svg>Paste
-                    </button>
-                    <button id="addPastedPathButton" class="btn btn-primary" style="flex-shrink: 0;">
-                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>Add Path
-                    </button>
-                </div>
-                <div class="input-row">
-                    <input type="text" id="projectNameInput" class="input-field" placeholder="Descriptive name for the item(s) (optional)">
-                    <select id="categorySelectInput" class="input-field"></select>
-                </div>
-                <button id="addItemsButton" class="btn btn-success" style="align-self: flex-start;">
-                    <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>Add to List
-                </button>
-            </div>
-            <div id="selectedFilesDisplay"></div>
-        </div>
-
-        <div id="itemsDisplayArea">
-            </div>
-    </div>
 
     <div id="notificationToast" class="notification-toast"></div>
 
@@ -699,34 +670,33 @@
         <div class="modal-dialog">
             <p id="confirmModalMessage"></p>
             <div class="modal-dialog-actions">
-                <button id="confirmModalYesBtn" class="btn btn-danger">Yes</button>
-                <button id="confirmModalNoBtn" class="btn btn-primary">No</button>
+                <button id="confirmModalYesBtn" class="btn btn-danger">Yes</button> 
+                <button id="confirmModalNoBtn" class="btn btn-primary">No</button> 
             </div>
         </div>
     </div>
 
     <div id="categoryManagerModal" class="modal-backdrop">
         <div class="category-manager-content">
-            <h2>Manage Categories</h2>
-            <div id="categoryListContainer">
-                </div>
+            <h2>Manage Categories</h2> 
+            <div id="categoryListContainer"></div>
             <div class="add-category-form">
-                <input type="text" id="newManagedCategoryInput" class="input-field" placeholder="New category name">
+                <input type="text" id="newManagedCategoryInput" class="input-field" placeholder="New category name"> 
                 <button id="addManagedCategoryBtn" class="btn btn-success">
-                    <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>Add Category
-                </button>
+                    <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>Add Category </button>
             </div>
             <div class="category-manager-actions">
-                <button id="closeCategoryManagerBtn" class="btn btn-secondary">Close</button>
+                <button id="closeCategoryManagerBtn" class="btn btn-secondary">Close</button> 
             </div>
         </div>
     </div>
+    
+    <div class="loading-indicator" id="loadingOverlay"> <div class="spinner"></div></div>
 
     <script>
     // Electron and Node.js modules
     let shell = null, pathModule = null, ipcRenderer = null, electronClipboard = null;
     try {
-        // Check if running in Electron renderer process
         if (typeof require === 'function' && typeof window !== 'undefined' && window.process && window.process.type === 'renderer') {
             shell = require('electron').shell;
             pathModule = require('path');
@@ -738,11 +708,14 @@
 
     // Global state variables
     let projectFiles = [];
-    let stagedFilePaths = []; // Stores { path: string, name: string, entryType: 'file' | 'folderLink' }
+    let stagedFilePaths = []; 
     let appCategories = [];
+    let todos = []; // For To-Do List
 
     // DOM Elements Cache
     const DOM = {
+        sidebar: document.getElementById('sidebar'),
+        mainContent: document.getElementById('mainContent'),
         selectedFilesDisplay: document.getElementById('selectedFilesDisplay'),
         projectNameInput: document.getElementById('projectNameInput'),
         categorySelectInput: document.getElementById('categorySelectInput'),
@@ -768,33 +741,79 @@
         categoryListContainer: document.getElementById('categoryListContainer'),
         newManagedCategoryInput: document.getElementById('newManagedCategoryInput'),
         addManagedCategoryBtn: document.getElementById('addManagedCategoryBtn'),
-        closeCategoryManagerBtn: document.getElementById('closeCategoryManagerBtn')
+        closeCategoryManagerBtn: document.getElementById('closeCategoryManagerBtn'),
+        // To-Do List elements
+        todoInput: document.getElementById('todoInput'),
+        addTodoBtn: document.getElementById('addTodoBtn'),
+        todosContainer: document.getElementById('todosContainer')
     };
 
     // Storage Keys
-    const STORAGE_ITEMS_KEY = 'projectFileManagerData_v1.2_Items_Glass'; // Updated key for new version/theme
-    const STORAGE_CATEGORIES_KEY = 'projectFileManagerCategories_v1.2_Glass'; // Updated key
+    const STORAGE_ITEMS_KEY = 'projectFileManagerData_v1.4_English'; 
+    const STORAGE_CATEGORIES_KEY = 'projectFileManagerCategories_v1.4_English';
+    const STORAGE_TODOS_KEY = 'projectFileManagerTodos_v1.4_English';
 
-    // Default categories structure
+
     const DEFAULT_CATEGORIES_STRUCTURE = [
         { key: 'auto_detect', display: '--- Auto-Detect Category ---', isCustom: false, isDefaultOption: true, order: 0, isEditable: false, isDeletable: false },
         { key: 'photoshop', display: 'Photoshop Projects', isCustom: false, order: 1, isEditable: true, isDeletable: false },
         { key: 'aftereffects', display: 'After Effects Projects', isCustom: false, order: 2, isEditable: true, isDeletable: false },
         { key: 'premiere', display: 'Premiere Pro Projects', isCustom: false, order: 3, isEditable: true, isDeletable: false },
         { key: 'folder', display: 'Folder Links', isCustom: false, order: 4, isEditable: true, isDeletable: false },
-        { key: 'general', display: 'General Files', isCustom: false, order: 5, isEditable: true, isDeletable: false },
+        { key: 'website', display: 'Website Links', isCustom: false, order: 5, isEditable: true, isDeletable: false }, // New category
+        { key: 'general', display: 'General Files', isCustom: false, order: 6, isEditable: true, isDeletable: false },
     ];
     
-    // Mapping file types to default category keys
     const FILE_TYPE_TO_DEFAULT_CAT_KEY = {
-        'photoshop': 'photoshop', 'aftereffects': 'aftereffects', 'premiere': 'premiere', 'folderLink': 'folder',
+        'photoshop': 'photoshop', 'aftereffects': 'aftereffects', 'premiere': 'premiere', 
+        'folderLink': 'folder', 'websiteLink': 'website' // New mapping
     };
     
-    // --- Utility Functions ---
+    // --- Sidebar and Page Navigation ---
+    function toggleSidebar() {
+        DOM.sidebar.classList.toggle('collapsed');
+        DOM.mainContent.classList.toggle('expanded');
+        // On mobile, if sidebar is opened by toggle, add 'show' for overlay behavior
+        if (window.innerWidth <= 768 && !DOM.sidebar.classList.contains('collapsed')) {
+            DOM.sidebar.classList.add('show');
+        } else if (window.innerWidth <= 768 && DOM.sidebar.classList.contains('collapsed')) {
+            DOM.sidebar.classList.remove('show');
+        }
+    }
+
+    function showPage(pageId) {
+        document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+        const targetPage = document.getElementById(pageId);
+        if (targetPage) {
+            targetPage.classList.add('active');
+        }
+        
+        document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector(`.nav-link[onclick="showPage('${pageId}')"]`);
+        if (activeLink) {
+            activeLink.classList.add('active');
+        }
+
+        if (window.innerWidth <= 768) {
+            DOM.sidebar.classList.add('collapsed'); // Always collapse on mobile after navigation
+            DOM.sidebar.classList.remove('show'); // Ensure overlay is hidden
+            DOM.mainContent.classList.add('expanded'); // Ensure content takes full width
+        }
+    }
+    
+    function handleMinimizeWindow() {
+        if (ipcRenderer) ipcRenderer.send('minimize-window');
+        else showAppNotification('Minimize feature is available in the desktop app only.', 'warning');
+    }
+    function handleCloseWindow() {
+        if (ipcRenderer) ipcRenderer.send('close-window');
+        else showAppCustomConfirm("Are you sure you want to close this tab?", (confirmed) => { if (confirmed) window.close(); });
+    }
+
     function escapeHTML(str) { return typeof str === 'string' ? str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'})[m]) : String(str); }
     function escapeAttr(str) { return typeof str === 'string' ? str.replace(/"/g, '&quot;') : String(str); }
     
-    function showAppNotification(message, type = 'success') { // success, error, warning, info
+    function showAppNotification(message, type = 'success') { 
         const el = DOM.notification; 
         el.textContent = message; 
         el.className = `notification-toast ${type} show`; 
@@ -806,23 +825,17 @@
     function showAppCustomConfirm(message, callback) {
         DOM.confirmModalMessage.textContent = message; 
         DOM.confirmModal.classList.add('show');
-        // Re-clone buttons to remove old event listeners
         const newYes = DOM.confirmModalYesBtn.cloneNode(true);
         DOM.confirmModalYesBtn.parentNode.replaceChild(newYes, DOM.confirmModalYesBtn);
         DOM.confirmModalYesBtn = newYes;
-        
         const newNo = DOM.confirmModalNoBtn.cloneNode(true);
         DOM.confirmModalNoBtn.parentNode.replaceChild(newNo, DOM.confirmModalNoBtn);
         DOM.confirmModalNoBtn = newNo;
-        
         DOM.confirmModalYesBtn.onclick = () => { DOM.confirmModal.classList.remove('show'); callback(true); };
         DOM.confirmModalNoBtn.onclick = () => { DOM.confirmModal.classList.remove('show'); callback(false); };
     }
 
-    function clearStagedFilesDisplay() {
-        stagedFilePaths = []; 
-        DOM.selectedFilesDisplay.textContent = '';
-    }
+    function clearStagedFilesDisplay() { stagedFilePaths = []; DOM.selectedFilesDisplay.textContent = ''; }
     function updateStagedPaths(paths, entryType, prefix) {
         if (paths && Array.isArray(paths) && paths.length > 0) {
             stagedFilePaths = paths.map(p => ({ 
@@ -831,30 +844,27 @@
                 entryType 
             }));
             DOM.selectedFilesDisplay.textContent = `${prefix} ${stagedFilePaths.map(f => f.name).join(', ')}`;
-            DOM.pathInput.value = ''; // Clear path input if files are selected via dialog
-        } else if (!DOM.pathInput.value.trim()) { 
-            clearStagedFilesDisplay();
-        }
+            DOM.pathInput.value = ''; 
+        } else if (!DOM.pathInput.value.trim()) { clearStagedFilesDisplay(); }
     }
 
-    // --- Category Management Functions ---
     function populateCategoryDropdown() {
         DOM.categorySelectInput.innerHTML = '';
         const sortedForDropdown = [...appCategories].sort((a,b) => (a.order === undefined ? Infinity : a.order) - (b.order === undefined ? Infinity : b.order));
-
         sortedForDropdown.forEach(cat => {
             const option = document.createElement('option');
-            option.value = cat.key;
-            option.textContent = cat.display;
+            option.value = cat.key; option.textContent = cat.display;
             if (cat.isDefaultOption) option.selected = true;
             DOM.categorySelectInput.appendChild(option);
         });
     }
     
-    function getFileType(fileName, entryType = 'file') {
+    function getFileType(pathOrName, entryType = 'file') {
         if (entryType === 'folderLink') return 'folderLink';
-        if (!fileName || typeof fileName !== 'string') return 'unknown';
-        const ext = fileName.split('.').pop().toLowerCase();
+        if (typeof pathOrName === 'string' && pathOrName.toLowerCase().startsWith('https://')) return 'websiteLink';
+        if (!pathOrName || typeof pathOrName !== 'string') return 'unknown';
+        const name = pathModule ? pathModule.basename(pathOrName) : pathOrName.substring(pathOrName.lastIndexOf(/[/\\]/) + 1);
+        const ext = name.split('.').pop().toLowerCase();
         return ext === 'psd' ? 'photoshop' 
              : ext === 'aep' ? 'aftereffects' 
              : ext === 'prproj' ? 'premiere' 
@@ -865,126 +875,73 @@
         if (chosenKey && chosenKey !== 'auto_detect') return chosenKey;
         return FILE_TYPE_TO_DEFAULT_CAT_KEY[fileType] || 'general';
     }
-
     function getCategoryDisplay(key) {
         const cat = appCategories.find(c => c.key === key);
         return cat ? cat.display : (key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' '));
     }
     
-    // --- Category Manager Modal ---
-    function openCategoryManagerModal() {
-        renderCategoryManagerList();
-        DOM.categoryManagerModal.classList.add('show');
-        DOM.newManagedCategoryInput.value = ''; 
-        DOM.newManagedCategoryInput.focus();
-    }
+    function openCategoryManagerModal() { renderCategoryManagerList(); DOM.categoryManagerModal.classList.add('show'); DOM.newManagedCategoryInput.value = ''; DOM.newManagedCategoryInput.focus(); }
     function closeCategoryManagerModal() {
-        // If an inline edit is active, cancel it before closing
         const activeEditInput = DOM.categoryListContainer.querySelector('.category-name-input-inline');
-        if (activeEditInput) {
-            const categoryKey = activeEditInput.dataset.key;
-            cancelInlineEdit(categoryKey, activeEditInput.closest('.category-manager-item'));
-        }
+        if (activeEditInput) { cancelInlineEdit(activeEditInput.dataset.key, activeEditInput.closest('.category-manager-item')); }
         DOM.categoryManagerModal.classList.remove('show');
     }
 
     function renderCategoryManagerList() {
         DOM.categoryListContainer.innerHTML = '';
-        const manageableCategories = appCategories.filter(c => c.key !== 'auto_detect')
-                                               .sort((a,b) => (a.order === undefined ? Infinity : a.order) - (b.order === undefined ? Infinity : b.order));
-        
+        const manageableCategories = appCategories.filter(c => c.key !== 'auto_detect').sort((a,b) => (a.order ?? Infinity) - (b.order ?? Infinity));
         const orders = manageableCategories.map(c => c.order).filter(o => typeof o === 'number');
         const minOrder = orders.length > 0 ? Math.min(...orders) : 0;
         const maxOrder = orders.length > 0 ? Math.max(...orders) : 0;
 
         manageableCategories.forEach((cat) => {
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'category-manager-item';
-            itemDiv.dataset.categoryKey = cat.key; 
-            
-            const isMinOrder = cat.order === minOrder;
-            const isMaxOrder = cat.order === maxOrder;
-            const canMoveUp = !isMinOrder && manageableCategories.length > 1;
-            const canMoveDown = !isMaxOrder && manageableCategories.length > 1;
-
+            const itemDiv = document.createElement('div'); itemDiv.className = 'category-manager-item'; itemDiv.dataset.categoryKey = cat.key; 
+            const isMinOrder = cat.order === minOrder; const isMaxOrder = cat.order === maxOrder;
+            const canMoveUp = !isMinOrder && manageableCategories.length > 1; const canMoveDown = !isMaxOrder && manageableCategories.length > 1;
             itemDiv.innerHTML = `
                 <div class="category-manager-item-name-container">
                     <span class="category-tag ${cat.isCustom ? 'custom' : ''}">${cat.isCustom ? 'Custom' : 'Default'}</span>
                     <span class="category-manager-item-name">${escapeHTML(cat.display)}</span>
                 </div>
                 <div class="category-manager-item-controls">
-                    <button class="btn-icon btn-move-managed-category-up" data-key="${escapeAttr(cat.key)}" title="Move Up" ${!canMoveUp ? 'disabled' : ''}>
-                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-arrow-up"></use></svg>
-                    </button>
-                    <button class="btn-icon btn-move-managed-category-down" data-key="${escapeAttr(cat.key)}" title="Move Down" ${!canMoveDown ? 'disabled' : ''}>
-                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-arrow-down"></use></svg>
-                    </button>
-                    <button class="btn-icon btn-edit-managed-category" data-key="${escapeAttr(cat.key)}" title="Edit Name" ${(!cat.isCustom && !cat.isEditable) ? 'disabled' : ''}>
-                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-edit"></use></svg>
-                    </button>
-                    <button class="btn-icon btn-delete-managed-category" data-key="${escapeAttr(cat.key)}" title="Delete Category" ${!cat.isCustom || !cat.isDeletable ? 'disabled' : ''}>
-                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-delete"></use></svg>
-                    </button>
-                    <button class="btn-icon btn-save-inline-edit" data-key="${escapeAttr(cat.key)}" title="Save Changes" style="display:none;">
-                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-save"></use></svg>
-                    </button>
-                    <button class="btn-icon btn-cancel-inline-edit" data-key="${escapeAttr(cat.key)}" title="Cancel Edit" style="display:none;">
-                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-cancel"></use></svg>
-                    </button>
-                </div>
-            `;
+                    <button class="btn-icon btn-move-managed-category-up" data-key="${escapeAttr(cat.key)}" title="Move Up" ${!canMoveUp ? 'disabled' : ''}><svg viewBox="0 0 24 24"><use xlink:href="#icon-arrow-up"></use></svg></button>
+                    <button class="btn-icon btn-move-managed-category-down" data-key="${escapeAttr(cat.key)}" title="Move Down" ${!canMoveDown ? 'disabled' : ''}><svg viewBox="0 0 24 24"><use xlink:href="#icon-arrow-down"></use></svg></button>
+                    <button class="btn-icon btn-edit-managed-category" data-key="${escapeAttr(cat.key)}" title="Edit Name" ${(!cat.isCustom && !cat.isEditable) ? 'disabled' : ''}><svg viewBox="0 0 24 24"><use xlink:href="#icon-edit"></use></svg></button>
+                    <button class="btn-icon btn-delete-managed-category" data-key="${escapeAttr(cat.key)}" title="Delete Category" ${!cat.isCustom || !cat.isDeletable ? 'disabled' : ''}><svg viewBox="0 0 24 24"><use xlink:href="#icon-delete"></use></svg></button>
+                    <button class="btn-icon btn-save-inline-edit" data-key="${escapeAttr(cat.key)}" title="Save Changes" style="display:none;"><svg viewBox="0 0 24 24"><use xlink:href="#icon-save"></use></svg></button>
+                    <button class="btn-icon btn-cancel-inline-edit" data-key="${escapeAttr(cat.key)}" title="Cancel Edit" style="display:none;"><svg viewBox="0 0 24 24"><use xlink:href="#icon-cancel"></use></svg></button>
+                </div>`;
             itemDiv.querySelector('.btn-edit-managed-category').addEventListener('click', (e) => activateInlineEdit(e.currentTarget.dataset.key, itemDiv));
             itemDiv.querySelector('.btn-delete-managed-category').addEventListener('click', (e) => handleDeleteManagedCategory(e.currentTarget.dataset.key));
             itemDiv.querySelector('.btn-move-managed-category-up').addEventListener('click', (e) => handleMoveCategory(e.currentTarget.dataset.key, 'up', true));
             itemDiv.querySelector('.btn-move-managed-category-down').addEventListener('click', (e) => handleMoveCategory(e.currentTarget.dataset.key, 'down', true));
-            
-            // Event listeners for inline edit buttons
             itemDiv.querySelector('.btn-save-inline-edit').addEventListener('click', (e) => saveInlineEdit(e.currentTarget.dataset.key, itemDiv));
             itemDiv.querySelector('.btn-cancel-inline-edit').addEventListener('click', (e) => cancelInlineEdit(e.currentTarget.dataset.key, itemDiv));
-
             DOM.categoryListContainer.appendChild(itemDiv);
         });
     }
 
     function activateInlineEdit(categoryKey, itemDiv) {
-        // If another item is already being edited, cancel that first
         const currentlyEditing = DOM.categoryListContainer.querySelector('.category-name-input-inline');
-        if (currentlyEditing && currentlyEditing.dataset.key !== categoryKey) {
-            cancelInlineEdit(currentlyEditing.dataset.key, currentlyEditing.closest('.category-manager-item'));
-        }
-
+        if (currentlyEditing && currentlyEditing.dataset.key !== categoryKey) { cancelInlineEdit(currentlyEditing.dataset.key, currentlyEditing.closest('.category-manager-item'));}
         const nameContainer = itemDiv.querySelector('.category-manager-item-name-container');
         const nameSpan = itemDiv.querySelector('.category-manager-item-name');
         const category = appCategories.find(c => c.key === categoryKey);
-
-        if (!nameSpan || !category || (!category.isCustom && !category.isEditable)) return; // Cannot edit non-editable default categories
-
+        if (!nameSpan || !category || (!category.isCustom && !category.isEditable)) return;
         const currentName = category.display;
         const tagSpanHTML = nameContainer.querySelector('.category-tag').outerHTML; 
-        nameContainer.innerHTML = `
-            ${tagSpanHTML}
-            <input type="text" class="category-name-input-inline input-field" value="${escapeAttr(currentName)}" data-key="${categoryKey}" data-original-name="${escapeAttr(currentName)}">
-        `;
+        nameContainer.innerHTML = `<${tagSpanHTML}<input type="text" class="category-name-input-inline input-field" value="${escapeAttr(currentName)}" data-key="${categoryKey}" data-original-name="${escapeAttr(currentName)}">`;
         const inputField = nameContainer.querySelector('.category-name-input-inline');
-        inputField.focus();
-        inputField.select(); 
-
-        // Toggle visibility of action buttons
+        inputField.focus(); inputField.select(); 
         itemDiv.querySelector('.btn-edit-managed-category').style.display = 'none';
         itemDiv.querySelector('.btn-delete-managed-category').style.display = 'none'; 
         itemDiv.querySelector('.btn-move-managed-category-up').style.display = 'none';
         itemDiv.querySelector('.btn-move-managed-category-down').style.display = 'none';
         itemDiv.querySelector('.btn-save-inline-edit').style.display = 'inline-flex';
         itemDiv.querySelector('.btn-cancel-inline-edit').style.display = 'inline-flex';
-
-        // Add keydown listener to input for Enter/Escape
         inputField.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault(); 
-                saveInlineEdit(categoryKey, itemDiv);
-            } else if (e.key === 'Escape') {
-                cancelInlineEdit(categoryKey, itemDiv);
-            }
+            if (e.key === 'Enter') { e.preventDefault(); saveInlineEdit(categoryKey, itemDiv); } 
+            else if (e.key === 'Escape') { cancelInlineEdit(categoryKey, itemDiv); }
         });
     }
 
@@ -992,42 +949,22 @@
         const inputField = itemDiv.querySelector('.category-name-input-inline');
         const category = appCategories.find(c => c.key === categoryKey);
         if (!inputField || !category) return;
-
         const newDisplayName = inputField.value.trim();
         const originalName = inputField.dataset.originalName;
-
-        if (!newDisplayName) {
-            showAppNotification("Category name cannot be empty.", "warning");
-            inputField.focus(); 
-            return;
-        }
-        // Check for duplicate names (case-insensitive), excluding the current category being edited
+        if (!newDisplayName) { showAppNotification("Category name cannot be empty.", "warning"); inputField.focus(); return; }
         if (newDisplayName !== originalName && appCategories.some(cat => cat.key !== categoryKey && cat.display.toLowerCase() === newDisplayName.toLowerCase())) {
-            showAppNotification(`Category name "${newDisplayName}" already exists.`, 'warning');
-            inputField.focus(); 
-            return;
+            showAppNotification(`Category name "${newDisplayName}" already exists.`, 'warning'); inputField.focus(); return;
         }
-
         category.display = newDisplayName;
-        saveCategoriesToStorage();
-        renderCategoryManagerList(); // Re-render the list to reflect changes and reset buttons
-        populateCategoryDropdown();
-        renderProjectFilesUI(); // Update main UI if category names changed
+        saveCategoriesToStorage(); renderCategoryManagerList(); populateCategoryDropdown(); renderProjectFilesUI(); 
         showAppNotification("Category name updated.", "success");
     }
 
     function cancelInlineEdit(categoryKey, itemDiv) {
         const category = appCategories.find(c => c.key === categoryKey);
         if (!category || !itemDiv) return; 
-
-        // Restore the original name display
         const nameContainer = itemDiv.querySelector('.category-manager-item-name-container');
-        nameContainer.innerHTML = `
-            <span class="category-tag ${category.isCustom ? 'custom' : ''}">${category.isCustom ? 'Custom' : 'Default'}</span>
-            <span class="category-manager-item-name">${escapeHTML(category.display)}</span>
-        `;
-        
-        // Toggle visibility of action buttons back to normal
+        nameContainer.innerHTML = `<span class="category-tag ${category.isCustom ? 'custom' : ''}">${category.isCustom ? 'Custom' : 'Default'}</span><span class="category-manager-item-name">${escapeHTML(category.display)}</span>`;
         itemDiv.querySelector('.btn-edit-managed-category').style.display = 'inline-flex';
         itemDiv.querySelector('.btn-delete-managed-category').style.display = 'inline-flex';
         itemDiv.querySelector('.btn-move-managed-category-up').style.display = 'inline-flex';
@@ -1036,30 +973,19 @@
         itemDiv.querySelector('.btn-cancel-inline-edit').style.display = 'none';
     }
 
-
     function handleAddManagedCategory() {
         const displayName = DOM.newManagedCategoryInput.value.trim();
-        if (!displayName) {
-            showAppNotification("Category name cannot be empty.", "warning"); 
-            DOM.newManagedCategoryInput.focus();
-            return;
-        }
+        if (!displayName) { showAppNotification("Category name cannot be empty.", "warning"); DOM.newManagedCategoryInput.focus(); return; }
         if (appCategories.some(cat => cat.display.toLowerCase() === displayName.toLowerCase())) {
-            showAppNotification(`Category name "${displayName}" already exists.`, 'warning'); 
-            DOM.newManagedCategoryInput.focus();
-            return;
+            showAppNotification(`Category name "${displayName}" already exists.`, 'warning'); DOM.newManagedCategoryInput.focus(); return;
         }
         const nonAutoDetectCategories = appCategories.filter(c => c.key !== 'auto_detect');
         const orders = nonAutoDetectCategories.map(c => c.order).filter(o => typeof o === 'number');
-        const maxOrder = orders.length > 0 ? Math.max(0, ...orders) : -1; // Ensure order is at least 0
-
+        const maxOrder = orders.length > 0 ? Math.max(0, ...orders) : -1; 
         const newKey = `custom_${displayName.toLowerCase().replace(/\s+/g, '_')}_${Date.now().toString().slice(-5)}`;
         appCategories.push({ key: newKey, display: displayName, isCustom: true, order: maxOrder + 1, isEditable: true, isDeletable: true });
-        saveCategoriesToStorage();
-        renderCategoryManagerList(); 
-        populateCategoryDropdown(); 
-        DOM.newManagedCategoryInput.value = '';
-        DOM.newManagedCategoryInput.focus();
+        saveCategoriesToStorage(); renderCategoryManagerList(); populateCategoryDropdown(); 
+        DOM.newManagedCategoryInput.value = ''; DOM.newManagedCategoryInput.focus();
         showAppNotification(`Category "${displayName}" added.`, 'success');
     }
     
@@ -1072,10 +998,8 @@
             if (confirmed) {
                 projectFiles.forEach(item => { if (item.category === categoryKey) item.category = 'general'; });
                 appCategories = appCategories.filter(cat => cat.key !== categoryKey);
-                // Re-order remaining categories
                 let currentOrder = 0;
                 appCategories.filter(c => c.key !== 'auto_detect').sort((a,b) => (a.order || 0) - (b.order || 0)).forEach(c => c.order = currentOrder++);
-
                 saveItemsToStorage(); saveCategoriesToStorage();
                 renderCategoryManagerList(); populateCategoryDropdown(); renderProjectFilesUI();
                 showAppNotification(`Category "${category.display}" deleted.`, "success");
@@ -1086,132 +1010,91 @@
     function handleMoveCategory(categoryKey, direction, isFromModal = false) {
         let sortableCats = appCategories.filter(c => c.key !== 'auto_detect');
         const catIndexInSortable = sortableCats.findIndex(cat => cat.key === categoryKey);
-
         if (catIndexInSortable === -1) return; 
-
         const targetIndexInSortable = direction === 'up' ? catIndexInSortable - 1 : catIndexInSortable + 1;
-        
-        if (targetIndexInSortable < 0 || targetIndexInSortable >= sortableCats.length) return; // Cannot move further
-
-        // Get the actual category objects from appCategories to swap their orders
+        if (targetIndexInSortable < 0 || targetIndexInSortable >= sortableCats.length) return;
         const catToMove = sortableCats[catIndexInSortable];
         const catToSwapWith = sortableCats[targetIndexInSortable];
-
-        // Find these in the main appCategories array to modify their 'order' property
         const appCatToMove = appCategories.find(c => c.key === catToMove.key);
         const appCatToSwapWith = appCategories.find(c => c.key === catToSwapWith.key);
-
         if (appCatToMove && appCatToSwapWith) {
-            // Swap order properties
             const tempOrder = appCatToMove.order;
             appCatToMove.order = appCatToSwapWith.order;
             appCatToSwapWith.order = tempOrder;
-        
-            // Re-sort the main appCategories array based on the new orders
-            appCategories.sort((a,b) => (a.order === undefined ? Infinity : a.order) - (b.order === undefined ? Infinity : b.order));
-
-            saveCategoriesToStorage();
-            populateCategoryDropdown(); 
-            renderProjectFilesUI();
-            if (isFromModal) {
-                renderCategoryManagerList(); 
-            }
+            appCategories.sort((a,b) => (a.order ?? Infinity) - (b.order ?? Infinity));
+            saveCategoriesToStorage(); populateCategoryDropdown(); renderProjectFilesUI();
+            if (isFromModal) { renderCategoryManagerList(); }
         }
     }
 
-
-    // --- Item Management Functions ---
     function handleProcessStagedItems() {
         if (!stagedFilePaths || stagedFilePaths.length === 0) {
             showAppNotification('Please select or paste items first.', 'warning'); return;
         }
-        
         const groupName = DOM.projectNameInput.value.trim();
         let addedCount = 0;
         stagedFilePaths.forEach(itemInfo => {
-            const { path, name, entryType = 'file' } = itemInfo; // Default to 'file' if not specified
+            const { path, name, entryType = 'file' } = itemInfo; 
             if (!path || typeof path !== 'string' || projectFiles.some(pf => pf.location.toLowerCase() === path.toLowerCase())) {
                 if (projectFiles.some(pf => pf.location.toLowerCase() === path.toLowerCase())) {
-                    showAppNotification(`Item "${name}" already exists in the list.`, 'warning');
-                }
-                return; // Skip if path is invalid or already exists
+                    showAppNotification(`Item "${name}" already exists.`, 'warning');
+                } return; 
             }
-            const itemType = getFileType(name, entryType);
+            const itemType = getFileType(path, entryType); // Pass full path for website detection
             const catKey = determineItemCategoryKey(itemType, DOM.categorySelectInput.value); 
             projectFiles.push({
-                id: Date.now() + Math.random(), // Simple unique ID
+                id: Date.now() + Math.random(), 
                 name: groupName ? `${groupName} - ${name}` : name,
-                actualName: name, // Store original name for easier identification
-                location: path,
-                type: itemType,
-                category: catKey,
-                entryType, // 'file' or 'folderLink'
+                actualName: name, location: path, type: itemType, category: catKey, entryType,
                 dateAdded: new Date().toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' }) 
             });
             addedCount++;
         });
-
         if (addedCount > 0) {
             saveItemsToStorage(); renderProjectFilesUI();
-            showAppNotification(`✨ Added ${addedCount} item(s) to the list!`, 'success');
+            showAppNotification(`✨ Added ${addedCount} item(s)!`, 'success');
         }
         DOM.projectNameInput.value = ''; clearStagedFilesDisplay();
-        DOM.categorySelectInput.value = 'auto_detect'; // Reset category dropdown
-        if (addedCount > 0) DOM.projectNameInput.focus(); // Focus for next entry
+        DOM.categorySelectInput.value = 'auto_detect'; 
+        if (addedCount > 0) DOM.projectNameInput.focus(); 
     }
 
     function renderProjectFilesUI() {
         DOM.fileCountDisplay.textContent = projectFiles.length;
         DOM.openAllBtn.disabled = projectFiles.length === 0;
         DOM.filesDisplayContainer.innerHTML = '';
-
         if (projectFiles.length === 0) {
-            DOM.filesDisplayContainer.innerHTML = `<div class="empty-placeholder"><div class="icon"><svg viewBox="0 0 24 24"><use xlink:href="#icon-empty-folder"></use></svg></div><h3>Your list is empty.</h3><p>Start by adding files, folders, or importing from a directory.</p></div>`;
+            DOM.filesDisplayContainer.innerHTML = `<div class="empty-placeholder"><div class="icon"><svg viewBox="0 0 24 24"><use xlink:href="#icon-empty-folder"></use></svg></div><h3>List is empty.</h3><p>Start by adding files, folders, or website links.</p></div>`;
             return;
         }
-
         const grouped = projectFiles.reduce((acc, item) => {
-            const key = item.category || 'general'; // Fallback to general if no category
+            const key = item.category || 'general'; 
             if (!acc[key]) acc[key] = [];
             acc[key].push(item); return acc;
         }, {});
-        
-        // Sort category keys based on the 'order' property in appCategories
         const sortedKeys = Object.keys(grouped).sort((a, b) => {
-            const catA = appCategories.find(c => c.key === a) || { order: Infinity, display: a }; // Fallback for unknown cats
+            const catA = appCategories.find(c => c.key === a) || { order: Infinity, display: a }; 
             const catB = appCategories.find(c => c.key === b) || { order: Infinity, display: b };
-            // Primary sort by order, secondary by display name
-            return (catA.order === undefined ? Infinity : catA.order) - (catB.order === undefined ? Infinity : catB.order) || catA.display.localeCompare(catB.display, 'en'); 
+            return (catA.order ?? Infinity) - (catB.order ?? Infinity) || catA.display.localeCompare(catB.display, 'en'); 
         });
-
         sortedKeys.forEach(catKey => {
             const items = grouped[catKey];
-            const section = document.createElement('div');
-            section.className = 'category-section collapsed'; // Start collapsed
-            section.dataset.categoryKey = catKey;
-
-            const header = document.createElement('div');
-            header.className = 'category-header';
+            const section = document.createElement('div'); section.className = 'category-section collapsed'; section.dataset.categoryKey = catKey;
+            const header = document.createElement('div'); header.className = 'category-header';
             const catDisplay = getCategoryDisplay(catKey);
             const categoryObject = appCategories.find(c => c.key === catKey);
-            
-            // Determine if category can be moved (similar logic to manager modal)
             const sortableCatsForOrderCheck = appCategories.filter(c => c.key !== 'auto_detect');
             const orders = sortableCatsForOrderCheck.map(c => c.order).filter(o => typeof o === 'number');
             const minOrder = orders.length > 0 ? Math.min(...orders) : 0;
             const maxOrder = orders.length > 0 ? Math.max(...orders) : 0;
-
             const isMinOrder = categoryObject && categoryObject.order === minOrder;
             const isMaxOrder = categoryObject && categoryObject.order === maxOrder;
-
-            // Category can be moved if it's not 'auto_detect' and not already at the top/bottom
             const canMoveUp = categoryObject && categoryObject.key !== 'auto_detect' && !isMinOrder && sortableCatsForOrderCheck.length > 1;
             const canMoveDown = categoryObject && categoryObject.key !== 'auto_detect' && !isMaxOrder && sortableCatsForOrderCheck.length > 1;
-
-
+            const chevronIcon = document.dir === 'rtl' ? '#icon-chevron-left' : '#icon-chevron-right';
             header.innerHTML = `
                 <div class="category-title-container">
-                    <span class="category-toggle-icon"><svg viewBox="0 0 24 24"><use xlink:href="#icon-chevron-right"></use></svg></span>
+                    <span class="category-toggle-icon"><svg viewBox="0 0 24 24"><use xlink:href="${chevronIcon}"></use></svg></span>
                     <h2 class="category-title">${escapeHTML(catDisplay)}</h2>
                     <span class="category-item-count">(${items.length})</span>
                 </div>
@@ -1224,87 +1107,41 @@
                 </div>`;
             header.querySelector('.category-title-container').addEventListener('click', () => section.classList.toggle('collapsed'));
             header.querySelector('.btn-open-all-in-category').addEventListener('click', (e) => { e.stopPropagation(); handleOpenAllFilesInCategory(e); });
-            // Add event listeners for moving categories directly from the main UI
             header.querySelector('.btn-move-category-up').addEventListener('click', (e) => { e.stopPropagation(); handleMoveCategory(e.currentTarget.dataset.categoryKey, 'up'); });
             header.querySelector('.btn-move-category-down').addEventListener('click', (e) => { e.stopPropagation(); handleMoveCategory(e.currentTarget.dataset.categoryKey, 'down'); });
-            
-            const grid = document.createElement('div');
-            grid.className = 'items-grid';
+            const grid = document.createElement('div'); grid.className = 'items-grid';
             items.forEach((item, idx) => {
                 const cardHTML = createFileCardHTML(item, idx);
-                // Add fade-in animation class to the card element itself
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = cardHTML.trim();
+                const tempDiv = document.createElement('div'); tempDiv.innerHTML = cardHTML.trim();
                 const cardElement = tempDiv.firstChild;
-                if (cardElement) {
-                    cardElement.classList.add('fade-in-item'); // Add animation class
-                    grid.appendChild(cardElement);
-                }
+                if (cardElement) { cardElement.classList.add('fade-in-item'); grid.appendChild(cardElement); }
             });
-            
-            section.appendChild(header);
-            section.appendChild(grid);
-            DOM.filesDisplayContainer.appendChild(section);
+            section.appendChild(header); section.appendChild(grid); DOM.filesDisplayContainer.appendChild(section);
         });
-        // Re-attach event listeners for options menus on newly rendered cards
         DOM.filesDisplayContainer.querySelectorAll('.path-card-options-btn').forEach(btn => btn.addEventListener('click', handleOptionsMenu));
     }
     
     function handleOptionsMenu(event) {
-        event.stopPropagation(); // Prevent click from immediately closing menu via document listener
-        const itemId = event.currentTarget.dataset.itemId;
-        const menuId = `options-menu-${itemId}`;
+        event.stopPropagation(); 
+        const itemId = event.currentTarget.dataset.itemId; const menuId = `options-menu-${itemId}`;
         const currentMenu = document.getElementById(menuId);
-
-        // Close all other open menus
-        document.querySelectorAll('.item-actions-menu.show').forEach(m => {
-            if (m.id !== menuId) {
-                m.classList.remove('show');
-            }
-        });
-
+        document.querySelectorAll('.item-actions-menu.show').forEach(m => { if (m.id !== menuId) { m.classList.remove('show'); } });
         if (currentMenu) {
-            currentMenu.classList.toggle('show'); // Toggle the current menu
-
+            currentMenu.classList.toggle('show'); 
             if (currentMenu.classList.contains('show')) { 
-                // Position the menu (basic positioning, can be enhanced)
-                const card = event.currentTarget.closest('.item-card');
-                const btnRect = event.currentTarget.getBoundingClientRect();
-                // const cardRect = card.getBoundingClientRect(); // Not strictly needed if positioning relative to button
-
-                // Attempt to position below the button first
-                let top = btnRect.height + 5; // Position below the button with a small gap
-                let left = 0; // Align with the left of the button by default
-
-                currentMenu.style.top = `${top}px`;
-                currentMenu.style.left = `${left}px`;
-                currentMenu.style.right = 'auto'; // Reset right positioning
-
-                // Adjust if it goes off-screen (simple adjustment)
-                const menuRect = currentMenu.getBoundingClientRect();
-                const viewportWidth = window.innerWidth;
-                const viewportHeight = window.innerHeight;
-
-                if (menuRect.right > viewportWidth - 10) { // Off right edge
-                    currentMenu.style.left = 'auto';
-                    currentMenu.style.right = '0px'; // Align to the right of the button or card
-                }
-                if (menuRect.left < 10) { // Off left edge
-                    currentMenu.style.left = '0px'; // Align to the left of the button or card
-                    currentMenu.style.right = 'auto';
-                }
-                if (menuRect.bottom > viewportHeight - 10) { // Off bottom edge
-                    // Position above the button instead
-                    currentMenu.style.top = `-${currentMenu.offsetHeight + 5}px`;
-                }
-                 if (menuRect.top < 10 && currentMenu.style.top.startsWith('-')) { // Still off top edge (e.g. button is very close to top)
-                    currentMenu.style.top = `${btnRect.height + 5}px`; // Revert to below if above is also bad
-                }
+                const btnRect = event.currentTarget.getBoundingClientRect(); let top = btnRect.height + 5; 
+                let positionProp = document.dir === 'rtl' ? 'right' : 'left';
+                let oppositeProp = document.dir === 'rtl' ? 'left' : 'right';
+                currentMenu.style[positionProp] = '0px'; currentMenu.style[oppositeProp] = 'auto'; currentMenu.style.top = `${top}px`;
+                const menuRect = currentMenu.getBoundingClientRect(); const viewportWidth = window.innerWidth; const viewportHeight = window.innerHeight;
+                if (document.dir === 'rtl') { if (menuRect.left < 10) { currentMenu.style.right = 'auto'; currentMenu.style.left = '0px'; } } 
+                else { if (menuRect.right > viewportWidth - 10) { currentMenu.style.left = 'auto'; currentMenu.style.right = '0px'; } }
+                if (menuRect.bottom > viewportHeight - 10) { currentMenu.style.top = `-${currentMenu.offsetHeight + 5}px`; }
+                if (menuRect.top < 10 && currentMenu.style.top.startsWith('-')) { currentMenu.style.top = `${btnRect.height + 5}px`; }
             }
         }
     }
     
-    // Global click listener to close open menus
     document.addEventListener('click', e => { 
         if (!e.target.closest('.path-card-options-btn') && !e.target.closest('.item-actions-menu')) {
             document.querySelectorAll('.item-actions-menu.show').forEach(m => m.classList.remove('show'));
@@ -1312,13 +1149,26 @@
     });
 
     function createFileCardHTML(item, index) {
-        const typeDisplay = item.entryType === 'folderLink' ? 'Folder Link' : (FILE_TYPE_TO_DEFAULT_CAT_KEY[item.type] ? getCategoryDisplay(FILE_TYPE_TO_DEFAULT_CAT_KEY[item.type]) : 'File');
-        let iconId = item.entryType === 'folderLink' ? 'icon-folder' : 'icon-file';
-        if (item.type === 'photoshop') iconId = 'icon-photoshop';
-        else if (item.type === 'aftereffects') iconId = 'icon-aftereffects';
-        else if (item.type === 'premiere') iconId = 'icon-premiere';
+        let typeDisplay = 'File';
+        let iconId = 'icon-file';
 
-        // Use --card-index for staggered animation
+        if (item.entryType === 'folderLink') {
+            typeDisplay = 'Folder Link';
+            iconId = 'icon-folder';
+        } else if (item.type === 'websiteLink') {
+            typeDisplay = 'Website Link';
+            iconId = 'icon-website'; // New icon
+        } else if (FILE_TYPE_TO_DEFAULT_CAT_KEY[item.type]) {
+            typeDisplay = getCategoryDisplay(FILE_TYPE_TO_DEFAULT_CAT_KEY[item.type]);
+            if (item.type === 'photoshop') iconId = 'icon-photoshop';
+            else if (item.type === 'aftereffects') iconId = 'icon-aftereffects';
+            else if (item.type === 'premiere') iconId = 'icon-premiere';
+        }
+        
+        const openActionText = item.type === 'websiteLink' ? 'Open Website' : 'Open';
+        const openIcon = item.type === 'websiteLink' ? 'icon-website' : (item.entryType === 'folderLink' ? 'icon-folder' : 'icon-open');
+
+
         return `
             <div class="item-card" style="--card-index: ${index};">
                 <div class="item-card-main">
@@ -1334,49 +1184,67 @@
                     <button class="btn btn-icon path-card-options-btn" data-item-id="${item.id}" title="Options"><svg viewBox="0 0 24 24"><use xlink:href="#icon-options"></use></svg></button>
                 </div>
                 <div class="item-actions-menu" id="options-menu-${item.id}">
-                    <button data-action="open" data-id="${item.id}"><svg viewBox="0 0 24 24"><use xlink:href="#${item.entryType === 'folderLink' ? 'icon-folder' : 'icon-open'}"></use></svg>Open</button>
-                    <button data-action="show-location" data-id="${item.id}"><svg viewBox="0 0 24 24"><use xlink:href="#icon-show-location"></use></svg>Open File Location</button>
+                    <button data-action="open" data-id="${item.id}"><svg viewBox="0 0 24 24"><use xlink:href="#${openIcon}"></use></svg>${openActionText}</button>
+                    ${item.type !== 'websiteLink' ? `<button data-action="show-location" data-id="${item.id}"><svg viewBox="0 0 24 24"><use xlink:href="#icon-show-location"></use></svg>Open File Location</button>` : ''}
                     <button data-action="delete" data-id="${item.id}"><svg viewBox="0 0 24 24"><use xlink:href="#icon-delete"></use></svg>Delete from List</button>
                 </div>
             </div>`;
     }
 
-    // --- File Operations ---
-    function openItem(location, entryType = 'file') {
-        if (!shell) { showAppNotification('This feature is only available in the desktop app.', 'warning'); return; }
-        if (!location || typeof location !== 'string') { showAppNotification('❌ Invalid path provided.', 'error'); return; }
+    function openItem(location, entryType = 'file', itemType = 'unknown') { // Added itemType
+        if (!shell && itemType !== 'websiteLink') { // Allow website links to open in browser even without Electron
+            showAppNotification('This feature is available in the desktop app only.', 'warning'); return;
+        }
+        if (!location || typeof location !== 'string') { showAppNotification('❌ Invalid path/URL.', 'error'); return; }
+        
+        if (itemType === 'websiteLink') { // Handle website links
+            try {
+                // For web environment, directly use window.open
+                // For Electron, shell.openExternal is preferred for security.
+                if (shell && shell.openExternal) {
+                    shell.openExternal(location);
+                } else {
+                    window.open(location, '_blank', 'noopener,noreferrer');
+                }
+                showAppNotification(`✅ Opening website...`, 'success');
+            } catch (e) {
+                showAppNotification(`❌ Error opening website: ${e.message}`, 'error');
+            }
+            return;
+        }
+
+        // Existing logic for files/folders
         showAppLoading(true);
         shell.openPath(location)
             .then(errMessage => { 
                 showAppLoading(false); 
-                if (errMessage) { 
-                    showAppNotification(`❌ Error opening ${entryType === 'folderLink' ? 'folder' : 'file'}: ${errMessage.split('\n')[0]}`, 'error'); 
-                } else {
-                    showAppNotification(`✅ Opened ${entryType === 'folderLink' ? 'folder' : 'file'}.`, 'success'); 
-                }
+                if (errMessage) { showAppNotification(`❌ Error opening ${entryType === 'folderLink' ? 'folder' : 'file'}: ${errMessage.split('\n')[0]}`, 'error');  } 
+                else { showAppNotification(`✅ Opened ${entryType === 'folderLink' ? 'folder' : 'file'}.`, 'success'); }
             })
             .catch(e => { showAppLoading(false); showAppNotification(`❌ Exception opening item: ${e.message}`, 'error'); });
     }
+
     function showItemInFolder(itemPath, entryType = 'file') {
-        if (!shell || !pathModule) { showAppNotification('This feature is only available in the desktop app.', 'warning'); return; }
-        if (!itemPath || typeof itemPath !== 'string') { showAppNotification('❌ Invalid path provided.', 'error'); return; }
+        if (entryType === 'websiteLink') { // This action doesn't apply to websites
+            showAppNotification('This action is not applicable to website links.', 'info');
+            return;
+        }
+        if (!shell || !pathModule) { showAppNotification('This feature is available in the desktop app only.', 'warning'); return; }
+        if (!itemPath || typeof itemPath !== 'string') { showAppNotification('❌ Invalid path.', 'error'); return; }
         showAppLoading(true);
-        setTimeout(() => { // Short delay to allow UI update
+        setTimeout(() => { 
             try {
                 if (entryType === 'folderLink') { 
-                    // For folder links, just open the folder itself
                     shell.openPath(itemPath)
                         .then(errMessage => {
                             if (errMessage) showAppNotification('❌ Error opening folder location: ' + errMessage.split('\n')[0], 'error');
                             else showAppNotification('✅ Opened folder location.', 'success');
                         }).catch(e => showAppNotification('❌ Exception opening folder location: ' + e.message, 'error'));
                 } else { 
-                    // For files, use showItemInFolder
                     shell.showItemInFolder(itemPath); 
                     showAppNotification('✅ Shown file in folder.', 'success');
                 }
             } catch (e) {
-                // Fallback: try to open the parent directory if showItemInFolder fails or for other errors
                 try { 
                     shell.openPath(pathModule.dirname(itemPath))
                         .then(errMessage => {
@@ -1384,13 +1252,13 @@
                             else showAppNotification('✅ Opened containing folder.', 'success');
                         }).catch(e2 => showAppNotification('❌ Exception opening containing folder: ' + e2.message, 'error'));
                 }
-                catch (e2) { showAppNotification('❌ Critical error opening location. Path might be inaccessible.', 'error');}
+                catch (e2) { showAppNotification('❌ Critical error opening location.', 'error');}
             }
             showAppLoading(false);
         }, 100);
     }
     function deleteItemEntry(id) {
-        showAppCustomConfirm('Are you sure you want to remove this entry from the list? (The actual file/folder on your computer will NOT be deleted).', conf => {
+        showAppCustomConfirm('Are you sure you want to remove this entry from the list? (The actual file/folder/website will NOT be deleted).', conf => {
             if (conf) { projectFiles = projectFiles.filter(i => i.id !== id); saveItemsToStorage(); renderProjectFilesUI(); showAppNotification('🗑️ Entry removed from list.', 'success');}
         });
     }
@@ -1398,42 +1266,50 @@
         showAppCustomConfirm('Are you sure you want to delete all data (all listed items and custom categories)? This action cannot be undone.', conf => {
             if (conf) {
                 projectFiles = []; 
-                appCategories = DEFAULT_CATEGORIES_STRUCTURE.map(cat => ({...cat})); // Reset to defaults
-                saveItemsToStorage(); saveCategoriesToStorage();
-                populateCategoryDropdown(); renderProjectFilesUI();
+                appCategories = DEFAULT_CATEGORIES_STRUCTURE.map(cat => ({...cat})); 
+                todos = []; // Clear todos as well
+                saveItemsToStorage(); saveCategoriesToStorage(); saveTodos();
+                populateCategoryDropdown(); renderProjectFilesUI(); renderTodos();
                 clearStagedFilesDisplay(); DOM.pathInput.value = '';
                 showAppNotification('🗑️ All data has been cleared.', 'success');
             }
         });
     }
     function openMultiple(itemsToOpen, itemEntryType, context) {
-        if (!shell) { showAppNotification('This feature is only available in the desktop app.', 'warning'); return; }
-        const validItems = itemsToOpen.filter(i => i.entryType === itemEntryType && i.location && typeof i.location === 'string');
+        if (!shell && itemEntryType !== 'websiteLink') { showAppNotification('This feature is available in the desktop app only.', 'warning'); return; }
+        
+        const validItems = itemsToOpen.filter(i => {
+            if (i.entryType === 'websiteLink') return i.location && typeof i.location === 'string' && i.location.startsWith('https://');
+            return i.entryType === itemEntryType && i.location && typeof i.location === 'string';
+        });
+
         if (validItems.length === 0) { 
-            // Avoid notifying if it's part of a larger "Open All" where one type might be empty
-            if (context !== 'All Files' && context !== 'All Folder Links') { 
-                // showAppNotification(`No valid ${itemEntryType === 'file' ? 'files' : 'folders'} to open in "${context}".`, 'warning');
-            }
+            if (context !== 'All Files' && context !== 'All Folder Links' && context !== 'All Website Links') { }
             return; 
         }
         
         showAppLoading(true);
         let successCount = 0, failureCount = 0;
         
-        // Sequentially open items with a small delay to avoid overwhelming the OS
         const openPromises = validItems.map((item, i) => 
             new Promise(resolve => 
                 setTimeout(() => {
-                    shell.openPath(item.location)
-                        .then(errMessage => {
-                            if (errMessage) failureCount++; else successCount++;
-                            resolve();
-                        })
-                        .catch(() => {
-                            failureCount++; // Count as failure on exception
-                            resolve();
-                        });
-                }, i * 300) // 300ms delay between each open attempt
+                    if (item.entryType === 'websiteLink') {
+                        try {
+                            if (shell && shell.openExternal) shell.openExternal(item.location);
+                            else window.open(item.location, '_blank', 'noopener,noreferrer');
+                            successCount++;
+                        } catch (e) { failureCount++; }
+                        resolve();
+                    } else if (shell) { // Only use shell for non-website links if shell is available
+                        shell.openPath(item.location)
+                            .then(errMessage => { if (errMessage) failureCount++; else successCount++; resolve(); })
+                            .catch(() => { failureCount++; resolve(); });
+                    } else { // No shell for file/folder, count as failure
+                        failureCount++;
+                        resolve();
+                    }
+                }, i * 300) 
             )
         );
 
@@ -1441,8 +1317,9 @@
             .then(() => {
                 showAppLoading(false);
                 let message = '';
-                if (successCount > 0) message += `✅ Attempted to open ${successCount} ${itemEntryType === 'file' ? 'file(s)' : 'folder(s)'}. `;
-                if (failureCount > 0) message += `❌ Failed to open ${failureCount} ${itemEntryType === 'file' ? 'file(s)' : 'folder(s)'}. `;
+                const typeString = itemEntryType === 'file' ? 'file(s)' : itemEntryType === 'folderLink' ? 'folder(s)' : 'website(s)';
+                if (successCount > 0) message += `✅ Attempted to open ${successCount} ${typeString}. `;
+                if (failureCount > 0) message += `❌ Failed to open ${failureCount} ${typeString}. `;
                 if (message.trim()) { 
                     showAppNotification(message.trim(), failureCount > 0 && successCount === 0 ? 'error' : failureCount > 0 ? 'warning' : 'success');
                 }
@@ -1450,127 +1327,173 @@
     }
 
     function handleOpenAllClick() {
-        if (projectFiles.length === 0) {
-             showAppNotification("The list is empty. Nothing to open.", "info");
-             return;
-        }
-        // Open files first, then folders
+        if (projectFiles.length === 0) { showAppNotification("The list is empty. Nothing to open.", "info"); return; }
         openMultiple(projectFiles.filter(i => i.entryType === 'file'), 'file', 'All Files');
-        // Delay folder opening until files are processed
+        let delay = projectFiles.filter(i => i.entryType === 'file').length * 300 + 300;
         setTimeout(() => {
             openMultiple(projectFiles.filter(i => i.entryType === 'folderLink'), 'folderLink', 'All Folder Links');
-        }, projectFiles.filter(i => i.entryType === 'file').length * 300 + 300); // Add a small buffer
+        }, delay);
+        delay += projectFiles.filter(i => i.entryType === 'folderLink').length * 300 + 300;
+        setTimeout(() => {
+            openMultiple(projectFiles.filter(i => i.entryType === 'websiteLink'), 'websiteLink', 'All Website Links');
+        }, delay);
     }
 
     function handleOpenAllFilesInCategory(event) {
         const key = event.currentTarget.dataset.categoryKey;
         const itemsInCategory = projectFiles.filter(i => i.category === key);
         const categoryDisplay = getCategoryDisplay(key);
+        if (itemsInCategory.length === 0) { showAppNotification(`No items to open in category "${categoryDisplay}".`, "info"); return; }
         
-        if (itemsInCategory.length === 0) {
-            showAppNotification(`No items to open in category "${categoryDisplay}".`, "info");
-            return;
-        }
         openMultiple(itemsInCategory.filter(i => i.entryType === 'file'), 'file', categoryDisplay);
+        let delay = itemsInCategory.filter(i => i.entryType === 'file').length * 300 + 300;
         setTimeout(() => {
             openMultiple(itemsInCategory.filter(i => i.entryType === 'folderLink'), 'folderLink', categoryDisplay);
-        }, itemsInCategory.filter(i => i.entryType === 'file').length * 300 + 300);
+        }, delay);
+        delay += itemsInCategory.filter(i => i.entryType === 'folderLink').length * 300 + 300;
+        setTimeout(() => {
+            openMultiple(itemsInCategory.filter(i => i.entryType === 'websiteLink'), 'websiteLink', categoryDisplay);
+        }, delay);
+    }
+
+    // --- To-Do List Functions ---
+    function loadTodos() {
+        try {
+            const storedTodos = localStorage.getItem(STORAGE_TODOS_KEY);
+            todos = storedTodos ? JSON.parse(storedTodos) : [];
+        } catch (e) {
+            todos = [];
+            console.error("[Renderer] Error parsing todos from LS", e);
+            localStorage.removeItem(STORAGE_TODOS_KEY);
+        }
+        renderTodos();
+    }
+    function saveTodos() {
+        try { localStorage.setItem(STORAGE_TODOS_KEY, JSON.stringify(todos)); }
+        catch (e) { console.error('[Renderer] Error saving todos:', e); showAppNotification('Error saving to-do list!', 'error');}
+    }
+    function renderTodos() {
+        if (!DOM.todosContainer) return; // Ensure container exists
+        DOM.todosContainer.innerHTML = '';
+        if (todos.length === 0) {
+            DOM.todosContainer.innerHTML = `<p style="text-align:center; color: #90a4ae;">No tasks yet. Add one above!</p>`;
+            return;
+        }
+        todos.forEach(todo => {
+            const todoItemDiv = document.createElement('div');
+            todoItemDiv.className = `todo-item ${todo.completed ? 'completed' : ''}`;
+            todoItemDiv.dataset.id = todo.id;
+            todoItemDiv.innerHTML = `
+                <div class="todo-item-left">
+                    <span class="todo-checkbox" onclick="toggleTodoComplete(${todo.id})">
+                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-check"></use></svg>
+                    </span>
+                    <span class="todo-text">${escapeHTML(todo.text)}</span>
+                </div>
+                <div class="todo-item-right">
+                    <span class="todo-date">${todo.dateAdded}</span>
+                    <button class="btn-icon" onclick="deleteTodo(${todo.id})" title="Delete Task">
+                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-delete"></use></svg>
+                    </button>
+                </div>
+            `;
+            DOM.todosContainer.appendChild(todoItemDiv);
+        });
+    }
+    function addTodo() {
+        if (!DOM.todoInput) return;
+        const text = DOM.todoInput.value.trim();
+        if (!text) {
+            showAppNotification('Task cannot be empty.', 'warning');
+            return;
+        }
+        todos.push({
+            id: Date.now(),
+            text: text,
+            completed: false,
+            dateAdded: new Date().toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' })
+        });
+        DOM.todoInput.value = '';
+        saveTodos();
+        renderTodos();
+        showAppNotification('Task added!', 'success');
+    }
+    function toggleTodoComplete(id) {
+        const todo = todos.find(t => t.id === id);
+        if (todo) {
+            todo.completed = !todo.completed;
+            saveTodos();
+            renderTodos();
+        }
+    }
+    function deleteTodo(id) {
+        showAppCustomConfirm('Are you sure you want to delete this task?', (confirmed) => {
+            if (confirmed) {
+                todos = todos.filter(t => t.id !== id);
+                saveTodos();
+                renderTodos();
+                showAppNotification('Task deleted.', 'success');
+            }
+        });
     }
 
 
-    // --- Persistence ---
-    function saveItemsToStorage() { try { localStorage.setItem(STORAGE_ITEMS_KEY, JSON.stringify(projectFiles)); } catch (e) { console.error('[Renderer] Error saving items:', e); showAppNotification('Error saving items to local storage!', 'error');}}
-    function saveCategoriesToStorage() { try { localStorage.setItem(STORAGE_CATEGORIES_KEY, JSON.stringify(appCategories)); } catch (e) { console.error('[Renderer] Error saving categories:', e); showAppNotification('Error saving categories to local storage!', 'error');}}
+    function saveItemsToStorage() { try { localStorage.setItem(STORAGE_ITEMS_KEY, JSON.stringify(projectFiles)); } catch (e) { console.error('[Renderer] Error saving items:', e); showAppNotification('Error saving items!', 'error');}}
+    function saveCategoriesToStorage() { try { localStorage.setItem(STORAGE_CATEGORIES_KEY, JSON.stringify(appCategories)); } catch (e) { console.error('[Renderer] Error saving categories:', e); showAppNotification('Error saving categories!', 'error');}}
     
     function loadData() {
         try {
             const storedItems = localStorage.getItem(STORAGE_ITEMS_KEY);
-            // Ensure loaded items have essential properties
             projectFiles = storedItems ? JSON.parse(storedItems).filter(i => i.location && i.name && i.id) : []; 
-        } catch (e) { projectFiles = []; console.error("[Renderer] Error parsing items from LocalStorage", e); localStorage.removeItem(STORAGE_ITEMS_KEY); }
+        } catch (e) { projectFiles = []; console.error("[Renderer] Error parsing items from LS", e); localStorage.removeItem(STORAGE_ITEMS_KEY); }
 
         try {
             const storedCategories = localStorage.getItem(STORAGE_CATEGORIES_KEY);
             if (storedCategories) {
                 const parsedCats = JSON.parse(storedCategories);
-                // Merge stored categories with defaults to ensure all default keys exist and new custom ones are kept
                 const mergedCategories = DEFAULT_CATEGORIES_STRUCTURE.map(defaultCat => {
                     const savedCat = parsedCats.find(sc => sc.key === defaultCat.key);
                     if (savedCat) {
-                        // If a saved category matches a default one, update its properties
-                        // but respect certain non-editable flags from default structure
-                        return {
-                            ...defaultCat, // Start with default structure
-                            display: (savedCat.isCustom || (savedCat.isEditable && savedCat.display)) ? savedCat.display : defaultCat.display, // Allow custom display name if editable
-                            order: typeof savedCat.order === 'number' ? savedCat.order : defaultCat.order,
-                            // Ensure boolean flags are correctly merged
-                            isCustom: savedCat.isCustom !== undefined ? savedCat.isCustom : defaultCat.isCustom,
-                            isEditable: savedCat.isEditable !== undefined ? savedCat.isEditable : defaultCat.isEditable,
-                            isDeletable: savedCat.isDeletable !== undefined ? savedCat.isDeletable : defaultCat.isDeletable,
-                        };
-                    }
-                    return {...defaultCat}; // If no saved version, use default
+                        return { ...defaultCat, display: (savedCat.isCustom || (savedCat.isEditable && savedCat.display)) ? savedCat.display : defaultCat.display, order: typeof savedCat.order === 'number' ? savedCat.order : defaultCat.order, isCustom: savedCat.isCustom ?? defaultCat.isCustom, isEditable: savedCat.isEditable ?? defaultCat.isEditable, isDeletable: savedCat.isDeletable ?? defaultCat.isDeletable, };
+                    } return {...defaultCat}; 
                 });
-
-                // Add any purely custom categories from storage that are not in defaults
-                parsedCats.forEach(savedCat => {
-                    if (savedCat.isCustom && !mergedCategories.some(mc => mc.key === savedCat.key)) {
-                        mergedCategories.push(savedCat);
-                    }
-                });
-                
-                // Sort all categories by order
-                appCategories = mergedCategories.sort((a,b) => (a.order === undefined ? Infinity : a.order) - (b.order === undefined ? Infinity : b.order));
-
-            } else { 
-                // No stored categories, use defaults
-                appCategories = DEFAULT_CATEGORIES_STRUCTURE.map(cat => ({...cat})); // Deep copy
-            }
+                parsedCats.forEach(savedCat => { if (savedCat.isCustom && !mergedCategories.some(mc => mc.key === savedCat.key)) { mergedCategories.push(savedCat); } });
+                appCategories = mergedCategories.sort((a,b) => (a.order ?? Infinity) - (b.order ?? Infinity));
+            } else { appCategories = DEFAULT_CATEGORIES_STRUCTURE.map(cat => ({...cat})); }
         } catch (e) {
-            // Error parsing, fallback to defaults
             appCategories = DEFAULT_CATEGORIES_STRUCTURE.map(cat => ({...cat})); 
-            console.error("[Renderer] Error parsing categories from LocalStorage", e);
-            localStorage.removeItem(STORAGE_CATEGORIES_KEY); // Clear corrupted data
+            console.error("[Renderer] Error parsing categories from LS", e); localStorage.removeItem(STORAGE_CATEGORIES_KEY); 
         }
-        // Final check: ensure 'auto_detect' category exists
         if (!Array.isArray(appCategories) || appCategories.length === 0 || !appCategories.find(c => c.key === 'auto_detect')) { 
             appCategories = DEFAULT_CATEGORIES_STRUCTURE.map(cat => ({...cat}));
         }
+        loadTodos(); // Load todos after categories
         populateCategoryDropdown();
         renderProjectFilesUI();
     }
     
-    // --- IPC Listeners (Electron Specific) ---
     function setupIpcListeners() {
         if (!ipcRenderer) {
-            console.warn("[Renderer] ipcRenderer not available. File/folder dialogs and clipboard paste will be limited or disabled.");
-            // Optionally disable buttons that rely on IPC
+            console.warn("[Renderer] ipcRenderer not available. File/folder operations will be disabled.");
             [DOM.selectFilesBtn, DOM.addFolderLinkBtn, DOM.importFromFolderBtn, DOM.pastePathBtn, DOM.addPastedPathButton].forEach(btn => {
-                if(btn) {
-                    btn.disabled = true;
-                    btn.title = (btn.title || btn.textContent || btn.id) + ' (Desktop app feature only)';
-                    btn.style.opacity = "0.5"; // Visually indicate disabled state
-                    btn.style.cursor = "not-allowed";
-                }
-            });
-            return;
+                if(btn) { btn.disabled = true; btn.title = (btn.title || btn.textContent || btn.id) + ' (Desktop app feature only)'; btn.style.opacity = "0.5"; btn.style.cursor = "not-allowed"; }
+            }); return;
         }
         ipcRenderer.on('selected-files-for-files', (event, paths) => updateStagedPaths(paths, 'file', 'Files ready: '));
         ipcRenderer.on('selected-folder-for-link', (event, paths) => updateStagedPaths(paths, 'folderLink', 'Folder links ready: '));
-        ipcRenderer.on('selected-folder-for-import', (event, contents) => { // contents is [{name, path, entryType}]
+        ipcRenderer.on('selected-folder-for-import', (event, contents) => { 
             if (contents && Array.isArray(contents) && contents.length > 0) {
-                stagedFilePaths = contents.map(item => ({ ...item, entryType: 'file' })); // Assuming imported items are files
+                stagedFilePaths = contents.map(item => ({ ...item, entryType: 'file' })); 
                 let baseName = "Selected folder";
-                if (pathModule && contents[0].path) { // Try to get parent folder name
-                    const parentDir = pathModule.dirname(contents[0].path);
-                    baseName = pathModule.basename(parentDir); 
-                     if (!baseName && parentDir) baseName = parentDir; // Handle root paths
+                if (pathModule && contents[0].path) { 
+                    const parentDir = pathModule.dirname(contents[0].path); baseName = pathModule.basename(parentDir); 
+                     if (!baseName && parentDir) baseName = parentDir; 
                 }
                 DOM.selectedFilesDisplay.textContent = `Files to import from "${baseName}" (${stagedFilePaths.length})`;
                 DOM.pathInput.value = '';
             } else if (!DOM.pathInput.value.trim()) clearStagedFilesDisplay();
         });
-        ipcRenderer.on('pasted-path-processed', (event, { items, originalPath }) => { // items is [{name, path, entryType}]
+        ipcRenderer.on('pasted-path-processed', (event, { items, originalPath }) => { 
             if (items && Array.isArray(items) && items.length > 0) {
                 stagedFilePaths = items; 
                 DOM.selectedFilesDisplay.textContent = `Processed path. Ready to add: ${items.map(f => f.name).join(', ')}`;
@@ -1587,54 +1510,51 @@
         });
     }
 
-    // --- Event Listener Setup Functions (for buttons etc.) ---
-    function handleSelectFilesClick() {
-        if (ipcRenderer) ipcRenderer.send('open-file-dialog-for-files');
-        else showAppNotification('This feature is only available in the desktop app.', 'warning');
-    }
-    function handleAddFolderLinkClick() {
-        if (ipcRenderer) ipcRenderer.send('open-folder-dialog-for-link');
-        else showAppNotification('This feature is only available in the desktop app.', 'warning');
-    }
-    function handleImportFromFolderClick() {
-        if (ipcRenderer) ipcRenderer.send('open-folder-dialog-for-import');
-        else showAppNotification('This feature is only available in the desktop app.', 'warning');
-    }
+    function handleSelectFilesClick() { if (ipcRenderer) ipcRenderer.send('open-file-dialog-for-files'); else showAppNotification('This feature is available in the desktop app only.', 'warning'); }
+    function handleAddFolderLinkClick() { if (ipcRenderer) ipcRenderer.send('open-folder-dialog-for-link'); else showAppNotification('This feature is available in the desktop app only.', 'warning'); }
+    function handleImportFromFolderClick() { if (ipcRenderer) ipcRenderer.send('open-folder-dialog-for-import'); else showAppNotification('This feature is available in the desktop app only.', 'warning'); }
     async function handlePastePathClick() {
         let clipboardText = '';
         try {
-            if (electronClipboard) { // Prefer Electron's clipboard API if available
-                 clipboardText = electronClipboard.readText();
-            } else if (navigator.clipboard && navigator.clipboard.readText) { // Fallback to browser API
-                clipboardText = await navigator.clipboard.readText();
-            } else { 
-                showAppNotification('Clipboard API not available in this environment.', 'warning'); return; 
-            }
+            if (electronClipboard) { clipboardText = electronClipboard.readText(); } 
+            else if (navigator.clipboard && navigator.clipboard.readText) { clipboardText = await navigator.clipboard.readText(); } 
+            else { showAppNotification('Clipboard API not available.', 'warning'); return; }
             DOM.pathInput.value = clipboardText;
-            showAppNotification(clipboardText ? 'Path pasted from clipboard.' : 'Clipboard is empty.', clipboardText ? 'success' : 'warning');
-        } catch (err) {
-            console.error('[Renderer] Failed to read clipboard: ', err);
-            showAppNotification('Failed to paste from clipboard. Please ensure clipboard access permission if prompted by your browser.', 'error');
-        }
+            showAppNotification(clipboardText ? 'Path pasted.' : 'Clipboard is empty.', clipboardText ? 'success' : 'warning');
+        } catch (err) { console.error('[Renderer] Failed to read clipboard: ', err); showAppNotification('Failed to paste from clipboard. Ensure permission if prompted.', 'error'); }
     }
     function handleAddPastedPathClick() {
         const pathValue = DOM.pathInput.value.trim();
         if (!pathValue) { showAppNotification('Please enter or paste a path first.', 'warning'); return; }
         if (ipcRenderer) {
-            stagedFilePaths = []; // Clear previous staged paths from dialogs
+            stagedFilePaths = []; 
             DOM.selectedFilesDisplay.textContent = `Processing: ${pathValue.substring(pathValue.lastIndexOf(/[/\\]/) + 1)}`;
             ipcRenderer.send('process-pasted-path', pathValue);
-        } else {
-            showAppNotification('This feature is only available in the desktop app.', 'warning');
+        } else { // Handle non-Electron environments for website links
+            if (pathValue.toLowerCase().startsWith('https://')) {
+                updateStagedPaths([pathValue], 'websiteLink', 'Website link ready: ');
+            } else {
+                showAppNotification('This feature (for local paths) is available in the desktop app only.', 'warning');
+            }
         }
     }
     
-    // --- Initialization & Global Event Listeners ---
     document.addEventListener('DOMContentLoaded', () => {
+        // Set HTML direction to LTR
+        document.documentElement.dir = 'ltr';
+        document.documentElement.lang = 'en';
+
         setupIpcListeners(); 
-        loadData();
+        loadData(); // This will also call renderTodos
+        showPage('pathsPage'); 
+        if (window.innerWidth > 768) { 
+            DOM.sidebar.classList.remove('collapsed'); 
+            DOM.mainContent.classList.remove('expanded');
+        } else {
+            DOM.sidebar.classList.add('collapsed'); 
+            DOM.mainContent.classList.add('expanded');
+        }
         
-        // Attach event listeners to DOM elements
         DOM.openAllBtn.addEventListener('click', handleOpenAllClick);
         DOM.selectFilesBtn.addEventListener('click', handleSelectFilesClick);
         DOM.addFolderLinkBtn.addEventListener('click', handleAddFolderLinkClick);
@@ -1644,47 +1564,37 @@
         DOM.clearAllDataBtn.addEventListener('click', clearAllData);
         DOM.addItemsBtn.addEventListener('click', handleProcessStagedItems);
         
-        // Category Manager Modal Listeners
         DOM.manageCategoriesBtn.addEventListener('click', openCategoryManagerModal);
         DOM.closeCategoryManagerBtn.addEventListener('click', closeCategoryManagerModal);
         DOM.addManagedCategoryBtn.addEventListener('click', handleAddManagedCategory);
         
-        // Event delegation for item actions (Open, Show Location, Delete from List)
+        if(DOM.addTodoBtn) DOM.addTodoBtn.addEventListener('click', addTodo);
+        if(DOM.todoInput) DOM.todoInput.addEventListener('keydown', e => { if (e.key === 'Enter') addTodo(); });
+
+
         DOM.filesDisplayContainer.addEventListener('click', e => {
             const btn = e.target.closest('.item-actions-menu button[data-action]');
             if (btn) {
-                const id = parseFloat(btn.dataset.id); // Ensure ID is a number if needed for comparison
+                const id = parseFloat(btn.dataset.id); 
                 const action = btn.dataset.action;
                 const item = projectFiles.find(pf => pf.id === id); 
-                if (!item) {
-                    console.warn(`Item with id ${id} not found for action ${action}`);
-                    showAppNotification('Error: Item not found.', 'error');
-                    return;
-                }
+                if (!item) { console.warn(`Item with id ${id} not found for action ${action}`); showAppNotification('Error: Item not found.', 'error'); return; }
                 const menu = btn.closest('.item-actions-menu'); 
-                if(menu) menu.classList.remove('show'); // Hide menu after action
+                if(menu) menu.classList.remove('show'); 
                 
-                if (action === 'open') openItem(item.location, item.entryType);
+                if (action === 'open') openItem(item.location, item.entryType, item.type); // Pass item.type
                 else if (action === 'show-location') showItemInFolder(item.location, item.entryType);
                 else if (action === 'delete') deleteItemEntry(item.id);
             }
         });
 
-        // Enter key listeners for input fields
         DOM.projectNameInput.addEventListener('keydown', e => { if (e.key === 'Enter' && stagedFilePaths.length > 0) handleProcessStagedItems(); });
         DOM.pathInput.addEventListener('keydown', e => { if (e.key === 'Enter') handleAddPastedPathClick(); });
         DOM.newManagedCategoryInput.addEventListener('keydown', e => { if (e.key === 'Enter') DOM.addManagedCategoryBtn.click(); }); 
 
     });
-    // Global error handlers
-    window.addEventListener('error', e => {
-        console.error('[Renderer] Unhandled Error:', e.error || e.message, e.filename, e.lineno, e.colno, e);
-        showAppNotification('An unexpected error occurred! Check console for details.', 'error');
-    });
-    window.addEventListener('unhandledrejection', event => {
-        console.error('[Renderer] Unhandled Rejection:', event.reason);
-        showAppNotification('An unexpected asynchronous error occurred! Check console.', 'error');
-    });
+    window.addEventListener('error', e => { console.error('[Renderer] Unhandled Error:', e.error || e.message, e.filename, e.lineno, e.colno, e); showAppNotification('An unexpected error occurred! Check console.', 'error'); });
+    window.addEventListener('unhandledrejection', event => { console.error('[Renderer] Unhandled Rejection:', event.reason); showAppNotification('An unexpected asynchronous error occurred! Check console.', 'error'); });
     </script>
 </body>
 </html>
