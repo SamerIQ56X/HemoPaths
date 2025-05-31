@@ -22,7 +22,7 @@
             --warning-color: #ffab00;
             --info-color: #3ea6ff;
             --font-family: 'Inter', 'Segoe UI', 'Tahoma', sans-serif;
-            --border-radius: 12px; /* Slightly reduced for a cleaner modern look */
+            --border-radius: 12px; 
             --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1), 0 1px 1px rgba(0,0,0,0.06);
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
             --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
@@ -35,7 +35,7 @@
             font-family: var(--font-family);
             background-color: var(--bg-color);
             color: var(--text-color-primary);
-            padding: 15px; /* Increased padding for body */
+            padding: 15px; 
             line-height: 1.6; 
             font-size: 14px;
             -webkit-font-smoothing: antialiased;
@@ -43,14 +43,14 @@
         }
 
         /* Custom Scrollbar Styling */
-        ::-webkit-scrollbar { width: 8px; height: 8px; } /* Slimmer scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; } 
         ::-webkit-scrollbar-track { background: var(--bg-color); border-radius: var(--border-radius); }
         ::-webkit-scrollbar-thumb { background: #4a5058; border-radius: var(--border-radius); border: 2px solid var(--bg-color); }
         ::-webkit-scrollbar-thumb:hover { background: #5f6770; }
         html { scrollbar-width: thin; scrollbar-color: #4a5058 var(--bg-color); }
 
         .container {
-            max-width: 1000px; /* Slightly wider container */
+            max-width: 1000px; 
             margin: 20px auto;
             background-color: var(--card-bg-color);
             border-radius: var(--border-radius);
@@ -62,29 +62,29 @@
         .header {
             background: linear-gradient(135deg, var(--header-bg-color) 0%, #2a2e33 100%);
             color: var(--accent-color);
-            padding: 15px 20px; /* Increased padding */
+            padding: 15px 20px; 
             text-align: center;
             border-bottom: 1px solid var(--border-color);
         }
-        .header h1 { font-size: 1.8rem; margin-bottom: 5px; font-weight: 700; text-transform: capitalize;} /* Slightly larger */
+        .header h1 { font-size: 1.8rem; margin-bottom: 5px; font-weight: 700; text-transform: capitalize;} 
         .header p { font-size: 0.85rem; color: var(--text-color-secondary); }
 
         .top-actions-bar {
             display: flex; justify-content: space-between; align-items: center;
             padding: 12px 20px; background-color: #222529; 
             border-bottom: 1px solid var(--border-color);
-            flex-wrap: wrap; gap: 12px; /* Increased gap */
+            flex-wrap: wrap; gap: 12px; 
         }
         .stats { font-size: 0.8rem; font-weight: 500; display:flex; align-items:center; }
         .stats svg { margin-right: 8px; width:16px; height:16px; vertical-align: middle; fill: var(--text-color-secondary);}
 
         .btn {
-            padding: 9px 18px; /* Slightly more padding */
+            padding: 9px 18px; 
             border: 1px solid transparent; 
-            border-radius: var(--border-radius); font-size: 0.85rem; /* Slightly larger font */
+            border-radius: var(--border-radius); font-size: 0.85rem; 
             font-weight: 600; 
             cursor: pointer; transition: all var(--transition-speed) ease-in-out;
-            background-color: var(--accent-color); color: white; /* White text on accent */
+            background-color: var(--accent-color); color: white; 
             text-decoration: none; display: inline-flex; align-items: center; gap: 7px; 
             letter-spacing: 0.1px; 
             box-shadow: var(--shadow-sm);
@@ -96,7 +96,7 @@
             border-color: var(--accent-color-hover); 
             box-shadow: var(--shadow-md); 
             transform: translateY(-2px); 
-            color:#111; /* Darker text on cyan hover */
+            color:#111; 
         }
         .btn:active { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
         .btn:disabled { 
@@ -131,36 +131,36 @@
         }
 
         .btn-success { /* Used for "Add to List", "Add Category" */
-            background-color: var(--success-color); /* Uses accent blue */
+            background-color: var(--success-color); 
             border-color: var(--success-color); 
             color: white; 
         }
         .btn-success:hover { 
-            background-color: var(--accent-color-hover); /* Uses accent hover (cyan) */
+            background-color: var(--accent-color-hover); 
             border-color: var(--accent-color-hover); 
             color: #111; 
         }
         
         .btn-icon {
             background: transparent; border: none; color: var(--text-color-secondary);
-            padding: 8px; line-height: 1; /* Slightly more padding */
+            padding: 8px; line-height: 1; 
             border-radius: var(--border-radius); 
             transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
         }
-        .btn-icon:hover { color: var(--accent-color); background-color: rgba(82, 156, 253, 0.12); /* Blue accent hover, slightly more visible */ }
-        .btn-icon svg { width: 16px; height: 16px; } /* Slightly larger icons */
+        .btn-icon:hover { color: var(--accent-color); background-color: rgba(82, 156, 253, 0.12); }
+        .btn-icon svg { width: 16px; height: 16px; } 
         .btn-icon:disabled { color: #5f6770; background-color: transparent !important; cursor: not-allowed;}
         .btn-icon:disabled svg { fill: #5f6770; } 
         
         .add-item-section {
-            padding: 20px; border-bottom: 1px solid var(--border-color); /* Increased padding */
+            padding: 20px; border-bottom: 1px solid var(--border-color); 
             background-color: #1f2225; 
         }
-        .input-group { display: flex; flex-direction: column; gap: 12px; } /* Increased gap */
-        .input-row { display: flex; gap: 12px; flex-wrap: wrap; } /* Increased gap */
+        .input-group { display: flex; flex-direction: column; gap: 12px; } 
+        .input-row { display: flex; gap: 12px; flex-wrap: wrap; } 
         
         .input-field, #categorySelectInput, .category-name-input-inline {
-            flex: 1; padding: 10px 14px; /* Increased padding */
+            flex: 1; padding: 10px 14px; 
             border: 1px solid var(--border-color); border-radius: var(--border-radius);
             font-size: 0.85rem; min-width: 130px; 
             background-color: var(--input-bg-color); color: var(--input-text-color);
@@ -169,18 +169,18 @@
         .input-field::placeholder { color: #888e95; } 
         .input-field:focus, #categorySelectInput:focus, .category-name-input-inline:focus {
             outline: none; border-color: var(--accent-color);
-            box-shadow: 0 0 0 3px rgba(82, 156, 253, 0.25); /* Slightly thicker focus ring */
+            box-shadow: 0 0 0 3px rgba(82, 156, 253, 0.25); 
         }
         #categorySelectInput {
             appearance: none; -webkit-appearance: none; -moz-appearance: none;
             background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23b0b0b0%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
-            background-repeat: no-repeat; background-size: 10px; /* Slightly larger arrow */
+            background-repeat: no-repeat; background-size: 10px; 
         }
         html[dir="ltr"] #categorySelectInput { background-position: right 15px center; padding-right: 35px; padding-left: 14px;}
         html[dir="rtl"] #categorySelectInput { background-position: left 15px center; padding-left: 35px; padding-right: 14px;}
 
         #selectedFilesDisplay { margin-top: 10px; font-size: 0.75rem; color: var(--text-color-secondary); }
-        #itemsDisplayArea { padding: 20px; } /* Increased padding */
+        #itemsDisplayArea { padding: 20px; } 
 
         .category-section {
             margin-bottom: 20px; 
@@ -221,8 +221,9 @@
         .category-controls .btn-open-all-in-category svg { width: 12px; height: 12px;}
 
         .items-grid {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Slightly wider min card width */
-            gap: 12px; padding: 15px; max-height: 1200px; overflow-y: auto; opacity: 1;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); /* Increased min card width for better spacing */
+            gap: 15px; padding: 20px; /* Increased padding and gap */
+            max-height: 1200px; overflow-y: auto; opacity: 1;
             transition: max-height 0.3s ease-out, opacity 0.3s ease-out, padding 0.3s ease-out;
         }
         .category-section.collapsed .items-grid { max-height: 0; opacity: 0; padding-top: 0; padding-bottom: 0; margin-top:0; overflow: hidden; }
@@ -235,50 +236,53 @@
         .item-card {
             background-color: #2c3035; 
             border: 1px solid var(--border-color);
-            border-radius: var(--border-radius); padding: 12px; /* Increased padding */
+            border-radius: var(--border-radius); padding: 15px; /* Increased padding */
             box-shadow: var(--shadow-sm);
             transition: box-shadow var(--transition-speed) ease-in-out, transform var(--transition-speed) ease-in-out, background-color var(--transition-speed) ease-in-out;
             display: flex; flex-direction: column; justify-content: space-between;
-            position: relative; min-height: 120px; /* Slightly taller */
+            position: relative; 
+            min-height: 100px; /* Adjusted min-height, path removed */
         }
         .item-card:hover {
             box-shadow: var(--shadow-md); transform: translateY(-3px);
             background-color: #32373d; 
         }
-        html[dir="ltr"] .item-card:hover { border-left: 4px solid var(--accent-color); border-right: 1px solid var(--border-color); } /* Thicker accent border */
+        html[dir="ltr"] .item-card:hover { border-left: 4px solid var(--accent-color); border-right: 1px solid var(--border-color); } 
         html[dir="rtl"] .item-card:hover { border-right: 4px solid var(--accent-color); border-left: 1px solid var(--border-color); }
 
-        .item-card-main { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; } 
+        .item-card-main { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; } /* Increased margin */
         .item-card-icon svg { width: 24px; height: 24px; fill: var(--accent-color); flex-shrink: 0; } 
-        .item-card-info { overflow: hidden; }
+        .item-card-info { overflow: hidden; flex-grow: 1; }
         .item-card-name {
-            font-size: 0.85rem; font-weight: 600; white-space: nowrap;
-            overflow: hidden; text-overflow: ellipsis; color: var(--text-color-primary);
+            font-size: 0.9rem; /* Slightly larger */
+            font-weight: 600; 
+            white-space: nowrap;
+            overflow: hidden; text-overflow: ellipsis; 
+            color: var(--text-color-primary);
+            margin-bottom: 4px; /* Space between name and filetype */
         }
-        .item-card-filetype { font-size: 0.7rem; color: var(--text-color-secondary); }
+        .item-card-filetype { font-size: 0.75rem; color: var(--text-color-secondary); } /* Slightly larger */
         .item-card-path {
-            font-size: 0.65rem; color: #888e95; margin: 4px 0; word-break: break-all; 
-            max-height: 2.8em; overflow: hidden; text-overflow: ellipsis;
-            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+           display: none; /* Path removed as requested */
         }
 
         .item-card-footer {
             margin-top: auto; display: flex; justify-content: space-between;
-            align-items: center; padding-top: 8px; border-top: 1px solid var(--border-color);
+            align-items: center; padding-top: 10px; border-top: 1px solid var(--border-color); /* Increased padding */
         }
-        .item-card-date { font-size: 0.65rem; color: #78828c; } 
-        .item-card-actions-trigger svg { width: 15px; height: 15px; } 
+        .item-card-date { font-size: 0.7rem; color: #78828c; } /* Slightly larger */
+        .item-card-actions-trigger svg { width: 16px; height: 16px; } /* Slightly larger */
 
         .item-actions-menu {
             display: none; 
             position: absolute; 
-            background-color: #30353b; /* Slightly darker for better pop */
+            background-color: #30353b; 
             border: 1px solid #454a50; 
-            border-radius: 10px; /* Slightly less rounded than main elements for distinction */
+            border-radius: 10px; 
             box-shadow: var(--shadow-lg); 
-            z-index: 500; min-width: 180px; 
+            z-index: 500; min-width: 190px; /* Increased width for longer text */
             overflow: hidden; 
-            padding: 5px 0; /* Padding around the group of buttons */
+            padding: 6px 0; 
         }
         .item-actions-menu.show { display: block; }
         html[dir="ltr"] .item-actions-menu { left: 8px; right:auto; } 
@@ -286,23 +290,22 @@
 
         .item-actions-menu button {
             display: flex; align-items: center; gap: 10px; 
-            width: 100%; padding: 10px 15px; 
-            background: none; border: none; /* Removed bottom border */
+            width: calc(100% - 10px); /* Account for margin */
+            padding: 10px 15px; 
+            background: none; border: none; 
             cursor: pointer;
             font-size: 0.82rem; 
             color: var(--text-color-primary);
             transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
             text-align: left; 
-            border-radius: 6px; /* Rounded corners for individual menu items */
-            margin: 3px 5px; /* Spacing between menu items */
-            width: calc(100% - 10px); /* Account for margin */
+            border-radius: 6px; 
+            margin: 4px 5px; /* Spacing between menu items */
         }
         html[dir="rtl"] .item-actions-menu button { text-align: right; }
 
         .item-actions-menu button svg { width: 14px; height: 14px; fill: currentColor; margin-right: 8px; } 
         html[dir="rtl"] .item-actions-menu button svg { margin-left: 8px; margin-right: 0; }
 
-        /* .item-actions-menu button:last-child { border-bottom: none; } */ /* Removed as individual borders are gone */
         .item-actions-menu button:hover { background-color: var(--accent-color); color: white; }
         .item-actions-menu button:hover svg { fill: white; }
         .item-actions-menu button[data-action="delete"]:hover {
@@ -444,11 +447,11 @@
             .input-row { flex-direction: column; gap: 12px; }
             .input-field, #categorySelectInput, #newManagedCategoryInput, .category-name-input-inline { font-size: 0.9rem; padding: 10px 14px;}
             .items-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px;} 
-            .item-card { min-height: 125px; padding: 14px; }
+            .item-card { min-height: 100px; padding: 14px; } /* Adjusted min-height for mobile */
             .item-card-icon svg { width: 28px; height: 28px; }
             .item-card-name { font-size: 0.9rem; }
             .item-card-filetype { font-size: 0.75rem;}
-            .item-card-path { font-size: 0.7rem;}
+            /* .item-card-path is already display:none */
             .item-actions-menu { font-size: 0.9rem; min-width: 160px; } 
             .item-actions-menu button { padding: 10px 15px; font-size: 0.85rem;} 
             .notification-toast { max-width: calc(100% - 24px); font-size: 0.9rem; padding: 14px 20px; }
@@ -1090,37 +1093,37 @@
 
                 if (currentMenu.classList.contains('show')) { 
                     // Position the menu
-                    const card = event.currentTarget.closest('.item-card');
-                    const btnRect = event.currentTarget.getBoundingClientRect();
-                    // const cardRect = card.getBoundingClientRect(); // Not strictly needed if positioning relative to button
+                    const card = event.currentTarget.closest('.item-card'); // Get the parent card
+                    const btnRect = event.currentTarget.getBoundingClientRect(); // Button's position relative to viewport
+                    const cardRect = card.getBoundingClientRect(); // Card's position relative to viewport
 
-                    // Attempt to position below the button first
-                    let top = btnRect.height + 2; // Position below the button with a small gap
-                    let left = 0; // Align with the left of the button by default
+                    // Calculate position relative to the card
+                    let top = btnRect.bottom - cardRect.top + 2; // Position below the button
+                    let left = btnRect.left - cardRect.left;    // Align with button's left edge relative to card
 
                     currentMenu.style.top = `${top}px`;
                     currentMenu.style.left = `${left}px`;
-                    currentMenu.style.right = 'auto'; // Reset right positioning
+                    currentMenu.style.right = 'auto'; 
 
-                    // Adjust if it goes off-screen
+                    // Adjust if it goes off-screen (relative to viewport)
                     const menuRect = currentMenu.getBoundingClientRect();
                     const viewportWidth = window.innerWidth;
                     const viewportHeight = window.innerHeight;
 
-                    if (menuRect.right > viewportWidth - 10) { // Off right edge
+                    if (menuRect.right > viewportWidth - 10) { 
                         currentMenu.style.left = 'auto';
-                        currentMenu.style.right = '0px'; // Align to the right of the button or card
+                        // Position to the left of the button instead of right of the card
+                        currentMenu.style.right = `${card.offsetWidth - (btnRect.left - cardRect.left) - btnRect.width}px`; 
                     }
-                    if (menuRect.left < 10) { // Off left edge
-                        currentMenu.style.left = '0px'; // Align to the left of the button or card
+                    if (menuRect.left < 10) { 
+                        currentMenu.style.left = '0px'; 
                         currentMenu.style.right = 'auto';
                     }
-                    if (menuRect.bottom > viewportHeight - 10) { // Off bottom edge
-                        // Position above the button instead
-                        currentMenu.style.top = `-${currentMenu.offsetHeight + 2}px`;
+                    if (menuRect.bottom > viewportHeight - 10) { 
+                        currentMenu.style.top = `${btnRect.top - cardRect.top - menuRect.height - 2}px`; // Position above
                     }
-                     if (menuRect.top < 10 && currentMenu.style.top.startsWith('-')) { // Still off top edge (e.g. button is very close to top)
-                        currentMenu.style.top = `${btnRect.height + 2}px`; // Revert to below if above is also bad
+                     if (menuRect.top < 10 && currentMenu.style.top.startsWith('-')) { 
+                        currentMenu.style.top = `${btnRect.bottom - cardRect.top + 2}px`; // Revert to below
                     }
                 }
             }
@@ -1148,7 +1151,6 @@
                             <div class="item-card-filetype">${escapeHTML(typeDisplay)}</div>
                         </div>
                     </div>
-                    <div class="item-card-path" title="${escapeAttr(item.location)}">${escapeHTML(item.location)}</div>
                     <div class="item-card-footer">
                         <span class="item-card-date">Added: ${item.dateAdded}</span>
                         <button class="btn btn-icon path-card-options-btn" data-item-id="${item.id}" title="Options"><svg viewBox="0 0 24 24"><use xlink:href="#icon-options"></use></svg></button>
