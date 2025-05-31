@@ -12,6 +12,30 @@
             box-sizing: border-box;
         }
 
+        .title-bar { /* افترض أن لديك عنصر بهذا الكلاس */
+            -webkit-app-region: drag;
+            /* أنماط أخرى للشريط العلوي */
+            height: 30px; /* أو أي ارتفاع مناسب */
+            background-color: #333; /* أو أي لون خلفية */
+            width: 100%;
+            position: fixed; /* أو حسب تصميمك */
+            top: 0;
+            left: 0;
+            z-index: 9990; /* تأكد أنه خلف أزرار التحكم الفعلية */
+        }
+
+
+        .title-bar-button { /* افترض أن أزرار التحكم لديك بهذا الكلاس */
+            -webkit-app-region: no-drag;
+        }
+
+        /* وأيضاً لأزرار التحكم بالنافذة التي لديك بالفعل */
+        .window-controls {
+            /* ... أنماطك الحالية ... */
+            -webkit-app-region: no-drag; /* مهم جداً */
+            z-index: 99999; /* يجب أن تكون فوق منطقة السحب */
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #0a0a0a, #1a1a2e, #16213e, #0f0f23);
