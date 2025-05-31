@@ -3,31 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project File Manager v1.1 - Modern Dark UI</title>
+    <title>Hemo Paths Manager</title>
     <style>
         :root {
-            --bg-color: #1a1d21; /* Slightly lighter, more modern dark */
-            --card-bg-color: #25292d; 
-            --header-bg-color: #1f2225; 
-            --text-color-primary: #e1e3e6; 
-            --text-color-secondary: #a8b0b8; 
-            --accent-color: #00e676; /* Vibrant Green */
-            --accent-color-hover: #00d16a;
-            --border-color: #363b42; 
-            --input-bg-color: #2c3035; 
+            --bg-color: #181a1c;
+            --card-bg-color: #25292d;
+            --header-bg-color: #000000;
+            --text-color-primary: #e1e3e6;
+            --text-color-secondary: #a8b0b8;
+            --accent-color: #529cfd;
+            --accent-color-hover: #68f9ec;
+            --border-color: #363b42;
+            --input-bg-color: #1a1a1a;
             --input-text-color: #e1e3e6;
-            --danger-color: #ff5252; 
+            --danger-color: #ff5252;
             --danger-color-hover: #f04141;
-            --success-color: var(--accent-color); 
-            --warning-color: #ffab00; 
-            --info-color: #3ea6ff; /* Brighter info blue */
-            --font-family: 'Inter', 'Segoe UI', 'Tahoma', sans-serif; /* Modern font stack */
-            --border-radius: 8px; /* More rounded */
+            --success-color: var(--accent-color);
+            --warning-color: #ffab00;
+            --info-color: #3ea6ff;
+            --font-family: 'Inter', 'Segoe UI', 'Tahoma', sans-serif;
+            --border-radius: 15px;
             --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1), 0 1px 1px rgba(0,0,0,0.06);
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
             --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
-            --transition-speed: 0.2s; 
+            --transition-speed: 0.2s;
         }
+
+        
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -36,7 +38,7 @@
             background-color: var(--bg-color);
             color: var(--text-color-primary);
             padding: 12px; 
-            line-height: 1.6; /* Improved line height */
+            line-height: 2.6; /* Improved line height */
             font-size: 14px; /* Slightly larger base font */
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
@@ -144,19 +146,21 @@
             border-color: #5a6067;
         }
         .btn-danger { 
-            background-color: var(--danger-color); 
+            background-color: var(--card-bg-color); 
             border-color: var(--danger-color); 
             color: white; 
         }
+        
         .btn-danger:hover { 
             background-color: var(--danger-color-hover); 
             border-color: var(--danger-color-hover);
         }
         .btn-success { 
-            background-color: var(--success-color); 
-            border-color: var(--success-color); 
-            color: #111; 
+            background-color: var(--card-bg-color);
+            border-color: var(--danger-color);
+            color: white;
         }
+        
         .btn-success:hover { 
             background-color: var(--accent-color-hover); 
             border-color: var(--accent-color-hover); 
