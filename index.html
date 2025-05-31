@@ -14,7 +14,7 @@
             --accent-color: #529cfd; /* User's blue accent */
             --accent-color-hover: #68f9ec; /* User's cyan accent hover */
             --border-color: #363b42;
-            --input-bg-color: #2c3035; /* Changed for better contrast/standard dark theme */
+            --input-bg-color: #2c3035; 
             --input-text-color: #e1e3e6;
             --danger-color: #ff5252;
             --danger-color-hover: #f04141;
@@ -36,7 +36,7 @@
             background-color: var(--bg-color);
             color: var(--text-color-primary);
             padding: 12px; 
-            line-height: 1.6; /* Changed from 2.6 for more standard modern look */
+            line-height: 1.6; 
             font-size: 14px;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
@@ -268,23 +268,27 @@
         .item-card-actions-trigger svg { width: 14px; height: 14px; } 
 
         .item-actions-menu {
-            display: none; position: absolute; top: 22px; 
+            display: none; /* Initially hidden */
+            position: absolute; top: 22px; 
             background-color: #32373d; 
             border: 1px solid #4a5058; 
             border-radius: var(--border-radius); 
             box-shadow: var(--shadow-md); 
-            z-index: 500; min-width: 160px; 
+            z-index: 500; min-width: 170px; /* Adjusted width */
             overflow: hidden; 
+        }
+        .item-actions-menu.show { /* Added this class to make menu visible */
+            display: block; 
         }
         html[dir="ltr"] .item-actions-menu { left: 8px; right:auto; } 
         html[dir="rtl"] .item-actions-menu { right: 8px; left:auto; } 
 
         .item-actions-menu button {
             display: flex; align-items: center; gap: 8px; 
-            width: 100%; padding: 10px 15px; /* Adjusted padding */
+            width: 100%; padding: 10px 15px; 
             background: none; border: none;
             border-bottom: 1px solid var(--border-color); cursor: pointer;
-            font-size: 0.8rem; /* Adjusted font size */
+            font-size: 0.8rem; 
             color: var(--text-color-primary);
             transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
             text-align: left; 
@@ -552,7 +556,9 @@
         <div class="modal-dialog">
             <p id="confirmModalMessage"></p>
             <div class="modal-dialog-actions">
-                <button id="confirmModalYesBtn" class="btn btn-danger">Yes</button> <button id="confirmModalNoBtn" class="btn btn-primary">No</button> </div>
+                <button id="confirmModalYesBtn" class="btn btn-danger">Yes</button> 
+                <button id="confirmModalNoBtn" class="btn btn-primary">No</button> 
+            </div>
         </div>
     </div>
 
@@ -1116,7 +1122,6 @@
             else if (item.type === 'aftereffects') iconId = 'icon-aftereffects';
             else if (item.type === 'premiere') iconId = 'icon-premiere';
 
-            // Menu items are already in English as per user's provided HTML
             return `
                 <div class="item-card" style="--card-index: ${index};">
                     <div class="item-card-main">
@@ -1132,9 +1137,9 @@
                         <button class="btn btn-icon path-card-options-btn" data-item-id="${item.id}" title="Options"><svg viewBox="0 0 24 24"><use xlink:href="#icon-options"></use></svg></button>
                     </div>
                     <div class="item-actions-menu" id="options-menu-${item.id}">
-                        <button data-action="open" data-id="${item.id}"><svg viewBox="0 0 24 24"><use xlink:href="#${item.entryType === 'folderLink' ? 'icon-folder' : 'icon-open'}"></use></svg>${item.entryType === 'folderLink' ? 'Open Folder' : 'Open Item'}</button>
-                        <button data-action="show-location" data-id="${item.id}"><svg viewBox="0 0 24 24"><use xlink:href="#icon-show-location"></use></svg>Show in Folder</button>
-                        <button data-action="delete" data-id="${item.id}" style="color: var(--danger-color);"><svg viewBox="0 0 24 24"><use xlink:href="#icon-delete"></use></svg>Remove Entry</button>
+                        <button data-action="open" data-id="${item.id}"><svg viewBox="0 0 24 24"><use xlink:href="#${item.entryType === 'folderLink' ? 'icon-folder' : 'icon-open'}"></use></svg>Open</button>
+                        <button data-action="show-location" data-id="${item.id}"><svg viewBox="0 0 24 24"><use xlink:href="#icon-show-location"></use></svg>Open File Location</button>
+                        <button data-action="delete" data-id="${item.id}" style="color: var(--danger-color);"><svg viewBox="0 0 24 24"><use xlink:href="#icon-delete"></use></svg>Delete from List</button>
                     </div>
                 </div>`;
         }
@@ -1460,3 +1465,4 @@
     </script>
 </body>
 </html>
+
