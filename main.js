@@ -10,7 +10,16 @@ const log = require('electron-log');
 
 // Configure electron-log: Options: error, warn, info, verbose, debug, silly. Default: info
 log.transports.file.level = "info";
-log.transports.file.resolvePathFn = () => path.join(app.getPath('userData'), 'logs/main.log'); // Updated for new electron-log version
+// Ensure the path is correct based on your electron-log version.
+// For v5.x log.transports.file.resolvePathFn is correct. For older v4.x it was resolvePath.
+if (typeof log.transports.file.resolvePathFn === 'function') {
+    log.transports.file.resolvePathFn = () => path.join(app.getPath('userData'), 'logs/main.log');
+} else if (typeof log.transports.file.resolvePath === 'function') { // Fallback for older electron-log
+    log.transports.file.resolvePath = () => path.join(app.getPath('userData'), 'logs/main.log');
+} else {
+    console.warn("[Main Process] Could not set custom log path for electron-log. Using default.");
+    log.warn("[Main Process] Ensure electron-log is version 5.x for resolvePathFn or adjust accordingly for v4.x (resolvePath).");
+}
 autoUpdater.logger = log;
 autoUpdater.autoDownload = false; // User will be prompted or it will download after 'update-available'
                                  // Set to true if you want silent auto-download
@@ -20,8 +29,8 @@ const liveUrl = 'https://hemopaths.vercel.app'; // Your live site URL
 const localCacheFileName = 'cached_index.html';
 const localCacheDirPath = app.getPath('userData');
 const localCachePath = path.join(localCacheDirPath, localCacheFileName);
-const defaultErrorPageFileName = 'error_page.html';
-const defaultErrorPagePath = path.join(__dirname, defaultErrorPageFileName);
+const defaultErrorPageFileName = 'error_page.html'; // This file should be in the same directory as main.js or adjust path
+const defaultErrorPagePath = path.join(__dirname, defaultErrorPageFileName); 
 
 if (!fsSync.existsSync(localCacheDirPath)) {
     try {
@@ -77,14 +86,13 @@ async function loadInitialContent() {
         const { hostname } = new URL(liveUrl);
         const hostResolved = await new Promise(resolve => {
             require('dns').lookup(hostname, (err) => {
-                if (err && err.code === 'ENOTFOUND') { // Explicitly check for ENOTFOUND
-                    log.warn(`[Main Process] DNS lookup for ${hostname} failed (ENOTFOUND).`);
+                if (err && (err.code === 'ENOTFOUND' || err.code === 'EAI_AGAIN')) { 
+                    log.warn(`[Main Process] DNS lookup for ${hostname} failed (${err.code}).`);
                     resolve(false);
                 } else if (err) {
                     log.warn(`[Main Process] DNS lookup for ${hostname} failed with other error: ${err.message}.`);
                     resolve(false);
-                }
-                 else {
+                } else {
                     log.info(`[Main Process] Successfully resolved ${hostname}.`);
                     resolve(true);
                 }
@@ -96,7 +104,7 @@ async function loadInitialContent() {
         } else {
             log.warn(`[Main Process] Host-specific DNS lookup failed for ${hostname}. Checking general internet connection...`);
             isEffectivelyOnline = await new Promise(resolve => {
-                require('dns').lookup('google.com', (err) => {
+                require('dns').lookup('google.com', (err) => { // Using google.com as a general check
                     if (err) {
                         log.warn('[Main Process] General internet connection check (google.com) failed.');
                         resolve(false);
@@ -112,8 +120,8 @@ async function loadInitialContent() {
         isEffectivelyOnline = false;
     }
 
-    if (isEffectivelyOnline) {
-        log.info('[Main Process] Attempting to fetch live site and update cache.');
+    if (isEffectivelyOnline && mainWindow && !mainWindow.isDestroyed()) {
+        log.info('[Main Process] Internet connection detected. Attempting to fetch live site and update cache.');
         try {
             const response = await new Promise((resolve, reject) => {
                 const request = net.request({ method: 'GET', url: liveUrl, useSessionCookies: true, timeout: 15000 });
@@ -160,7 +168,7 @@ async function loadInitialContent() {
                     log.info('[Main Process] Live content is same as local cache.');
                 }
                 log.info('[Main Process] Loading latest content (from cache after check):', localCachePath);
-                await mainWindow.loadFile(localCachePath);
+                if (mainWindow && !mainWindow.isDestroyed()) await mainWindow.loadFile(localCachePath);
             } else { 
                 log.warn('[Main Process] Fetching live site failed. Loading from cache or error page.');
                 await loadFromCacheOrErrorPage();
@@ -169,20 +177,29 @@ async function loadInitialContent() {
             log.error('[Main Process] Error fetching live site. Loading from cache or error page:', fetchError.message);
             await loadFromCacheOrErrorPage();
         }
-    } else {
-        log.info('[Main Process] No internet connection detected. Loading from local cache or error page.');
+    } else if (mainWindow && !mainWindow.isDestroyed()) { 
+        log.info('[Main Process] No internet connection detected or mainWindow not ready. Loading from local cache or error page.');
         await loadFromCacheOrErrorPage();
     }
 }
 
 async function loadFromCacheOrErrorPage() {
+    if (!mainWindow || mainWindow.isDestroyed()) {
+        log.warn('[Main Process] Cannot load from cache or error page: mainWindow is not available.');
+        return;
+    }
     try {
         if (fsSync.existsSync(localCachePath)) {
             log.info('[Main Process] Loading from local cache:', localCachePath);
             await mainWindow.loadFile(localCachePath);
         } else {
             log.warn('[Main Process] Local cache not found. Loading default error page.');
-            await mainWindow.loadFile(defaultErrorPagePath);
+            if (fsSync.existsSync(defaultErrorPagePath)) {
+                await mainWindow.loadFile(defaultErrorPagePath);
+            } else {
+                 log.error('[Main Process] CRITICAL: Default error page not found at', defaultErrorPagePath);
+                 mainWindow.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent('<h1>Critical Error</h1><p>Application could not load any content and the default error page was also not found.</p>')}`);
+            }
         }
     } catch (cacheOrErrorPageError) {
         log.error('[Main Process] Error loading from cache or default error page:', cacheOrErrorPageError);
@@ -199,23 +216,27 @@ function setupAutoUpdater(windowInstance) {
     
     ipcMain.on('check-for-updates', () => {
         log.info('[AutoUpdater] Renderer requested update check.');
+        if (!windowInstance || windowInstance.isDestroyed()) return;
         windowInstance.webContents.send('update-status-message', 'Checking for updates...');
         autoUpdater.checkForUpdates();
     });
 
     autoUpdater.on('update-available', (info) => {
         log.info('[AutoUpdater] Update available.', info);
+        if (!windowInstance || windowInstance.isDestroyed()) return;
         windowInstance.webContents.send('update-status-message', `Update available (v${info.version}). Downloading...`);
         autoUpdater.downloadUpdate(); 
     });
 
     autoUpdater.on('update-not-available', (info) => {
         log.info('[AutoUpdater] Update not available.', info);
+        if (!windowInstance || windowInstance.isDestroyed()) return;
         windowInstance.webContents.send('update-status-message', 'You are on the latest version.');
     });
 
     autoUpdater.on('error', (err) => {
         log.error('[AutoUpdater] Error: ' + (err.message || err));
+        if (!windowInstance || windowInstance.isDestroyed()) return;
         windowInstance.webContents.send('update-status-message', `Error checking for updates: ${err.message || 'Unknown error'}`);
     });
 
@@ -224,11 +245,13 @@ function setupAutoUpdater(windowInstance) {
         log_message += ' - Downloaded ' + Math.round(progressObj.percent) + '%';
         log_message += ' (' + Math.round(progressObj.transferred / (1024*1024)) + "MB/" + Math.round(progressObj.total / (1024*1024)) + 'MB)';
         log.info(log_message);
+        if (!windowInstance || windowInstance.isDestroyed()) return;
         windowInstance.webContents.send('update-status-message', `Downloading update: ${Math.round(progressObj.percent)}%`);
     });
 
     autoUpdater.on('update-downloaded', (info) => {
         log.info('[AutoUpdater] Update downloaded.', info);
+        if (!windowInstance || windowInstance.isDestroyed()) return;
         windowInstance.webContents.send('update-status-message', 'Update downloaded. Restart the app to install.');
         dialog.showMessageBox(windowInstance, {
             type: 'info',
@@ -247,8 +270,8 @@ function setupAutoUpdater(windowInstance) {
 async function createWindow() {
  mainWindow = new BrowserWindow({
     width: 1300,
-    height: 720,
-    frame: false, 
+    height: 1300,
+    frame: true, 
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -260,7 +283,6 @@ async function createWindow() {
  await createDefaultErrorPageIfMissing();
  await loadInitialContent();
 
- // Setup auto-updater after the window is created and content is potentially loaded
  setupAutoUpdater(mainWindow);
 
 
@@ -337,8 +359,8 @@ ipcMain.on('process-pasted-path', (event, pastedPath) => {
 });
 
 // Window Controls IPC
-ipcMain.on('minimize-window', () => { if (mainWindow) mainWindow.minimize(); });
-ipcMain.on('close-window', () => { if (mainWindow) mainWindow.close(); });
+ipcMain.on('minimize-window', () => { if (mainWindow && !mainWindow.isDestroyed()) mainWindow.minimize(); });
+ipcMain.on('close-window', () => { if (mainWindow && !mainWindow.isDestroyed()) mainWindow.close(); });
 
 // File Operations IPC Handlers
 ipcMain.handle('save-dialog', async (event, data) => {
