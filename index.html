@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hemo Paths Manager</title>
+    </head>
     <style>
-        /* --- Base Styles --- */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+                /* --- Base Styles --- */
+                * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #0a0a0a, #1a1a2e, #16213e, #0f0f23);
@@ -621,6 +622,13 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
         .fade-in-item { animation: fadeIn 0.25s ease-out forwards; animation-delay: calc(var(--card-index, 0) * 0.04s); opacity: 0; }
 
+        /* Drag over visual feedback */
+        .main-content.dragover {
+             border: 2px dashed #64b5f6 !important; /* Ensure this overrides other borders */
+             background-color: rgba(100, 181, 246, 0.1) !important; /* Light blueish feedback */
+        }
+
+
         @media (max-width: 768px) {
             body { padding: 0; font-size:13px; }
             .main-content { margin-left: 0; margin-right:0; padding:10px; padding-top: calc(10px + 32px); } /* Adjusted for title bar */
@@ -658,13 +666,12 @@
         }
 
     </style>
-</head>
 <body>
     <div class="custom-title-bar">
         <span class="window-app-title">Hemo Paths Manager</span>
         <div class="window-controls">
             <button class="window-btn minimize-btn" onclick="handleMinimizeWindow()" title="Minimize">
-                 <svg viewBox="0 0 10 10"><path d="M0 4h10v2H0z"/></svg>
+                <svg viewBox="0 0 10 10"><path d="M0 4h10v2H0z"/></svg>
             </button>
             <button class="window-btn close-btn" onclick="handleCloseWindow()" title="Close">
                 <svg viewBox="0 0 10 10"><path d="M0 0l10 10M10 0l-10 10" stroke="currentColor" stroke-width="1.5" /></svg>
@@ -864,12 +871,6 @@
 
 
         <div id="aboutPage" class="page">
-             <div class="page-header-container">
-                <div>
-                    <h1 class="page-title">About Hemo Paths Manager</h1>
-                    <p class="page-subtitle">Your ultimate project file organization tool</p>
-                </div>
-            </div>
             <div class="glass-card">
                 <h3>Hemo Paths Manager</h3>
                 <p>Version: 1.7 (UI Refinements & Features)</p>
@@ -886,7 +887,7 @@
                     <li>Modern and attractive user interface with frameless window.</li>
                 </ul>
                 <br>
-                <h4>v 2.0.2 - 202561</h4>
+                <h5>v 2.0.2 - 202562</h5>
             </div>
         </div>
     </main>
@@ -1022,8 +1023,8 @@
         openIntervalInput: document.getElementById('openIntervalInput'),
         saveOpenIntervalBtn: document.getElementById('saveOpenIntervalBtn'),
         clearHistoryBtn: document.getElementById('clearHistoryBtn'),
-        checkForUpdatesBtn: document.getElementById('checkForUpdatesBtn'), // New button
-        updateStatusMessage: document.getElementById('updateStatusMessage') // New status display
+        checkForUpdatesBtn: document.getElementById('checkForUpdatesBtn'), 
+        updateStatusMessage: document.getElementById('updateStatusMessage') 
     };
 
     const STORAGE_ITEMS_KEY = 'projectFileManagerData_v1.7_FinalUI'; 
@@ -1079,6 +1080,7 @@
         DOM.confirmModalNoBtn.onclick = () => { DOM.confirmModal.classList.remove('show'); callback(false); };
     }
     function clearStagedFilesDisplayModal() { stagedFilePaths = []; if(DOM.selectedFilesDisplayModal) DOM.selectedFilesDisplayModal.textContent = ''; }
+    
     function updateStagedPathsModal(paths, entryType, prefix) { 
         if (paths && Array.isArray(paths) && paths.length > 0) {
             stagedFilePaths = paths.map(p => ({ path: p, name: pathModule ? pathModule.basename(p) : p.substring(p.lastIndexOf(/[/\\]/) + 1), entryType }));
@@ -1605,9 +1607,30 @@
     
     function setupIpcListeners() {
         if (!ipcRenderer) {
-            console.warn("[Renderer] ipcRenderer not available.");
-            [DOM.selectFilesButtonModal, DOM.addFolderLinkButtonModal, DOM.importFromFolderButtonModal, DOM.pastePathButtonModal, DOM.addPastedPathButtonModal, DOM.saveProjectAsBtn, DOM.importProjectBtn, DOM.saveActiveProjectBtn].forEach(btn => { if(btn) { btn.disabled = true; btn.title = (btn.title || btn.textContent || btn.id) + ' (Desktop app feature only)'; btn.style.opacity = "0.5"; btn.style.cursor = "not-allowed"; } }); return;
+            console.warn("[Renderer] ipcRenderer not available. File and Electron-specific features will be disabled.");
+            // Disable buttons that rely on Electron IPC
+            const electronOnlyButtons = [
+                DOM.selectFilesButtonModal, DOM.addFolderLinkButtonModal, DOM.importFromFolderButtonModal,
+                // DOM.pastePathButtonModal, // Paste can work via browser API for text
+                // DOM.addPastedPathButtonModal, // Logic inside handles non-ipc path for URLs
+                DOM.saveProjectAsBtn, DOM.importProjectBtn, DOM.saveActiveProjectBtn,
+                DOM.checkForUpdatesBtn
+            ];
+            electronOnlyButtons.forEach(btn => { 
+                if(btn) { 
+                    btn.disabled = true; 
+                    btn.title = (btn.title || btn.textContent || btn.id) + ' (Desktop app feature only)'; 
+                    if (btn.style) { // Ensure style property exists
+                        btn.style.opacity = "0.5"; 
+                        btn.style.cursor = "not-allowed";
+                    }
+                } 
+            });
+            // For paste button, if clipboard API is not available, it might also be limited.
+            // The paste logic itself has fallbacks/checks.
+            return;
         }
+
         ipcRenderer.on('selected-files-for-files', (event, paths) => updateStagedPathsModal(paths, 'file', 'Files ready: '));
         ipcRenderer.on('selected-folder-for-link', (event, paths) => updateStagedPathsModal(paths, 'folderLink', 'Folder links ready: '));
         ipcRenderer.on('selected-folder-for-import', (event, contents) => { if (contents && Array.isArray(contents) && contents.length > 0) { stagedFilePaths = contents.map(item => ({ ...item, entryType: 'file' })); let baseName = "Selected folder"; if (pathModule && contents[0].path) { const parentDir = pathModule.dirname(contents[0].path); baseName = pathModule.basename(parentDir); if (!baseName && parentDir) baseName = parentDir; } if(DOM.selectedFilesDisplayModal) DOM.selectedFilesDisplayModal.textContent = `Files to import from "${baseName}" (${stagedFilePaths.length})`; if(DOM.pathInputModal) DOM.pathInputModal.value = ''; } else if (DOM.pathInputModal && !DOM.pathInputModal.value.trim()) clearStagedFilesDisplayModal(); });
@@ -1636,17 +1659,171 @@
     // --- Add Item Modal Logic ---
     function openAddItemModal() {
         if(DOM.categorySelectInputModal) populateCategoryDropdown(DOM.categorySelectInputModal); 
-        clearStagedFilesDisplayModal(); 
+        // Do not clear stagedFilePaths here if it was populated by drag-drop
+        // clearStagedFilesDisplayModal(); // Only clear if not from drag-drop or if explicitly needed
         if(DOM.projectNameInputModal) DOM.projectNameInputModal.value = ''; 
-        if(DOM.pathInputModal) DOM.pathInputModal.value = ''; 
+        // if(DOM.pathInputModal) DOM.pathInputModal.value = ''; // Also might be populated by paste
         if(DOM.addItemModal) DOM.addItemModal.classList.add('show');
     }
     function closeAddItemModal() {
         if(DOM.addItemModal) DOM.addItemModal.classList.remove('show');
+        clearStagedFilesDisplayModal(); // Clear staged files when modal is closed
+        if(DOM.pathInputModal) DOM.pathInputModal.value = ''; // Clear path input
     }
 
+    // --- Drag and Drop Handlers ---
+    function handleDragOver(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        // Add class for visual feedback if CSS is present
+        // if (DOM.mainContent) DOM.mainContent.classList.add('dragover'); 
+        event.dataTransfer.dropEffect = 'copy';
+    }
+
+    function handleDragLeave(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        // Remove class for visual feedback if CSS is present
+        // if (DOM.mainContent) DOM.mainContent.classList.remove('dragover');
+    }
+
+    async function handleDrop(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        // if (DOM.mainContent) DOM.mainContent.classList.remove('dragover');
+        showAppLoading(true);
+
+        const files = event.dataTransfer.files;
+        const items = event.dataTransfer.items;
+        let hpmtFileToProcess = null; // {fileObject: File, pathForReading: string | null}
+        const otherItemsForModal = []; // {path: string, name: string, entryType: string, fileObject?: File}
+
+        // 1. Process dropped files
+        if (files.length > 0) {
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const filePath = file.path; // Electron-specific, undefined in browser
+
+                if (file.name.toLowerCase().endsWith('.hpmt') && !hpmtFileToProcess) {
+                    hpmtFileToProcess = { fileObject: file, pathForReading: filePath };
+                } else {
+                    let entryType = 'file';
+                    // Basic folder heuristic for Electron (not very reliable without fs.stat)
+                    // A file object for a folder might have an empty type and a path.
+                    if (ipcRenderer && filePath && !file.type && file.size === 0) { // Heuristic
+                         // To be more certain, an IPC call to main process to check fs.stat(filePath).isDirectory() would be needed.
+                         // For now, we'll assume it's a file unless explicitly known otherwise.
+                         // If you have an IPC call like 'check-path-type', you could use it here.
+                         // For this implementation, we'll keep it simple and mostly treat as files.
+                         // If it's a directory, true handling requires listing its contents, which is complex for drag-drop.
+                         // So, we'll add it as a 'folderLink' if it seems like a directory path from Electron.
+                         // This is still a guess.
+                         // entryType = 'folderLink'; // Example if we were more certain
+                    }
+                    otherItemsForModal.push({
+                        path: filePath || file.name,
+                        name: file.name,
+                        entryType: entryType, // Primarily 'file' for now
+                        fileObject: filePath ? null : file // Keep file object for browser reading
+                    });
+                }
+            }
+        }
+
+        // 2. Process .hpmt file if found (takes precedence)
+        if (hpmtFileToProcess) {
+            showAppNotification('Processing .hpmt file...', 'info');
+            const { fileObject, pathForReading } = hpmtFileToProcess;
+
+            if (pathForReading && ipcRenderer) { // Electron: read by path
+                try {
+                    const content = await ipcRenderer.invoke('read-file', pathForReading);
+                    loadProjectData(JSON.parse(content));
+                    activeFilePath = pathForReading;
+                    addToProjectHistory(activeFilePath, pathModule.basename(activeFilePath));
+                    updateActiveProjectInfo();
+                    showAppNotification(`Project "${pathModule.basename(activeFilePath)}" loaded from drop.`, 'success');
+                    showPage('pathsPage');
+                } catch (error) {
+                    showAppNotification(`Error loading .hpmt by path: ${error.message}`, 'error');
+                }
+            } else { // Browser or Electron without path: read File object
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        loadProjectData(JSON.parse(e.target.result));
+                        activeFilePath = fileObject.name; // No full path in browser
+                        addToProjectHistory(activeFilePath); // Add by name
+                        updateActiveProjectInfo();
+                        showAppNotification(`Project "${fileObject.name}" loaded from drop.`, 'success');
+                        showPage('pathsPage');
+                    } catch (error) {
+                        showAppNotification(`Error parsing dropped .hpmt: ${error.message}`, 'error');
+                    }
+                };
+                reader.onerror = () => showAppNotification('Error reading .hpmt file.', 'error');
+                reader.readAsText(fileObject);
+            }
+            showAppLoading(false);
+            return; // HPMT processed
+        }
+
+        // 3. If no .hpmt, process other files and try to get a dragged URL
+        stagedFilePaths = [...otherItemsForModal]; // Initialize with files/folders
+
+        let draggedUrl = null;
+        if (items && items.length > 0) {
+            for (const item of items) {
+                if (item.kind === 'string' && (item.type.includes('text/uri-list'))) {
+                    const urlString = await new Promise(resolve => item.getAsString(s => resolve(s)));
+                    if (urlString) {
+                        const firstUrl = urlString.split(/\r?\n/)[0].trim(); // Get the first URL
+                        if (firstUrl.toLowerCase().startsWith('http://') || firstUrl.toLowerCase().startsWith('https://')) {
+                            draggedUrl = firstUrl;
+                            break; 
+                        }
+                    }
+                }
+            }
+        }
+        if (!draggedUrl) { // Fallback for plain text URLs
+            const plainText = event.dataTransfer.getData('text/plain');
+            if (plainText) {
+                const potentialUrl = plainText.split(/\s/)[0].trim(); // Get first "word"
+                 if (potentialUrl.toLowerCase().startsWith('http://') || potentialUrl.toLowerCase().startsWith('https://')) {
+                    draggedUrl = potentialUrl;
+                }
+            }
+        }
+        
+        if (draggedUrl) {
+            // Avoid adding if it's already represented by a file (e.g., a .url file)
+            if (!stagedFilePaths.some(item => item.path === draggedUrl || item.name === draggedUrl)) {
+                stagedFilePaths.push({ path: draggedUrl, name: draggedUrl, entryType: 'websiteLink' });
+            }
+        }
+
+        // 4. Open modal if there are items to stage
+        if (stagedFilePaths.length > 0) {
+            if(DOM.selectedFilesDisplayModal) {
+                DOM.selectedFilesDisplayModal.textContent = `Dropped: ${stagedFilePaths.map(f => f.name).join(', ')}`;
+            }
+            if(DOM.pathInputModal) DOM.pathInputModal.value = ''; // Clear path input in modal
+            openAddItemModal(); // This will also populate categories
+            if(DOM.projectNameInputModal) DOM.projectNameInputModal.value = ''; // Clear name field
+        } else {
+            showAppNotification('No compatible files or URLs found in drop.', 'info');
+        }
+        showAppLoading(false);
+    }
+
+
     // --- Event Listeners for Modal ---
-    if(DOM.addItemFab) DOM.addItemFab.addEventListener('click', openAddItemModal);
+    if(DOM.addItemFab) DOM.addItemFab.addEventListener('click', () => {
+        clearStagedFilesDisplayModal(); // Clear any previous staged files when opening via FAB
+        if(DOM.pathInputModal) DOM.pathInputModal.value = '';
+        openAddItemModal();
+    });
     if(DOM.closeAddItemModalBtn) DOM.closeAddItemModalBtn.addEventListener('click', closeAddItemModal);
     if(DOM.selectFilesButtonModal) DOM.selectFilesButtonModal.addEventListener('click', () => { if (ipcRenderer) ipcRenderer.send('open-file-dialog-for-files'); else showAppNotification('This feature is available in the desktop app only.', 'warning'); });
     if(DOM.addFolderLinkButtonModal) DOM.addFolderLinkButtonModal.addEventListener('click', () => { if (ipcRenderer) ipcRenderer.send('open-folder-dialog-for-link'); else showAppNotification('This feature is available in the desktop app only.', 'warning'); });
@@ -1719,6 +1896,13 @@
             }
         });
         if(DOM.newManagedCategoryInput) DOM.newManagedCategoryInput.addEventListener('keydown', e => { if (e.key === 'Enter' && DOM.addManagedCategoryBtn) DOM.addManagedCategoryBtn.click(); }); 
+        
+        // Add Drag and Drop listeners to main content area
+        if (DOM.mainContent) {
+            DOM.mainContent.addEventListener('dragover', handleDragOver);
+            DOM.mainContent.addEventListener('dragleave', handleDragLeave);
+            DOM.mainContent.addEventListener('drop', handleDrop); // Use the new handleDrop
+        }
     });
     window.addEventListener('error', e => { console.error('[Renderer] Unhandled Error:', e); showAppNotification('An unexpected error occurred!', 'error'); });
     window.addEventListener('unhandledrejection', event => { console.error('[Renderer] Unhandled Rejection:', event.reason); showAppNotification('An unexpected async error occurred!', 'error'); });
