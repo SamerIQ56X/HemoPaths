@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl"> <!-- تم تغيير اللغة والاتجاه إلى العربية -->
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مدير مسارات هيمو</title> <!-- تم تعريب العنوان -->
+    <title>Hemo Paths Manager</title>
     <style>
-        /* --- الأنماط الأساسية --- */
+        /* --- Base Styles --- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -14,20 +14,20 @@
             line-height: 1.6; font-size: 14px;
         }
 
-        /* --- شريط التمرير المخصص --- */
+        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #0f0f23; border-radius: 12px; }
         ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 12px; border: 2px solid #0f0f23; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.25); }
         html { scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.15) #0f0f23; }
 
-        /* --- شريط العنوان المخصص القابل للسحب --- */
+        /* --- Custom Draggable Title Bar --- */
         .custom-title-bar {
             position: fixed; top: 0; left: 0; width: 100%; height: 32px; 
             background-color: #1c1e2b; 
             -webkit-app-region: drag; 
             z-index: 100000; display: flex; align-items: center;
-            justify-content: space-between; padding: 0 10px 0 0; /* تعديل الحشوة لـ RTL */
+            justify-content: space-between; padding: 0 0 0 10px; 
             user-select: none;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
         }
@@ -36,18 +36,17 @@
             font-size: 0.8rem; 
             font-weight: 400; 
             -webkit-app-region: no-drag;
-            padding-right: 5px; /* تعديل الحشوة لـ RTL */
+            padding-left: 5px;
             line-height: 32px; 
         }
 
-        /* --- أزرار التحكم بالنافذة (نمط ويندوز) --- */
+        /* --- Window Controls (Windows Style) --- */
         .window-controls {
             position: static; -webkit-app-region: no-drag;
             display: flex; height: 100%; 
-            margin-right: auto; /* تعديل الهامش لـ RTL */
-            margin-left: 0;
+            margin-left: auto; 
         }
-        /* html[dir="rtl"] .window-controls { margin-right: auto; margin-left: initial; } /* تم التعليق لأن الاتجاه محدد في html */
+        /* html[dir="rtl"] .window-controls { margin-right: auto; margin-left: initial; } */ /* Kept for LTR */
         
         .window-btn {
             width: 46px; 
@@ -86,24 +85,23 @@
         }
 
 
-        /* --- الشريط الجانبي --- */
+        /* --- Sidebar --- */
         .sidebar {
-            position: fixed; right: 0; top: 32px; /* تعديل لـ RTL */
+            position: fixed; left: 0; top: 32px; 
             width: 250px; height: calc(100vh - 32px); 
             background: rgba(10, 12, 28, 0.88); backdrop-filter: blur(18px); 
-            border-left: 1px solid rgba(255, 255, 255, 0.08); /* تعديل لـ RTL */
-            border-right: none;
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
             padding: 15px; transition: all 0.3s ease; z-index: 9999;
             display: flex; flex-direction: column;
         }
         .sidebar.collapsed { width: 70px; }
-        html[dir="rtl"] .sidebar.collapsed .nav-text,
-        html[dir="rtl"] .sidebar.collapsed .logo h2,
-        html[dir="rtl"] .sidebar.collapsed .logo p { display: none; }
-        html[dir="rtl"] .sidebar:not(.collapsed) .logo,
-        html[dir="rtl"] .sidebar:not(.collapsed) .nav-text { opacity: 1; transition: opacity 0.2s 0.1s ease-in-out; }
-        html[dir="rtl"] .sidebar.collapsed .logo,
-        html[dir="rtl"] .sidebar.collapsed .nav-text { opacity: 0; pointer-events: none; }
+        html[dir="ltr"] .sidebar.collapsed .nav-text,
+        html[dir="ltr"] .sidebar.collapsed .logo h2,
+        html[dir="ltr"] .sidebar.collapsed .logo p { display: none; }
+        html[dir="ltr"] .sidebar:not(.collapsed) .logo,
+        html[dir="ltr"] .sidebar:not(.collapsed) .nav-text { opacity: 1; transition: opacity 0.2s 0.1s ease-in-out; }
+        html[dir="ltr"] .sidebar.collapsed .logo,
+        html[dir="ltr"] .sidebar.collapsed .nav-text { opacity: 0; pointer-events: none; }
 
         .sidebar-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 25px; padding-top: 10px; }
         .logo { opacity: 1; transition: opacity 0.3s ease; }
@@ -133,17 +131,17 @@
             background: linear-gradient(90deg, #1e3a8a, #3b82f6, #6366f1); color: white;
             box-shadow: 0 3px 12px rgba(59, 130, 246, 0.2);
         }
-        .nav-icon { margin-left: 12px; margin-right:0; width: 18px; height: 18px; flex-shrink: 0; } /* تعديل لـ RTL */
+        .nav-icon { margin-right: 12px; width: 18px; height: 18px; flex-shrink: 0; }
         .sidebar.collapsed .nav-link { justify-content: center; }
-        .sidebar.collapsed .nav-icon { margin-left: 0; } /* تعديل لـ RTL */
+        .sidebar.collapsed .nav-icon { margin-right: 0; }
 
-        /* --- منطقة المحتوى الرئيسية --- */
+        /* --- Main Content Area --- */
         .main-content {
-            margin-right: 250px; margin-left:0; padding: 20px; /* تعديل لـ RTL */
-            padding-top: calc(20px + 32px); transition: margin-right 0.3s ease; min-height: 100vh; /* تعديل لـ RTL */
+            margin-left: 250px; padding: 20px;
+            padding-top: calc(20px + 32px); transition: margin-left 0.3s ease; min-height: 100vh;
             overflow-y: auto; height: calc(100vh - 32px);
         }
-        .main-content.expanded { margin-right: 70px; margin-left:0; } /* تعديل لـ RTL */
+        .main-content.expanded { margin-left: 70px; }
         .page { display: none; animation: fadeInContent 0.4s ease-out; }
         .page.active { display: block; }
         @keyframes fadeInContent { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -160,7 +158,7 @@
         }
         .page-header-container .page-subtitle { color: #64b5f6; font-size: 0.9rem; }
 
-        .container { /* لمحتوى مدير المسارات */
+        .container { /* For Path Manager content */
             max-width: 100%; margin: 0 auto; background: rgba(10, 10, 30, 0.45); 
             backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 12px; box-shadow: 0 6px 25px 0 rgba(0, 0, 0, 0.3); overflow: hidden;
@@ -180,7 +178,7 @@
             flex-wrap: wrap; gap: 10px;
         }
         .stats { font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; color: #90a4ae; }
-        .stats svg { margin-left: 8px; margin-right:0; width: 16px; height: 16px; vertical-align: middle; fill: #64b5f6; } /* تعديل لـ RTL */
+        .stats svg { margin-right: 8px; width: 16px; height: 16px; vertical-align: middle; fill: #64b5f6; }
 
         .btn {
             padding: 9px 18px; border: none; border-radius: 8px; font-size: 0.85rem; font-weight: 600;
@@ -223,29 +221,28 @@
         .btn-icon:disabled { color: #5f6770 !important; background-color: transparent !important; cursor: not-allowed;}
         .btn-icon:disabled svg { fill: #5f6770 !important; }
 
-        /* تم إزالة زر الإضافة العائم */
-        /* .add-item-fab { ... } */
+        /* add-item-fab removed */
 
-        /* قسم إضافة العناصر المدمج (سابقًا كان مودال) */
+        /* Integrated Add Item Section Styles */
         .integrated-add-item-section {
             padding: 20px;
-            background: rgba(15, 15, 35, 0.6); /* خلفية أغمق قليلاً للتمييز */
+            background: rgba(15, 15, 35, 0.6); 
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             margin-bottom: 20px;
-            border-radius: 0 0 12px 12px; /* تدوير الزوايا السفلية إذا كان تحت الهيدر مباشرة */
+            border-radius: 0 0 12px 12px; 
         }
-        .integrated-add-item-section h2 { /* يمكن إزالة هذا إذا لم يعد هناك عنوان رئيسي للقسم */
+        .integrated-add-item-section h2 { 
             text-align: center; font-size: 1.5rem; font-weight: 600; margin-bottom: 18px;
             color: #b0bec5;
         }
         .integrated-add-item-section .input-group { display: flex; flex-direction: column; gap: 15px; } 
         .integrated-add-item-section .input-row { display: flex; gap: 12px; flex-wrap: wrap; }
-        .integrated-add-item-section .add-item-actions { /* لتوسيط زر الإضافة الرئيسي */
+        .integrated-add-item-section .add-item-actions { 
             text-align: center; margin-top:15px;
         }
 
 
-        #selectedFilesDisplay { margin-top: 10px; font-size: 0.75rem; color: #90a4ae; max-height: 50px; overflow-y: auto;} /* اسم جديد لعرض الملفات المختارة */
+        #selectedFilesDisplay { margin-top: 10px; font-size: 0.75rem; color: #90a4ae; max-height: 50px; overflow-y: auto;}
         #itemsDisplayArea { padding: 18px; }
 
         .category-section {
@@ -264,32 +261,33 @@
         .category-header:hover .category-title { color: #64b5f6; } 
         .category-title-container { display: flex; align-items: center; gap: 10px; flex-grow: 1; }
         .category-toggle-icon svg { width: 11px; height: 11px; fill: #90a4ae; transition: transform 0.25s ease-in-out; }
-        html[dir="rtl"] .category-section:not(.collapsed) .category-toggle-icon svg { transform: rotate(-90deg); } /* تعديل لـ RTL */
         html[dir="ltr"] .category-section:not(.collapsed) .category-toggle-icon svg { transform: rotate(90deg); }
+        html[dir="rtl"] .category-section:not(.collapsed) .category-toggle-icon svg { transform: rotate(-90deg); }
 
-        .category-title { font-size: 1.1rem; font-weight: 600; color: white; text-transform: capitalize; margin-left: 5px; } /* هامش لـ RTL */
-        .category-name-input { /* حقل إدخال لتعديل اسم القسم */
+        .category-title { font-size: 1.1rem; font-weight: 600; color: white; text-transform: capitalize; margin-right: 5px; } 
+        .category-name-input { 
             font-size: 1.1rem; font-weight: 600; color: white;
             background-color: rgba(255,255,255,0.1); border: 1px solid #64b5f6;
-            border-radius: 5px; padding: 3px 8px; flex-grow:1; margin-left: 5px;
+            border-radius: 5px; padding: 3px 8px; flex-grow:1; margin-right: 5px;
         }
 
         .category-item-count {
             background: rgba(255, 255, 255, 0.08); color: #64b5f6; padding: 2px 9px;
-            border-radius: 18px; font-size: 0.7rem; margin-right: 8px; /* تعديل لـ RTL */
+            border-radius: 18px; font-size: 0.7rem; margin-left: 8px; 
         }
          
-        .category-header-controls { display: flex; align-items: center; gap: 5px; } /* حاوية جديدة لأزرار التحكم بالقسم */
+        .category-header-controls { display: flex; align-items: center; gap: 5px; } 
         .category-header-controls .btn-icon { padding: 5px; }
         .category-header-controls .btn-icon svg { width: 14px; height: 14px; }
         .category-header-controls .btn-open-all-in-category { padding: 5px 10px; font-size: 0.7rem; }
         .category-header-controls .btn-open-all-in-category svg { width: 12px; height: 12px;}
-        .category-on-off-toggle { /* زر التشغيل/الإيقاف */
+        .category-on-off-toggle { 
             padding: 4px 8px; font-size: 0.7rem; border-radius: 5px;
             cursor: pointer; transition: background-color 0.2s, color 0.2s;
+            border: 1px solid rgba(255,255,255,0.2); /* Added a subtle border */
         }
-        .category-on-off-toggle.on { background-color: #4caf50; color: white; }
-        .category-on-off-toggle.off { background-color: #555; color: #ccc; }
+        .category-on-off-toggle.on { background-color: #4caf50; color: white; border-color: #4caf50;}
+        .category-on-off-toggle.off { background-color: #555; color: #ccc; border-color: #555;}
 
 
         .items-grid {
@@ -328,7 +326,8 @@
         .item-card-date { font-size: 0.65rem; color: #78828c; }
         .item-card-actions-trigger { -webkit-app-region: no-drag; }
         .item-card-actions-trigger svg { width: 16px; height: 16px; }
-        .item-card-direct-open { -webkit-app-region: no-drag; margin-right: 8px; margin-left:0; flex-shrink: 0; } /* تعديل لـ RTL */
+        .item-card-direct-open { -webkit-app-region: no-drag; margin-left: 8px; flex-shrink: 0; }
+        /* html[dir="rtl"] .item-card-direct-open { margin-right: 8px; margin-left: 0; } */
 
 
         .item-actions-menu {
@@ -338,16 +337,16 @@
             z-index: 500; min-width: 190px; overflow: hidden; padding: 6px; 
         }
         .item-actions-menu.show { display: block; animation: fadeIn 0.15s ease-out; }
-        html[dir="rtl"] .item-actions-menu { right: 8px; left:auto; } 
         html[dir="ltr"] .item-actions-menu { left: 8px; right:auto; } 
+        html[dir="rtl"] .item-actions-menu { right: 8px; left:auto; } 
         .item-actions-menu button {
             display: flex; align-items: center; gap: 8px; width: 100%; padding: 9px 12px;
             background: none; border: none; cursor: pointer; font-size: 0.8rem;
-            color: #b0bec5; transition: all 0.15s ease; text-align: right; /* تعديل لـ RTL */
+            color: #b0bec5; transition: all 0.15s ease; text-align: left; 
             border-radius: 6px; margin: 0; 
         }
         /* html[dir="rtl"] .item-actions-menu button { text-align: right; } */
-        .item-actions-menu button svg { width: 14px; height: 14px; fill: currentColor; margin-left: 8px; margin-right:0; } /* تعديل لـ RTL */
+        .item-actions-menu button svg { width: 14px; height: 14px; fill: currentColor; margin-right: 8px; margin-left:0; } 
         /* html[dir="rtl"] .item-actions-menu button svg { margin-left: 8px; margin-right: 0; } */
         .item-actions-menu button:hover { background-color: rgba(33, 150, 243, 0.18); color: #64b5f6; }
         .item-actions-menu button:hover svg { fill: #64b5f6; }
@@ -359,30 +358,30 @@
         .empty-placeholder h3 { font-size: 1.3rem; margin-bottom: 7px; color: white;}
         .empty-placeholder p { font-size: 0.95rem; }
 
-        /* أنماط إشعار التوست في الأسفل والوسط */
+        /* Styles for bottom-center notification toast */
         .notification-toast {
             position: fixed;
-            bottom: 60px; /* مسافة أعلى شريط التقدم */
+            bottom: 60px; /* Adjusted to be above progress bar */
             left: 50%;
-            transform: translateX(-50%) translateY(20px); /* يبدأ من الأسفل قليلاً */
-            background-color: rgba(20, 20, 40, 0.92);
-            backdrop-filter: blur(12px);
+            transform: translateX(-50%) translateY(20px); /* Initial position for animation */
+            background-color: rgba(20, 20, 40, 0.92); /* Darker, more saturated */
+            backdrop-filter: blur(12px); /* Stronger blur */
             color: white;
             padding: 12px 20px;
-            border-radius: 8px;
-            box-shadow: 0 6px 25px rgba(0,0,0,0.35);
-            z-index: 100002; 
+            border-radius: 8px; /* Slightly less rounded */
+            box-shadow: 0 6px 25px rgba(0,0,0,0.35); /* More pronounced shadow */
+            z-index: 100002; /* Ensure it's above progress bar */
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.25s ease-out, transform 0.25s ease-out, visibility 0s 0.25s linear;
             max-width: 380px;
             font-size: 0.88rem;
-            border-top: 3px solid transparent; /* تم تغيير الاتجاه إلى الأعلى */
+            border-top: 3px solid transparent; /* Changed from left to top */
         }
         .notification-toast.show {
             opacity: 1;
             visibility: visible;
-            transform: translateX(-50%) translateY(0);
+            transform: translateX(-50%) translateY(0); /* Final position */
             transition-delay: 0s;
         }
         .notification-toast.success { border-top-color: #4caf50; } 
@@ -471,7 +470,7 @@
         #addManagedCategoryBtn { flex-shrink: 0; }
         .category-manager-actions { text-align: center; margin-top:25px;}
 
-        /* --- أنماط خاصة بقائمة المهام --- */
+        /* --- To-Do List Specific Styles --- */
         .todo-input-container { display: flex; gap: 10px; margin-bottom: 18px; }
         .todo-input { flex: 1; }
         #todosContainer { display: flex; flex-direction: column; gap: 8px; }
@@ -482,8 +481,8 @@
             transition: all 0.25s ease;
         }
         .todo-item:hover { background: rgba(255, 255, 255, 0.08); }
-        .todo-item.completed { background: rgba(76, 175, 80, 0.08); border-right-color: #4caf50; border-left: 1px solid rgba(255,255,255,0.08); } /* تعديل لـ RTL */
-        /* html[dir="rtl"] .todo-item.completed { border-right-color: #4caf50; border-left-color: rgba(255,255,255,0.08); } */
+        .todo-item.completed { background: rgba(76, 175, 80, 0.08); border-left-color: #4caf50; }
+        html[dir="rtl"] .todo-item.completed { border-right-color: #4caf50; border-left-color: rgba(255,255,255,0.08); }
         .todo-item-left { display: flex; align-items: center; gap: 8px; flex-grow: 1; }
         .todo-checkbox {
             width: 18px; height: 18px; border: 1.5px solid #64b5f6; border-radius: 5px;
@@ -500,13 +499,13 @@
             border-radius: 4px; padding: 4px 8px; font-size: 0.9rem;
         }
 
-        .todo-date { font-size: 0.7rem; color: #90a4ae; margin-right: auto; padding-right: 8px; flex-shrink: 0;} /* تعديل لـ RTL */
-        /* html[dir="rtl"] .todo-date { margin-right: auto; padding-right: 8px; margin-left:0; padding-left:0;} */
+        .todo-date { font-size: 0.7rem; color: #90a4ae; margin-left: auto; padding-left: 8px; flex-shrink: 0;}
+        html[dir="rtl"] .todo-date { margin-right: auto; padding-right: 8px; margin-left:0; padding-left:0;}
         .todo-item-actions { display:flex; gap: 6px; } 
         .todo-item .btn-icon { padding: 5px; } 
         .todo-item .btn-icon svg { width: 13px; height: 13px; }
 
-        /* أنماط خاصة بصفحة الخيارات */
+        /* Options Page Specific Styles */
         #optionsPage .glass-card { padding: 25px; }
         #optionsPage .options-group {
             margin-bottom: 30px; 
@@ -528,7 +527,7 @@
         }
         #optionsPage .options-group .btn { margin-top: 8px;} 
         #optionsPage .input-row { margin-bottom: 12px;} 
-        #optionsPage .input-row label { font-size: 0.85rem; color: #b0bec5; margin-left: 10px; margin-right:0; min-width: 120px; } /* تعديل لـ RTL */
+        #optionsPage .input-row label { font-size: 0.85rem; color: #b0bec5; margin-right: 10px; min-width: 120px; }
 
 
         #extensionMappingsContainer { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; max-height: 220px; overflow-y: auto; padding:10px; background: rgba(0,0,0,0.1); border-radius: 6px;}
@@ -543,7 +542,7 @@
         .extension-mapping-item .btn-icon svg { width: 12px; height: 12px; fill: #ff8a80; }
         .extension-mapping-item .btn-icon:hover svg { fill: #ff5252; }
 
-        /* صفحة عمليات الملفات: قائمة السجل */
+        /* File Operations Page: History List */
         #projectHistoryContainer .extension-mapping-item { 
             cursor: pointer;
         }
@@ -567,7 +566,7 @@
         }
 
 
-        /* توسيط صفحة "حول" */
+        /* About Page Centering */
         #aboutPage .glass-card {
             max-width: 700px; 
             margin-left: auto;
@@ -584,10 +583,10 @@
         #aboutPage h4 {
             font-size: 1.1rem; color: #81c784; margin-top: 20px; margin-bottom: 10px;
         }
-        #aboutPage ul { list-style-position: inside; padding-right: 0; padding-left:initial; text-align: right; max-width: 400px; margin: 0 auto;} /* تعديل لـ RTL */
+        #aboutPage ul { list-style-position: inside; padding-left: 0; text-align: left; max-width: 400px; margin: 0 auto;}
         #aboutPage li { margin-bottom: 8px; color: #b0bec5;}
 
-        /* أنماط شريط تقدم التحميل */
+        /* Download Progress Bar Styles */
         .download-progress-bar-container {
             position: fixed;
             bottom: 0;
@@ -628,10 +627,10 @@
 
         @media (max-width: 768px) {
             body { padding: 0; font-size:13px; }
-            .main-content { margin-right: 0; margin-left:0; padding:10px; padding-top: calc(10px + 32px); } /* تعديل لـ RTL */
-            .main-content.expanded { margin-right: 0; margin-left:0; } 
-            .sidebar { transform: translateX(100%); box-shadow: -3px 0 12px rgba(0,0,0,0.15); top: 32px; height: calc(100vh - 32px);} /* تعديل لـ RTL */
-            /* html[dir="rtl"] .sidebar { transform: translateX(100%); box-shadow: -3px 0 12px rgba(0,0,0,0.15); } */
+            .main-content { margin-left: 0; margin-right:0; padding:10px; padding-top: calc(10px + 32px); } /* Adjusted for title bar */
+            .main-content.expanded { margin-left: 0; margin-right:0; } 
+            .sidebar { transform: translateX(-100%); box-shadow: 3px 0 12px rgba(0,0,0,0.15); top: 32px; height: calc(100vh - 32px);} 
+            html[dir="rtl"] .sidebar { transform: translateX(100%); box-shadow: -3px 0 12px rgba(0,0,0,0.15); }
             .sidebar.show { transform: translateX(0); }
             .container { margin: 8px; width:auto; }
             .header { padding: 18px 12px; } .header h1 { font-size: 1.7rem; }
@@ -654,46 +653,42 @@
             .download-progress-bar-text { font-size: 0.7rem; }
         }
         @media (max-width: 480px) {
-            .custom-title-bar { height: 30px; padding: 0 8px 0 6px; } 
+            .custom-title-bar { height: 30px; padding: 0 6px 0 8px; } 
             .sidebar { top: 30px; height: calc(100vh - 30px); }
             .main-content { padding-top: calc(10px + 30px); height: calc(100vh - 30px); }
             .header h1 { font-size: 1.5rem; } .header p { font-size: 0.8rem; }
             .btn { font-size: 0.8rem; padding: 8px 14px; } .btn-primary { padding: 9px 18px; }
             .category-title { font-size: 1rem; }
             .category-item-count { font-size: 0.65rem; padding: 2px 7px;}
-            .category-header-controls .btn-open-all-in-category { font-size: 0.7rem; padding: 5px 9px;}
+            .category-controls .btn-open-all-in-category { font-size: 0.7rem; padding: 5px 9px;}
             .category-manager-content h2 { font-size: 1.4rem; }
             .sidebar.collapsed { width: 55px; } 
-            .main-content.expanded { margin-right: 55px; margin-left:0;} /* تعديل لـ RTL */
-            /* html[dir="rtl"] .main-content.expanded { margin-right: 55px; } */
+            .main-content.expanded { margin-left: 55px; } 
+            html[dir="rtl"] .main-content.expanded { margin-right: 55px; }
             #optionsPage .options-group h3 { font-size: 1.1rem; }
         }
 
     </style>
-</head>
 <body>
-    <!-- ... (محتوى body و script سيبقى كما هو في الرد السابق مع تعديلات طفيفة) ... -->
-    <!-- شريط العنوان المخصص -->
     <div class="custom-title-bar">
-        <span class="window-app-title">مدير مسارات هيمو</span>
+        <span class="window-app-title">Hemo Paths Manager</span>
         <div class="window-controls">
-            <button class="window-btn minimize-btn" onclick="handleMinimizeWindow()" title="تصغير">
+            <button class="window-btn minimize-btn" onclick="handleMinimizeWindow()" title="Minimize">
                 <svg viewBox="0 0 10 10"><path d="M0 4h10v2H0z"/></svg>
             </button>
-            <button class="window-btn close-btn" onclick="handleCloseWindow()" title="إغلاق">
+            <button class="window-btn close-btn" onclick="handleCloseWindow()" title="Close">
                 <svg viewBox="0 0 10 10"><path d="M0 0l10 10M10 0l-10 10" stroke="currentColor" stroke-width="1.5" /></svg>
             </button>
         </div>
     </div>
 
-    <!-- الشريط الجانبي -->
     <nav class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="logo">
-                <h2>مسارات هيمو</h2>
-                <p>المدير</p>
+                <h2>Hemo Paths</h2>
+                <p>Manager</p>
             </div>
-            <button class="menu-toggle" onclick="toggleSidebar()" title="تبديل القائمة">
+            <button class="menu-toggle" onclick="toggleSidebar()" title="Toggle Menu">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
                 </svg>
@@ -704,90 +699,87 @@
             <li class="nav-item">
                 <a href="#" class="nav-link active" onclick="showPage('pathsPage')">
                     <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><use xlink:href="#icon-folder"></use></svg>
-                    <span class="nav-text">مدير المسارات</span>
+                    <span class="nav-text">Path Manager</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a href="#" class="nav-link" onclick="showPage('todosPage')">
-                    <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><use xlink:href="#icon-check"></use></svg> <span class="nav-text">قائمة المهام</span>
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><use xlink:href="#icon-check"></use></svg> <span class="nav-text">To-Do List</span>
                 </a>
             </li>
              <li class="nav-item"> 
                 <a href="#" class="nav-link" onclick="showPage('fileOperationsPage')">
-                     <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><use xlink:href="#icon-save"></use></svg> <span class="nav-text">ملف</span>
+                     <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><use xlink:href="#icon-save"></use></svg> <span class="nav-text">File</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a href="#" class="nav-link" onclick="showPage('optionsPage')"> 
-                    <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"> <use xlink:href="#icon-settings-alt"></use></svg> <span class="nav-text">الخيارات</span>
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"> <use xlink:href="#icon-settings-alt"></use></svg> <span class="nav-text">Options</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a href="#" class="nav-link" onclick="showPage('aboutPage')">
                     <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"> <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/> </svg>
-                    <span class="nav-text">حول</span>
+                    <span class="nav-text">About</span>
                 </a>
             </li>
         </ul>
     </nav>
 
-    <!-- المحتوى الرئيسي -->
     <main class="main-content" id="mainContent">
-        <!-- تم إزالة الزر العائم -->
         <!-- <button class="add-item-fab" id="addItemFab" title="Add New Item">
             <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>
         </button> -->
 
         <div id="pathsPage" class="page active">
-            <!-- قسم إضافة العناصر المدمج -->
             <div class="integrated-add-item-section">
-                <h2>إضافة عنصر جديد</h2> <!-- يمكن تعديل هذا العنوان أو إزالته -->
+                <h2>Add New Item</h2> 
                 <div class="input-group">
                     <div class="input-row">
                         <button id="integratedSelectFilesButton" class="btn btn-secondary">
-                            <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>إضافة ملفات
+                            <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>Add Files
                         </button>
                         <button id="integratedAddFolderLinkButton" class="btn btn-secondary">
-                            <svg viewBox="0 0 24 24"><use xlink:href="#icon-folder"></use></svg>إضافة رابط مجلد
+                            <svg viewBox="0 0 24 24"><use xlink:href="#icon-folder"></use></svg>Add Folder Link
                         </button>
                         <button id="integratedImportFromFolderButton" class="btn btn-secondary">
-                            <svg viewBox="0 0 24 24"><use xlink:href="#icon-folder"></use></svg>استيراد من مجلد
+                            <svg viewBox="0 0 24 24"><use xlink:href="#icon-folder"></use></svg>Import From Folder
                         </button>
                     </div>
                     <div class="input-row paste-path-group">
-                        <input type="text" id="integratedPathInput" class="input-field" placeholder="أو الصق مسار ملف/مجلد/موقع هنا">
+                        <input type="text" id="integratedPathInput" class="input-field" placeholder="Or paste a file/folder/website path here">
                         <button id="integratedPastePathButton" class="btn btn-secondary" style="flex-shrink: 0;">
-                            <svg viewBox="0 0 24 24"><use xlink:href="#icon-paste"></use></svg>لصق
+                            <svg viewBox="0 0 24 24"><use xlink:href="#icon-paste"></use></svg>Paste
                         </button>
                         <button id="integratedAddPastedPathButton" class="btn btn-primary" style="flex-shrink: 0;">
-                            <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>إضافة مسار
+                            <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>Add Path
                         </button>
                     </div>
                     <div class="input-row">
-                        <input type="text" id="integratedProjectNameInput" class="input-field" placeholder="اسم وصفي للعنصر (اختياري)">
+                        <input type="text" id="integratedProjectNameInput" class="input-field" placeholder="Descriptive name for the item(s) (optional)">
                         <select id="integratedCategorySelectInput" class="input-field"></select>
                     </div>
-                    <div id="integratedSelectedFilesDisplay"></div> <!-- لعرض الملفات المختارة هنا -->
+                    <div id="integratedSelectedFilesDisplay"></div> 
                 </div>
-                <div class="add-item-actions"> <!-- تم تغيير الاسم ليكون أكثر تحديدًا -->
+                <div class="add-item-actions"> 
                     <button id="integratedAddItemsButton" class="btn btn-success">
-                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>إضافة إلى القائمة
+                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>Add to List
                     </button>
                 </div>
             </div>
 
             <div class="container">
                 <div class="header">
-                    <h1>مدير ملفات المشروع</h1> <p>نظم وأدر ملفات مشروعك بكفاءة</p> </div>
+                    <h1>Project File Manager</h1> <p>Efficiently organize and manage your project files</p> </div>
 
                 <div class="top-actions-bar">
                     <div class="stats">
                         <svg viewBox="0 0 24 24"><use xlink:href="#icon-folder"></use></svg>
-                        إجمالي العناصر: <span id="fileCount">0</span> </div>
+                        Total Items: <span id="fileCount">0</span> </div>
                     <div>
                         <button id="openAllBtn" class="btn btn-primary">
                             <svg viewBox="0 0 24 24"><use xlink:href="#icon-rocket"></use></svg>
-                            فتح الكل </button>
+                            Open All </button>
                         </div>
                 </div>
                 <div id="itemsDisplayArea"></div>
@@ -797,18 +789,18 @@
         <div id="todosPage" class="page">
             <div class="page-header-container">
                 <div>
-                    <h1 class="page-title">قائمة المهام</h1>
-                    <p class="page-subtitle">تتبع مهامك ومشاريعك</p>
+                    <h1 class="page-title">To-Do List</h1>
+                    <p class="page-subtitle">Keep track of your tasks and projects</p>
                 </div>
             </div>
             <div class="glass-card">
                 <div class="todo-input-container">
-                    <input type="text" id="todoInput" class="input-field todo-input" placeholder="أضف مهمة جديدة...">
+                    <input type="text" id="todoInput" class="input-field todo-input" placeholder="Add a new task...">
                     <button id="addTodoBtn" class="btn btn-primary">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="margin-left: 8px; margin-right:0;"> <!-- تعديل لـ RTL -->
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;"> 
                             <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
                         </svg>
-                        إضافة مهمة
+                        Add Task
                     </button>
                 </div>
                 <div id="todosContainer"></div>
@@ -818,34 +810,34 @@
         <div id="fileOperationsPage" class="page">
             <div class="page-header-container">
                 <div>
-                    <h1 class="page-title">عمليات الملفات</h1>
-                    <p class="page-subtitle">إدارة ملفات بيانات مشروعك</p>
+                    <h1 class="page-title">File Operations</h1>
+                    <p class="page-subtitle">Manage your project data files</p>
                 </div>
             </div>
             <div class="glass-card">
                 <div class="options-group">
-                    <h3>ملف المشروع</h3>
-                    <p>احفظ جميع المسارات والفئات والمهام الحالية في ملف، أو قم بتحميلها من ملف محفوظ مسبقًا.</p>
+                    <h3>Project File</h3>
+                    <p>Save all current paths, categories, and tasks to a file, or load them from a previously saved file.</p>
                     <div style="display: flex; gap: 10px; margin-top:10px; flex-wrap:wrap;">
                         <button id="saveProjectAsBtn" class="btn btn-primary">
-                            <svg viewBox="0 0 24 24"><use xlink:href="#icon-save"></use></svg> حفظ المشروع باسم...
+                            <svg viewBox="0 0 24 24"><use xlink:href="#icon-save"></use></svg> Save Project As...
                         </button>
                         <button id="importProjectBtn" class="btn btn-secondary">
-                            <svg viewBox="0 0 24 24"><use xlink:href="#icon-open"></use></svg> استيراد مشروع...
+                            <svg viewBox="0 0 24 24"><use xlink:href="#icon-open"></use></svg> Import Project...
                         </button>
-                         <button id="saveActiveProjectBtn" class="btn btn-success" disabled> <svg viewBox="0 0 24 24"><use xlink:href="#icon-save"></use></svg> حفظ المشروع الحالي
+                         <button id="saveActiveProjectBtn" class="btn btn-success" disabled> <svg viewBox="0 0 24 24"><use xlink:href="#icon-save"></use></svg> Save Current Project
                         </button>
                     </div>
-                     <p id="activeProjectInfo" style="font-size: 0.8rem; color: #90a4ae; margin-top: 10px;">لا يوجد ملف مشروع نشط.</p>
+                     <p id="activeProjectInfo" style="font-size: 0.8rem; color: #90a4ae; margin-top: 10px;">No active project file.</p>
                 </div>
                 <div class="options-group">
                     <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 5px;">
-                        <h3>السجل</h3>
-                        <button id="clearHistoryBtn" class="btn btn-danger btn-icon" title="مسح السجل">
+                        <h3>History</h3>
+                        <button id="clearHistoryBtn" class="btn btn-danger btn-icon" title="Clear History">
                              <svg viewBox="0 0 24 24"><use xlink:href="#icon-clear-all"></use></svg>
                         </button>
                     </div>
-                    <p>ملفات المشاريع المفتوحة أو المحفوظة مؤخرًا.</p>
+                    <p>Recently opened or saved project files.</p>
                     <div id="projectHistoryContainer" style="max-height: 200px; overflow-y: auto; padding: 5px; background: rgba(255,255,255,0.03); border-radius: 6px;">
                         </div>
                 </div>
@@ -856,63 +848,62 @@
         <div id="optionsPage" class="page">
             <div class="page-header-container">
                 <div>
-                    <h1 class="page-title">الخيارات</h1>
-                    <p class="page-subtitle">تكوين إعدادات وتفضيلات التطبيق</p>
+                    <h1 class="page-title">Options</h1>
+                    <p class="page-subtitle">Configure application settings and preferences</p>
                 </div>
             </div>
             <div class="glass-card">
                 <div class="options-group">
-                    <h3>إدارة الفئات</h3>
-                    <p>نظم كيفية تجميع العناصر الخاصة بك.</p>
+                    <h3>Category Management</h3>
+                    <p>Organize how your items are grouped.</p>
                     <button id="manageCategoriesBtn" class="btn btn-secondary">
-                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-settings-alt"></use></svg> إدارة الفئات
+                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-settings-alt"></use></svg> Manage Categories
                     </button>
                 </div>
 
                 <div class="options-group">
-                    <h3>ربط امتدادات الملفات</h3>
-                    <p>قم بتعيين فئات تلقائيًا بناءً على امتدادات الملفات.</p>
+                    <h3>File Extension Mappings</h3>
+                    <p>Automatically assign categories based on file extensions.</p>
                     <div class="input-row" style="margin-bottom: 10px;">
-                        <input type="text" id="newExtensionInput" class="input-field" placeholder=".example (مثال: .txt, .doc)">
-                        <input type="text" id="newExtensionCategoryNameInput" class="input-field" placeholder="اسم عرض الفئة (مثال: ملفات نصية)">
+                        <input type="text" id="newExtensionInput" class="input-field" placeholder=".example (e.g., .txt, .doc)">
+                        <input type="text" id="newExtensionCategoryNameInput" class="input-field" placeholder="Category Display Name (e.g., Text Files)">
                     </div>
                     <button id="addExtensionMappingBtn" class="btn btn-success">
                         <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>
-                        إضافة ربط امتداد
+                        Add Extension Mapping
                     </button>
                     <div id="extensionMappingsContainer" style="margin-top: 15px;"></div>
                 </div>
 
                 <div class="options-group">
-                    <h3>فاصل زمني لفتح عناصر متعددة</h3>
-                    <p>اضبط التأخير (بالثواني) بين فتح كل عنصر عند استخدام "فتح الكل" أو "فتح الكل في الفئة".</p>
+                    <h3>Open Multiple Items Interval</h3>
+                    <p>Set the delay (in seconds) between opening each item when using "Open All" or "Open All in Category".</p>
                      <div class="input-row" style="max-width: 300px;">
-                        <label for="openIntervalInput" style="white-space: nowrap; align-self: center;">الفاصل الزمني (ثواني):</label>
+                        <label for="openIntervalInput" style="white-space: nowrap; align-self: center;">Interval (seconds):</label>
                         <input type="number" id="openIntervalInput" class="input-field" value="0.3" min="0.05" step="0.05">
                     </div>
                     <button id="saveOpenIntervalBtn" class="btn btn-success" style="margin-top:10px;">
-                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-save"></use></svg> حفظ الفاصل
+                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-save"></use></svg> Save Interval
                     </button>
                 </div>
 
                 <div class="options-group">
-                    <h3>تحديثات التطبيق</h3>
-                    <p>تحقق من أحدث إصدار لـ مدير مسارات هيمو.</p>
+                    <h3>Application Updates</h3>
+                    <p>Check for the latest version of Hemo Paths Manager.</p>
                     <button id="checkForUpdatesBtn" class="btn btn-secondary">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-left:8px; margin-right:0;"><path d="M12 2.5c-5.25 0-9.5 4.25-9.5 9.5s4.25 9.5 9.5 9.5 9.5-4.25 9.5-9.5S17.25 2.5 12 2.5zm0 2c4.14 0 7.5 3.36 7.5 7.5s-3.36 7.5-7.5 7.5-7.5-3.36-7.5-7.5S7.86 4.5 12 4.5zm-1 11.5h2v2h-2v-2zm0-8h2v6h-2V8z"/></svg>
-                        التحقق من وجود تحديثات
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right:8px;"><path d="M12 2.5c-5.25 0-9.5 4.25-9.5 9.5s4.25 9.5 9.5 9.5 9.5-4.25 9.5-9.5S17.25 2.5 12 2.5zm0 2c4.14 0 7.5 3.36 7.5 7.5s-3.36 7.5-7.5 7.5-7.5-3.36-7.5-7.5S7.86 4.5 12 4.5zm-1 11.5h2v2h-2v-2zm0-8h2v6h-2V8z"/></svg>
+                        Check for Updates
                     </button>
                     <p id="updateStatusMessage" style="font-size: 0.8rem; color: #90a4ae; margin-top: 10px;"></p>
-                    <!-- حاوية لأزرار إعادة التشغيل الآن / لاحقًا -->
                     <div id="updateActionButtonsContainer" style="margin-top: 10px;"></div>
                 </div>
 
 
                 <div class="options-group">
-                    <h3>إدارة البيانات</h3>
-                     <p>إدارة جميع بيانات التطبيق المخزنة.</p>
+                    <h3>Data Management</h3>
+                     <p>Manage all stored application data.</p>
                     <button id="clearAllDataBtnOptionsPage" class="btn btn-danger"> <svg viewBox="0 0 24 24"><use xlink:href="#icon-clear-all"></use></svg>
-                        مسح جميع بيانات التطبيق
+                        Clear All Application Data
                     </button>
                 </div>
             </div>
@@ -922,30 +913,29 @@
         <div id="aboutPage" class="page">
              <div class="page-header-container">
                 <div>
-                    <h1 class="page-title">حول مدير مسارات هيمو</h1>
-                    <p class="page-subtitle">أداتك المثلى لتنظيم ملفات المشاريع</p>
+                    <h1 class="page-title">About Hemo Paths Manager</h1>
+                    <p class="page-subtitle">Your ultimate project file organization tool</p>
                 </div>
             </div>
             <div class="glass-card">
-                <h3>مدير مسارات هيمو</h3>
-                <p>الإصدار: <span id="appVersionDisplay">جاري التحميل...</span></p>
-                <p>تم تطويره لتبسيط إدارة مسارات ملفات مشاريعك، روابط المواقع، والمهام.</p>
+                <h3>Hemo Paths Manager</h3>
+                <p>Version: <span id="appVersionDisplay">Loading...</span></p>
+                <p>Developed to streamline the management of your project file paths, website links, and tasks.</p>
                 <br>
-                <h4>الميزات الرئيسية:</h4>
+                <h4>Key Features:</h4>
                 <ul>
-                    <li>إضافة وتصنيف مسارات الملفات، روابط المجلدات، وعناوين URL للمواقع بسهولة عبر نافذة منبثقة موحدة.</li>
-                    <li>فتح الملفات والمجلدات والمواقع مباشرة من التطبيق.</li>
-                    <li>إدارة الفئات المخصصة وربط امتدادات الملفات لتنظيم أفضل.</li>
-                    <li>قائمة مهام مدمجة مع وظيفة التعديل لتتبع مهامك.</li>
-                    <li>حفظ وتحميل إعدادات المشروع بالكامل كملفات `.hpmt`.</li>
-                    <li>سجل لملفات المشاريع المستخدمة مؤخرًا.</li>
-                    <li>واجهة مستخدم عصرية وجذابة مع نافذة بدون إطار.</li>
+                    <li>Easily add and categorize file paths, folder links, and website URLs via a unified popup.</li>
+                    <li>Directly open files, folders, and websites from the application.</li>
+                    <li>Manage custom categories and file extension mappings for better organization.</li>
+                    <li>Integrated To-Do list with edit functionality to track your tasks.</li>
+                    <li>Save and load entire project setups as `.hpmt` files.</li>
+                    <li>History of recently used project files.</li>
+                    <li>Modern and attractive user interface with frameless window.</li>
                 </ul>
             </div>
         </div>
     </main>
     
-    <!-- أيقونات SVG -->
     <svg width="0" height="0" style="display:none;">
         <symbol id="icon-folder" viewBox="0 0 24 24"><path d="M10 4H4c-1.11 0-2 .89-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></symbol>
         <symbol id="icon-file" viewBox="0 0 24 24"><path d="M13 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V9l-7-7zm4 18H7V4h5v5h5v11z"/></symbol>
@@ -974,28 +964,23 @@
         <symbol id="icon-close" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></symbol>
         <symbol id="icon-check" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></symbol>
         <symbol id="icon-history" viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7v2c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.25 2.52.77-1.28-3.52-2.09V8H12z"/></symbol>
-        <symbol id="icon-rename" viewBox="0 0 24 24"><path d="M20.71 4.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83zM3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM5.92 19H5v-.92l9.06-9.06.92.92L5.92 19z"/></symbol> <!-- أيقونة تعديل الاسم -->
-    </svg>
+        <symbol id="icon-rename" viewBox="0 0 24 24"><path d="M20.71 4.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83zM3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM5.92 19H5v-.92l9.06-9.06.92.92L5.92 19z"/></symbol> </svg>
 
-    <!-- تم إزالة مودال إضافة العناصر من هنا -->
-
-    <!-- إشعار التوست (سيبقى في مكانه الحالي ليتم التحكم به عبر CSS) -->
     <div id="notificationToast" class="notification-toast"></div>
 
-    <!-- حاوية شريط تقدم التحميل -->
     <div id="downloadProgressContainer" class="download-progress-bar-container">
         <div id="downloadProgressBarInner" class="download-progress-bar-inner">
-            <span id="downloadProgressBarText" class="download-progress-bar-text">جاري التحميل...</span>
+            <span id="downloadProgressBarText" class="download-progress-bar-text">Downloading...</span>
         </div>
     </div>
 
-    <div id="confirmModalBackdrop" class="modal-backdrop"> <div class="modal-dialog"> <p id="confirmModalMessage"></p> <div class="modal-dialog-actions"> <button id="confirmModalYesBtn" class="btn btn-danger">نعم</button> <button id="confirmModalNoBtn" class="btn btn-primary">لا</button> </div> </div> </div>
-    <div id="categoryManagerModal" class="modal-backdrop"> <div class="category-manager-content"> <h2>إدارة الفئات</h2> <div id="categoryListContainer"></div> <div class="add-category-form"> <input type="text" id="newManagedCategoryInput" class="input-field" placeholder="اسم الفئة الجديدة"> <button id="addManagedCategoryBtn" class="btn btn-success"> <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>إضافة فئة </button> </div> <div class="category-manager-actions"> <button id="closeCategoryManagerBtn" class="btn btn-secondary">إغلاق</button> </div> </div> </div>
+    <div id="confirmModalBackdrop" class="modal-backdrop"> <div class="modal-dialog"> <p id="confirmModalMessage"></p> <div class="modal-dialog-actions"> <button id="confirmModalYesBtn" class="btn btn-danger">Yes</button> <button id="confirmModalNoBtn" class="btn btn-primary">No</button> </div> </div> </div>
+    <div id="categoryManagerModal" class="modal-backdrop"> <div class="category-manager-content"> <h2>Manage Categories</h2> <div id="categoryListContainer"></div> <div class="add-category-form"> <input type="text" id="newManagedCategoryInput" class="input-field" placeholder="New category name"> <button id="addManagedCategoryBtn" class="btn btn-success"> <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>Add Category </button> </div> <div class="category-manager-actions"> <button id="closeCategoryManagerBtn" class="btn btn-secondary">Close</button> </div> </div> </div>
     <div class="loading-indicator" id="loadingOverlay"> <div class="spinner"></div></div>
 
     <script>
-    // وحدات Electron و Node.js
-    let shell = null, pathModule = null, ipcRenderer = null, electronClipboard = null, appVersion = 'N/A'; // إضافة متغير لإصدار التطبيق
+    // Electron and Node.js modules
+    let shell = null, pathModule = null, ipcRenderer = null, electronClipboard = null, appVersion = 'N/A'; // Added appVersion variable
     try {
         if (typeof require === 'function' && typeof window !== 'undefined' && window.process && window.process.type === 'renderer') {
             shell = require('electron').shell;
@@ -1007,7 +992,7 @@
     } catch (e) { console.warn("[Renderer] Error loading Electron modules.", e); }
 
     let projectFiles = [];
-    let stagedFilePaths = []; // ستبقى هذه لتخزين المسارات المختارة مؤقتًا قبل الضغط على "إضافة إلى القائمة"
+    let stagedFilePaths = []; 
     let appCategories = [];
     let todos = [];
     let customExtensionMappings = [];
@@ -1018,8 +1003,8 @@
     const DOM = {
         sidebar: document.getElementById('sidebar'),
         mainContent: document.getElementById('mainContent'),
-        // تم إزالة addItemFab
-        // عناصر واجهة إضافة العناصر المدمجة
+        // addItemFab removed
+        // Integrated Add Item Section elements
         integratedSelectFilesButton: document.getElementById('integratedSelectFilesButton'),
         integratedAddFolderLinkButton: document.getElementById('integratedAddFolderLinkButton'),
         integratedImportFromFolderButton: document.getElementById('integratedImportFromFolderButton'),
@@ -1071,36 +1056,51 @@
         appVersionDisplay: document.getElementById('appVersionDisplay')
     };
 
-    const STORAGE_ITEMS_KEY = 'projectFileManagerData_v1.8_IntegratedUI'; // تحديث مفتاح التخزين
-    const STORAGE_CATEGORIES_KEY = 'projectFileManagerCategories_v1.8_IntegratedUI';
-    const STORAGE_TODOS_KEY = 'projectFileManagerTodos_v1.8_IntegratedUI';
-    const STORAGE_EXTENSION_MAPPINGS_KEY = 'projectFileManagerExtMappings_v1.3_IntegratedUI';
-    const STORAGE_PROJECT_HISTORY_KEY = 'projectFileManagerHistory_v1.2_IntegratedUI';
-    const STORAGE_OPEN_INTERVAL_KEY = 'projectFileManagerOpenInterval_v1.1';
-    const STORAGE_CATEGORY_STATE_KEY = 'projectFileManagerCategoryState_v1.0'; // لتخزين حالة on/off للأقسام
+    const STORAGE_ITEMS_KEY = 'projectFileManagerData_v1.8_IntegratedUI_LTR'; 
+    const STORAGE_CATEGORIES_KEY = 'projectFileManagerCategories_v1.8_IntegratedUI_LTR';
+    const STORAGE_TODOS_KEY = 'projectFileManagerTodos_v1.8_IntegratedUI_LTR';
+    const STORAGE_EXTENSION_MAPPINGS_KEY = 'projectFileManagerExtMappings_v1.3_IntegratedUI_LTR';
+    const STORAGE_PROJECT_HISTORY_KEY = 'projectFileManagerHistory_v1.2_IntegratedUI_LTR';
+    const STORAGE_OPEN_INTERVAL_KEY = 'projectFileManagerOpenInterval_v1.1_LTR';
+    const STORAGE_CATEGORY_STATE_KEY = 'projectFileManagerCategoryState_v1.0_LTR'; 
     const DEFAULT_OPEN_INTERVAL = 0.3;
     const MAX_HISTORY_ITEMS = 10;
 
 
     const DEFAULT_CATEGORIES_STRUCTURE = [
-        { key: 'auto_detect', display: '--- كشف تلقائي للفئة ---', isCustom: false, isDefaultOption: true, order: 0, isEditable: false, isDeletable: false, isEnabledForOpenAll: true },
-        { key: 'photoshop', display: 'مشاريع فوتوشوب', isCustom: false, order: 1, isEditable: true, isDeletable: false, isEnabledForOpenAll: true },
-        { key: 'aftereffects', display: 'مشاريع أفترإفكتس', isCustom: false, order: 2, isEditable: true, isDeletable: false, isEnabledForOpenAll: true },
-        { key: 'premiere', display: 'مشاريع بريمير برو', isCustom: false, order: 3, isEditable: true, isDeletable: false, isEnabledForOpenAll: true },
-        { key: 'folder', display: 'روابط المجلدات', isCustom: false, order: 4, isEditable: true, isDeletable: false, isEnabledForOpenAll: true },
-        { key: 'website', display: 'روابط المواقع', isCustom: false, order: 5, isEditable: true, isDeletable: false, isEnabledForOpenAll: true },
-        { key: 'general', display: 'ملفات عامة', isCustom: false, order: 6, isEditable: true, isDeletable: false, isEnabledForOpenAll: true },
+        { key: 'auto_detect', display: '--- Auto-Detect Category ---', isCustom: false, isDefaultOption: true, order: 0, isEditable: false, isDeletable: false, isEnabledForOpenAll: true, isCollapsed: false },
+        { key: 'photoshop', display: 'Photoshop Projects', isCustom: false, order: 1, isEditable: true, isDeletable: false, isEnabledForOpenAll: true, isCollapsed: false },
+        { key: 'aftereffects', display: 'After Effects Projects', isCustom: false, order: 2, isEditable: true, isDeletable: false, isEnabledForOpenAll: true, isCollapsed: false },
+        { key: 'premiere', display: 'Premiere Pro Projects', isCustom: false, order: 3, isEditable: true, isDeletable: false, isEnabledForOpenAll: true, isCollapsed: false },
+        { key: 'folder', display: 'Folder Links', isCustom: false, order: 4, isEditable: true, isDeletable: false, isEnabledForOpenAll: true, isCollapsed: false },
+        { key: 'website', display: 'Website Links', isCustom: false, order: 5, isEditable: true, isDeletable: false, isEnabledForOpenAll: true, isCollapsed: false },
+        { key: 'general', display: 'General Files', isCustom: false, order: 6, isEditable: true, isDeletable: false, isEnabledForOpenAll: true, isCollapsed: false },
     ];
     const FILE_TYPE_TO_DEFAULT_CAT_KEY = { 'photoshop': 'photoshop', 'aftereffects': 'aftereffects', 'premiere': 'premiere', 'folderLink': 'folder', 'websiteLink': 'website' };
     
-    // ... (دوال JavaScript الأخرى تبقى كما هي مبدئيًا، مع تعديلات لاحقًا) ...
-
+    function toggleSidebar() {
+        if (DOM.sidebar) DOM.sidebar.classList.toggle('collapsed'); 
+        if (DOM.mainContent) DOM.mainContent.classList.toggle('expanded');
+        if (window.innerWidth <= 768 && DOM.sidebar && !DOM.sidebar.classList.contains('collapsed')) { DOM.sidebar.classList.add('show'); } 
+        else if (window.innerWidth <= 768 && DOM.sidebar && DOM.sidebar.classList.contains('collapsed')) { DOM.sidebar.classList.remove('show'); }
+    }
+    function showPage(pageId) {
+        document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+        const targetPage = document.getElementById(pageId); if (targetPage) targetPage.classList.add('active');
+        document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector(`.nav-link[onclick="showPage('${pageId}')"]`); if (activeLink) activeLink.classList.add('active');
+        if (window.innerWidth <= 768 && DOM.sidebar) { DOM.sidebar.classList.add('collapsed'); DOM.sidebar.classList.remove('show'); if(DOM.mainContent) DOM.mainContent.classList.add('expanded'); }
+    }
+    function handleMinimizeWindow() { if (ipcRenderer) ipcRenderer.send('minimize-window'); else showAppNotification('Minimize feature is available in the desktop app only.', 'warning'); }
+    function handleCloseWindow() { if (ipcRenderer) ipcRenderer.send('close-window'); else showAppCustomConfirm("Are you sure you want to close this tab?", (confirmed) => { if (confirmed) window.close(); }); }
+    function escapeHTML(str) { return typeof str === 'string' ? str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'})[m]) : String(str); }
+    function escapeAttr(str) { return typeof str === 'string' ? str.replace(/"/g, '&quot;') : String(str); }
+    
     function showAppNotification(message, type = 'success', duration = 3500) {
         const el = DOM.notification;
         if (el) {
             el.textContent = message;
             el.className = `notification-toast ${type} show`;
-            // CSS سيتحكم في التموضع في الأسفل والوسط
             if (el.timeoutId) clearTimeout(el.timeoutId);
             el.timeoutId = setTimeout(() => {
                 el.classList.remove('show');
@@ -1109,19 +1109,19 @@
             console.warn("Notification element not found for:", message);
         }
     }
-    
+
     function showDownloadProgressBar(show) {
         if (DOM.downloadProgressContainer) {
-            DOM.downloadProgressContainer.style.display = show ? 'flex' : 'none'; // 'flex' للتوسيط إذا كان هناك نص
+            DOM.downloadProgressContainer.style.display = show ? 'flex' : 'none';
         }
     }
 
     function updateDownloadProgressBar(percent, speedMBps, transferredMB, totalMB) {
         if (DOM.downloadProgressBarInner && DOM.downloadProgressBarText) {
             DOM.downloadProgressBarInner.style.width = `${percent}%`;
-            let text = `جاري التحميل: ${Math.round(percent)}%`;
+            let text = `Downloading: ${Math.round(percent)}%`;
             if (speedMBps !== null && !isNaN(speedMBps)) {
-                 text += ` (${speedMBps.toFixed(2)} ميجابايت/ثانية)`;
+                 text += ` (${speedMBps.toFixed(2)} MB/s)`;
             }
             if (transferredMB !== null && totalMB !== null && !isNaN(transferredMB) && !isNaN(totalMB)) {
                 text += ` - ${transferredMB.toFixed(1)}MB / ${totalMB.toFixed(1)}MB`;
@@ -1130,12 +1130,12 @@
         }
     }
 
-    function clearStagedFilesDisplay() { // اسم جديد للدالة
+    function clearStagedFilesDisplay() { 
         stagedFilePaths = [];
         if(DOM.integratedSelectedFilesDisplay) DOM.integratedSelectedFilesDisplay.textContent = '';
     }
 
-    function updateStagedPathsDisplay(paths, entryType, prefix) { // اسم جديد للدالة
+    function updateStagedPathsDisplay(paths, entryType, prefix) { 
         if (paths && Array.isArray(paths) && paths.length > 0) {
             stagedFilePaths = paths.map(p => ({ path: p, name: pathModule ? pathModule.basename(p) : p.substring(p.lastIndexOf(/[/\\]/) + 1), entryType }));
             if(DOM.integratedSelectedFilesDisplay) DOM.integratedSelectedFilesDisplay.textContent = `${prefix} ${stagedFilePaths.map(f => f.name).join(', ')}`; 
@@ -1145,55 +1145,52 @@
         }
     }
     
-    function populateCategoryDropdown(selectElement = DOM.integratedCategorySelectInput) { // استخدام العنصر المدمج
+    function populateCategoryDropdown(selectElement = DOM.integratedCategorySelectInput) { 
         if (!selectElement) return;
         selectElement.innerHTML = '';
         const sortedForDropdown = [...appCategories].sort((a,b) => (a.order ?? Infinity) - (b.order ?? Infinity));
         sortedForDropdown.forEach(cat => { const option = document.createElement('option'); option.value = cat.key; option.textContent = cat.display; if (cat.isDefaultOption) option.selected = true; selectElement.appendChild(option); });
     }
 
-    function handleProcessStagedItems() { // اسم جديد للدالة
+    function handleProcessStagedItems() { 
         if (!stagedFilePaths || stagedFilePaths.length === 0) {
-            // تحقق مما إذا كان هناك نص في حقل المسار المباشر
             const pathValue = DOM.integratedPathInput.value.trim();
             if (pathValue) {
-                // إذا كان هناك نص، حاول إضافته كمسار مباشر
                 if (ipcRenderer) {
-                    ipcRenderer.send('process-pasted-path', pathValue); // سيتم التعامل مع الرد في setupIpcListeners
+                    ipcRenderer.send('process-pasted-path', pathValue); 
                 } else if (pathValue.toLowerCase().startsWith('http://') || pathValue.toLowerCase().startsWith('https://')) {
-                    updateStagedPathsDisplay([pathValue], 'websiteLink', 'رابط موقع جاهز: ');
-                    // ثم قم بإضافة العنصر مباشرة
+                    updateStagedPathsDisplay([pathValue], 'websiteLink', 'Website link ready: ');
                      processSingleItemFromStaged();
                 } else {
-                    showAppNotification('إضافة المسارات المحلية متاحة فقط في تطبيق سطح المكتب.', 'warning');
+                    showAppNotification('Adding local paths is available in the desktop app only.', 'warning');
                 }
                 return;
             }
-            showAppNotification('الرجاء تحديد أو لصق العناصر أولاً.', 'warning');
+            showAppNotification('Please select or paste items first.', 'warning');
             return;
         }
-        processSingleItemFromStaged(); // معالجة العناصر الموجودة في stagedFilePaths
+        processSingleItemFromStaged(); 
     }
 
-    function processSingleItemFromStaged() { // دالة جديدة لمعالجة العناصر المضافة
+    function processSingleItemFromStaged() { 
         const groupName = DOM.integratedProjectNameInput.value.trim();
         let addedCount = 0;
         stagedFilePaths.forEach(itemInfo => {
             const { path, name, entryType = 'file' } = itemInfo;
             if (!path || typeof path !== 'string' || projectFiles.some(pf => pf.location.toLowerCase() === path.toLowerCase())) {
-                if (projectFiles.some(pf => pf.location.toLowerCase() === path.toLowerCase())) { showAppNotification(`العنصر "${name}" موجود بالفعل.`, 'warning'); }
+                if (projectFiles.some(pf => pf.location.toLowerCase() === path.toLowerCase())) { showAppNotification(`Item "${name}" already exists.`, 'warning'); }
                 return;
             }
             const itemType = getFileType(path, entryType);
             const catKey = determineItemCategoryKey(itemType, DOM.integratedCategorySelectInput.value);
-            projectFiles.push({ id: Date.now() + Math.random(), name: groupName ? `${groupName} - ${name}` : name, actualName: name, location: path, type: itemType, category: catKey, entryType, dateAdded: new Date().toLocaleString('ar-SA', { dateStyle: 'short', timeStyle: 'short' }), isEnabledForOpenAll: true }); // تمت إضافة isEnabledForOpenAll
+            projectFiles.push({ id: Date.now() + Math.random(), name: groupName ? `${groupName} - ${name}` : name, actualName: name, location: path, type: itemType, category: catKey, entryType, dateAdded: new Date().toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' }), isEnabledForOpenAll: true }); 
             addedCount++;
         });
 
         if (addedCount > 0) {
             saveItemsToStorage();
             renderProjectFilesUI();
-            showAppNotification(`✨ تمت إضافة ${addedCount} عنصر (عناصر)!`, 'success');
+            showAppNotification(`✨ Added ${addedCount} item(s)!`, 'success');
         }
         DOM.integratedProjectNameInput.value = '';
         clearStagedFilesDisplay();
@@ -1212,7 +1209,7 @@
         DOM.filesDisplayContainer.innerHTML = '';
 
         if (projectFiles.length === 0) {
-            DOM.filesDisplayContainer.innerHTML = `<div class="empty-placeholder"><div class="icon"><svg viewBox="0 0 24 24"><use xlink:href="#icon-empty-folder"></use></svg></div><h3>القائمة فارغة.</h3><p>ابدأ بإضافة ملفات أو مجلدات أو روابط مواقع.</p></div>`;
+            DOM.filesDisplayContainer.innerHTML = `<div class="empty-placeholder"><div class="icon"><svg viewBox="0 0 24 24"><use xlink:href="#icon-empty-folder"></use></svg></div><h3>List is empty.</h3><p>Start by adding files, folders, or website links.</p></div>`;
             return;
         }
 
@@ -1226,14 +1223,14 @@
         const sortedKeys = Object.keys(grouped).sort((a, b) => {
             const catA = appCategories.find(c => c.key === a) || { order: Infinity, display: a };
             const catB = appCategories.find(c => c.key === b) || { order: Infinity, display: b };
-            return (catA.order ?? Infinity) - (catB.order ?? Infinity) || catA.display.localeCompare(catB.display, 'ar'); // استخدام 'ar' للترتيب العربي
+            return (catA.order ?? Infinity) - (catB.order ?? Infinity) || catA.display.localeCompare(catB.display, 'en'); 
         });
 
         sortedKeys.forEach(catKey => {
             const items = grouped[catKey];
             const section = document.createElement('div');
-            const categoryObject = appCategories.find(c => c.key === catKey) || { display: catKey, isEnabledForOpenAll: true }; // قيمة افتراضية لـ isEnabledForOpenAll
-            section.className = `category-section ${categoryObject.isCollapsed ? 'collapsed' : ''}`; // تحقق من حالة الطي
+            const categoryObject = appCategories.find(c => c.key === catKey) || { display: catKey, isEnabledForOpenAll: true, isCollapsed: false }; 
+            section.className = `category-section ${categoryObject.isCollapsed ? 'collapsed' : ''}`; 
             section.dataset.categoryKey = catKey;
 
             const header = document.createElement('div');
@@ -1243,31 +1240,32 @@
             const chevronIcon = document.dir === 'rtl' ? '#icon-chevron-left' : '#icon-chevron-right';
 
             header.innerHTML = `
-                <div class="category-title-container" title="فتح/إغلاق القسم">
+                <div class="category-title-container" title="Toggle Section">
                     <span class="category-toggle-icon"><svg viewBox="0 0 24 24"><use xlink:href="${chevronIcon}"></use></svg></span>
                     <h2 class="category-title" data-category-key="${escapeAttr(catKey)}">${escapeHTML(catDisplay)}</h2>
                     <span class="category-item-count">(${items.length})</span>
                 </div>
                 <div class="category-header-controls">
-                    <button class="btn-icon btn-edit-category-name" title="تعديل اسم القسم" data-category-key="${escapeAttr(catKey)}">
+                    <button class="btn-icon btn-edit-category-name" title="Rename Category" data-category-key="${escapeAttr(catKey)}">
                         <svg viewBox="0 0 24 24"><use xlink:href="#icon-rename"></use></svg>
                     </button>
-                    <button class="btn-icon btn-delete-category-header" title="حذف القسم" data-category-key="${escapeAttr(catKey)}" ${(!categoryObject.isCustom || !categoryObject.isDeletable) ? 'disabled' : ''}>
+                    <button class="btn-icon btn-delete-category-header" title="Delete Category" data-category-key="${escapeAttr(catKey)}" ${(!categoryObject.isCustom || !categoryObject.isDeletable) ? 'disabled' : ''}>
                         <svg viewBox="0 0 24 24"><use xlink:href="#icon-delete"></use></svg>
                     </button>
                     <button class="category-on-off-toggle ${categoryObject.isEnabledForOpenAll ? 'on' : 'off'}" 
                             data-category-key="${escapeAttr(catKey)}" 
-                            title="${categoryObject.isEnabledForOpenAll ? 'تعطيل الفتح مع الكل' : 'تفعيل الفتح مع الكل'}">
+                            title="${categoryObject.isEnabledForOpenAll ? 'Disable for Open All' : 'Enable for Open All'}">
                         ${categoryObject.isEnabledForOpenAll ? 'ON' : 'OFF'}
                     </button>
                     <button class="btn btn-secondary btn-open-all-in-category" data-category-key="${escapeAttr(catKey)}">
-                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-folder"></use></svg>فتح الكل في القسم
+                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-folder"></use></svg>Open All in Category
                     </button>
                 </div>`;
             
             header.querySelector('.category-title-container').addEventListener('click', () => {
                 section.classList.toggle('collapsed');
-                categoryObject.isCollapsed = section.classList.contains('collapsed'); // حفظ حالة الطي
+                const catObj = appCategories.find(c => c.key === catKey);
+                if(catObj) catObj.isCollapsed = section.classList.contains('collapsed'); 
                 saveCategoryStates();
             });
             header.querySelector('.btn-open-all-in-category').addEventListener('click', (e) => { e.stopPropagation(); handleOpenAllFilesInCategory(e); });
@@ -1293,7 +1291,7 @@
             DOM.filesDisplayContainer.appendChild(section);
         });
         DOM.filesDisplayContainer.querySelectorAll('.path-card-options-btn, .item-card-direct-open').forEach(btn => btn.addEventListener('click', handleItemCardButton));
-        loadCategoryStates(); // استعادة حالة الطي بعد العرض
+        // loadCategoryStates(); // Moved to loadData to ensure it runs after appCategories is populated
     }
 
     function activateCategoryNameInlineEdit(categoryKey, headerElement) {
@@ -1304,7 +1302,7 @@
         const currentName = category.display;
         const inputField = document.createElement('input');
         inputField.type = 'text';
-        inputField.className = 'category-name-input input-field'; // استخدام نفس نمط حقول الإدخال
+        inputField.className = 'category-name-input input-field'; 
         inputField.value = currentName;
         inputField.dataset.originalName = currentName;
 
@@ -1316,21 +1314,21 @@
             const newDisplayName = inputField.value.trim();
             if (newDisplayName && newDisplayName !== currentName) {
                 if (appCategories.some(cat => cat.key !== categoryKey && cat.display.toLowerCase() === newDisplayName.toLowerCase())) {
-                    showAppNotification(`اسم الفئة "${newDisplayName}" موجود بالفعل.`, 'warning');
-                    inputField.value = currentName; // إعادة القيمة الأصلية
-                    inputField.replaceWith(titleElement); // إعادة العنوان الأصلي
+                    showAppNotification(`Category name "${newDisplayName}" already exists.`, 'warning');
+                    inputField.value = currentName; 
+                    inputField.replaceWith(titleElement); 
                     titleElement.textContent = currentName;
                     return;
                 }
                 category.display = newDisplayName;
                 titleElement.textContent = newDisplayName;
             } else {
-                titleElement.textContent = currentName; // إعادة الاسم الأصلي إذا لم يتغير أو كان فارغًا
+                titleElement.textContent = currentName; 
             }
             inputField.replaceWith(titleElement);
             saveCategoriesToStorage();
-            populateCategoryDropdown(); // تحديث القائمة المنسدلة في قسم الإضافة المدمج
-            if (DOM.categoryManagerModal.classList.contains('show')) { // تحديث قائمة مدير الفئات إذا كانت مفتوحة
+            populateCategoryDropdown(DOM.integratedCategorySelectInput); 
+            if (DOM.categoryManagerModal.classList.contains('show')) { 
                  renderCategoryManagerList();
             }
         };
@@ -1341,8 +1339,8 @@
                 e.preventDefault();
                 saveAndCancel();
             } else if (e.key === 'Escape') {
-                inputField.value = currentName; // تجاهل التغييرات
-                saveAndCancel(); // سيعيد العنصر الأصلي
+                inputField.value = currentName; 
+                saveAndCancel(); 
             }
         });
     }
@@ -1369,19 +1367,17 @@
                         cat.isCollapsed = states[cat.key].isCollapsed;
                         cat.isEnabledForOpenAll = states[cat.key].isEnabledForOpenAll !== undefined ? states[cat.key].isEnabledForOpenAll : true;
                     } else {
-                        cat.isEnabledForOpenAll = true; // القيمة الافتراضية إذا لم تكن الحالة مخزنة
+                        cat.isEnabledForOpenAll = true; 
                     }
                 });
-                 // إعادة عرض الواجهة لتعكس الحالات المحملة (خاصة الطي)
-                renderProjectFilesUI();
             } else {
-                 // إذا لم تكن هناك حالات مخزنة، تأكد من أن جميع الفئات لديها isEnabledForOpenAll = true
                 appCategories.forEach(cat => cat.isEnabledForOpenAll = true);
             }
         } catch (e) {
             console.error("Error loading category states:", e);
-            appCategories.forEach(cat => cat.isEnabledForOpenAll = true); // تعيين افتراضي عند الخطأ
+            appCategories.forEach(cat => cat.isEnabledForOpenAll = true); 
         }
+        // No need to call renderProjectFilesUI() here as it's called after loadData() which includes this.
     }
     
     function toggleCategoryOpenAllState(categoryKey, buttonElement) {
@@ -1391,28 +1387,28 @@
             buttonElement.textContent = category.isEnabledForOpenAll ? 'ON' : 'OFF';
             buttonElement.classList.toggle('on', category.isEnabledForOpenAll);
             buttonElement.classList.toggle('off', !category.isEnabledForOpenAll);
-            buttonElement.title = category.isEnabledForOpenAll ? 'تعطيل الفتح مع الكل' : 'تفعيل الفتح مع الكل';
-            saveCategoryStates(); // حفظ الحالة الجديدة
-            showAppNotification(`الفتح مع الكل لفئة "${category.display}" الآن ${category.isEnabledForOpenAll ? 'مُفعّل' : 'مُعطّل'}.`, 'info');
+            buttonElement.title = category.isEnabledForOpenAll ? 'Disable for Open All' : 'Enable for Open All';
+            saveCategoryStates(); 
+            showAppNotification(`"Open All" for category "${category.display}" is now ${category.isEnabledForOpenAll ? 'enabled' : 'disabled'}.`, 'info');
         }
     }
 
     function handleOpenAllClick() {
         const itemsToOpenOverall = projectFiles.filter(item => {
             const category = appCategories.find(c => c.key === item.category);
-            return category && category.isEnabledForOpenAll; // تحقق من أن الفئة مفعلة للفتح
+            return category && category.isEnabledForOpenAll; 
         });
 
         if (itemsToOpenOverall.length === 0) {
-            showAppNotification("لا توجد عناصر لفتحها (إما القائمة فارغة أو جميع الفئات معطلة للفتح مع الكل).", "info");
+            showAppNotification("No items to open (either list is empty or all categories are disabled for 'Open All').", "info");
             return;
         }
         const delayBetweenTypes = openInterval * 1000 * 2;
-        openMultiple(itemsToOpenOverall.filter(i => i.entryType === 'file'), 'file', 'جميع الملفات (المفعلة)');
+        openMultiple(itemsToOpenOverall.filter(i => i.entryType === 'file'), 'file', 'All enabled files');
         let nextDelay = itemsToOpenOverall.filter(i => i.entryType === 'file').length * (openInterval * 1000) + delayBetweenTypes;
-        setTimeout(() => { openMultiple(itemsToOpenOverall.filter(i => i.entryType === 'folderLink'), 'folderLink', 'جميع روابط المجلدات (المفعلة)'); }, nextDelay);
+        setTimeout(() => { openMultiple(itemsToOpenOverall.filter(i => i.entryType === 'folderLink'), 'folderLink', 'All enabled folder links'); }, nextDelay);
         nextDelay += itemsToOpenOverall.filter(i => i.entryType === 'folderLink').length * (openInterval * 1000) + delayBetweenTypes;
-        setTimeout(() => { openMultiple(itemsToOpenOverall.filter(i => i.entryType === 'websiteLink'), 'websiteLink', 'جميع روابط المواقع (المفعلة)'); }, nextDelay);
+        setTimeout(() => { openMultiple(itemsToOpenOverall.filter(i => i.entryType === 'websiteLink'), 'websiteLink', 'All enabled website links'); }, nextDelay);
     }
 
     function handleOpenAllFilesInCategory(event) {
@@ -1420,14 +1416,16 @@
         const categoryObject = appCategories.find(c => c.key === key);
         const categoryDisplay = getCategoryDisplay(key);
 
+        // This check is now redundant as the button itself should reflect the state,
+        // but kept for safety / if called from elsewhere.
         if (!categoryObject || !categoryObject.isEnabledForOpenAll) {
-            showAppNotification(`الفتح مع الكل معطل لهذه الفئة "${categoryDisplay}".`, "info");
+            showAppNotification(`"Open All" is disabled for category "${categoryDisplay}".`, "info");
             return;
         }
 
         const itemsInCategory = projectFiles.filter(i => i.category === key);
         if (itemsInCategory.length === 0) {
-            showAppNotification(`لا توجد عناصر لفتحها في فئة "${categoryDisplay}".`, "info");
+            showAppNotification(`No items to open in category "${categoryDisplay}".`, "info");
             return;
         }
         const delayBetweenTypes = openInterval * 1000 * 2;
@@ -1439,36 +1437,41 @@
     }
 
 
-    // ... (بقية دوال JavaScript مع تعديلات طفيفة للإشارة إلى عناصر DOM المدمجة) ...
+    // ... (Rest of the JavaScript functions, ensuring they use the correct DOM element IDs for the integrated section) ...
 
     function setupIpcListeners() {
         if (!ipcRenderer) {
             console.warn("[Renderer] ipcRenderer not available. Desktop features will be disabled.");
-            [DOM.integratedSelectFilesButton, DOM.integratedAddFolderLinkButton, DOM.integratedImportFromFolderButton, 
-             DOM.integratedPastePathButton, DOM.integratedAddPastedPathButton, DOM.saveProjectAsBtn, 
-             DOM.importProjectBtn, DOM.saveActiveProjectBtn, DOM.checkForUpdatesBtn].forEach(btn => { 
+            const electronOnlyButtons = [
+                DOM.integratedSelectFilesButton, DOM.integratedAddFolderLinkButton, DOM.integratedImportFromFolderButton,
+                DOM.saveProjectAsBtn, DOM.importProjectBtn, DOM.saveActiveProjectBtn,
+                DOM.checkForUpdatesBtn
+            ];
+            electronOnlyButtons.forEach(btn => { 
                 if(btn) { 
                     btn.disabled = true; 
-                    btn.title = (btn.title || btn.textContent || btn.id) + ' (ميزة تطبيق سطح المكتب فقط)'; 
-                    btn.style.opacity = "0.5"; 
-                    btn.style.cursor = "not-allowed"; 
+                    btn.title = (btn.title || btn.textContent || btn.id) + ' (Desktop app feature only)'; 
+                    if (btn.style) {
+                        btn.style.opacity = "0.5"; 
+                        btn.style.cursor = "not-allowed"; 
+                    }
                 } 
             });
-            if (DOM.appVersionDisplay) DOM.appVersionDisplay.textContent = "غير متاح (وضع المتصفح)";
+            if (DOM.appVersionDisplay) DOM.appVersionDisplay.textContent = "N/A (Browser Mode)";
             return;
         }
-        ipcRenderer.on('selected-files-for-files', (event, paths) => updateStagedPathsDisplay(paths, 'file', 'ملفات جاهزة: '));
-        ipcRenderer.on('selected-folder-for-link', (event, paths) => updateStagedPathsDisplay(paths, 'folderLink', 'روابط مجلدات جاهزة: '));
+        ipcRenderer.on('selected-files-for-files', (event, paths) => updateStagedPathsDisplay(paths, 'file', 'Files ready: '));
+        ipcRenderer.on('selected-folder-for-link', (event, paths) => updateStagedPathsDisplay(paths, 'folderLink', 'Folder links ready: '));
         ipcRenderer.on('selected-folder-for-import', (event, contents) => { 
             if (contents && Array.isArray(contents) && contents.length > 0) { 
                 stagedFilePaths = contents.map(item => ({ ...item, entryType: 'file' })); 
-                let baseName = "المجلد المحدد"; 
+                let baseName = "Selected folder"; 
                 if (pathModule && contents[0].path) { 
                     const parentDir = pathModule.dirname(contents[0].path); 
                     baseName = pathModule.basename(parentDir); 
                     if (!baseName && parentDir) baseName = parentDir; 
                 } 
-                if(DOM.integratedSelectedFilesDisplay) DOM.integratedSelectedFilesDisplay.textContent = `ملفات للاستيراد من "${baseName}" (${stagedFilePaths.length})`; 
+                if(DOM.integratedSelectedFilesDisplay) DOM.integratedSelectedFilesDisplay.textContent = `Files to import from "${baseName}" (${stagedFilePaths.length})`; 
                 if(DOM.integratedPathInput) DOM.integratedPathInput.value = ''; 
             } else if (DOM.integratedPathInput && !DOM.integratedPathInput.value.trim()) {
                 clearStagedFilesDisplay();
@@ -1477,22 +1480,21 @@
         ipcRenderer.on('pasted-path-processed', (event, { items, originalPath }) => { 
             if (items && Array.isArray(items) && items.length > 0) {
                  if (items[0].entryType === 'websiteLink') { 
-                    updateStagedPathsDisplay(items.map(i => i.path), 'websiteLink', 'رابط موقع جاهز: '); 
+                    updateStagedPathsDisplay(items.map(i => i.path), 'websiteLink', 'Website link ready: '); 
                  } else { 
                     stagedFilePaths = items; 
-                    if(DOM.integratedSelectedFilesDisplay) DOM.integratedSelectedFilesDisplay.textContent = `تمت معالجة المسار. جاهز للإضافة: ${items.map(f => f.name).join(', ')}`;
+                    if(DOM.integratedSelectedFilesDisplay) DOM.integratedSelectedFilesDisplay.textContent = `Processed path. Ready to add: ${items.map(f => f.name).join(', ')}`;
                  }
-                 // بعد معالجة المسار الملصق بنجاح، قم بإضافته مباشرة
-                 processSingleItemFromStaged();
+                 processSingleItemFromStaged(); // Add directly after processing pasted path
             } else { 
                 clearStagedFilesDisplay(); 
-                const name = (pathModule && originalPath) ? pathModule.basename(originalPath) : "المسار الملصق"; 
-                showAppNotification(`المسار "${name}" غير صالح أو فارغ أو لا يمكن الوصول إليه.`, 'error'); 
+                const name = (pathModule && originalPath) ? pathModule.basename(originalPath) : "Pasted path"; 
+                showAppNotification(`Path "${name}" is invalid, empty, or inaccessible.`, 'error'); 
             } 
         });
         ipcRenderer.on('pasted-path-error', (event, { message, originalPath }) => { 
-            const name = (pathModule && originalPath) ? pathModule.basename(originalPath) : "المسار الملصق"; 
-            showAppNotification(`خطأ في معالجة "${name}": ${message}`, 'error'); 
+            const name = (pathModule && originalPath) ? pathModule.basename(originalPath) : "Pasted path"; 
+            showAppNotification(`Error processing "${name}": ${message}`, 'error'); 
             clearStagedFilesDisplay(); 
         });
         
@@ -1502,11 +1504,11 @@
             }
             if (!message.toLowerCase().includes('downloading update:') && 
                 !message.toLowerCase().includes('update downloaded') &&
-                !message.toLowerCase().includes('update available')) { // لا تظهر توست لـ "update available" إذا كان هناك شريط تقدم
+                !message.toLowerCase().includes('update available')) {
                 showAppNotification(message, 'info');
             }
              if (message.toLowerCase().includes('update not available') || message.toLowerCase().includes('error checking for updates')) {
-                showDownloadProgressBar(false); // إخفاء شريط التقدم عند عدم توفر تحديث أو حدوث خطأ
+                showDownloadProgressBar(false);
             }
         });
 
@@ -1518,22 +1520,22 @@
             const totalMB = progressObj.total / (1024 * 1024);
             updateDownloadProgressBar(progressObj.percent, speedMBps, transferredMB, totalMB);
             if (DOM.updateStatusMessage) {
-                 DOM.updateStatusMessage.textContent = `جاري تنزيل التحديث: ${Math.round(progressObj.percent)}% (${speedMBps.toFixed(2)} ميجابايت/ثانية)`;
+                 DOM.updateStatusMessage.textContent = `Downloading update: ${Math.round(progressObj.percent)}% (${speedMBps.toFixed(2)} MB/s)`;
             }
         });
 
         ipcRenderer.on('update-downloaded-and-ready', (event, info) => {
             showDownloadProgressBar(false);
             if (DOM.updateStatusMessage) {
-                DOM.updateStatusMessage.textContent = `التحديث الإصدار ${info.version} جاهز للتثبيت!`;
+                DOM.updateStatusMessage.textContent = `Update v${info.version} is ready to install!`;
             }
             if (DOM.updateActionButtonsContainer) {
                 DOM.updateActionButtonsContainer.innerHTML = ''; 
 
                 const restartBtn = document.createElement('button');
-                restartBtn.textContent = 'إعادة التشغيل الآن';
+                restartBtn.textContent = 'Restart Now';
                 restartBtn.className = 'btn btn-success'; 
-                restartBtn.style.marginLeft = '10px'; // تعديل لـ RTL
+                restartBtn.style.marginRight = '10px'; 
                 restartBtn.onclick = () => {
                     if (ipcRenderer) {
                         ipcRenderer.send('restart-app-and-install');
@@ -1541,43 +1543,41 @@
                 };
 
                 const laterBtn = document.createElement('button');
-                laterBtn.textContent = 'لاحقًا';
+                laterBtn.textContent = 'Later';
                 laterBtn.className = 'btn btn-secondary';
                 laterBtn.onclick = () => {
                     if (DOM.updateActionButtonsContainer) {
                         DOM.updateActionButtonsContainer.innerHTML = ''; 
                     }
                     if (DOM.updateStatusMessage) {
-                         DOM.updateStatusMessage.textContent = `تم تنزيل التحديث الإصدار ${info.version}. يمكنك إعادة التشغيل لاحقًا.`;
+                         DOM.updateStatusMessage.textContent = `Update v${info.version} downloaded. You can restart later.`;
                     }
-                     showAppNotification(`سيتم تثبيت التحديث الإصدار ${info.version} عند إعادة التشغيل التالية.`, 'info', 5000);
+                     showAppNotification(`Update v${info.version} will be installed on next restart.`, 'info', 5000);
                 };
 
-                DOM.updateActionButtonsContainer.appendChild(laterBtn); // لاحقًا أولاً في RTL
                 DOM.updateActionButtonsContainer.appendChild(restartBtn);
+                DOM.updateActionButtonsContainer.appendChild(laterBtn);
             }
-            showAppNotification(`التحديث الإصدار ${info.version} جاهز! انقر فوق 'إعادة التشغيل الآن' للتثبيت.`, 'success', 7000);
+            showAppNotification(`Update v${info.version} is ready! Click 'Restart Now' to install.`, 'success', 7000);
         });
         
         ipcRenderer.on('app-version-is', (event, version) => {
-            appVersion = version || 'غير متوفر';
+            appVersion = version || 'N/A';
             if (DOM.appVersionDisplay) {
                 DOM.appVersionDisplay.textContent = appVersion;
             }
-            // تحديث النص في صفحة "حول" الذي قد يكون تم عرضه قبل وصول الإصدار
-            const aboutPageVersionElement = document.querySelector('#aboutPage .glass-card p:nth-child(2)'); // يفترض أنه ثاني فقرة
-            if (aboutPageVersionElement && aboutPageVersionElement.textContent.includes('الإصدار:')) {
-                aboutPageVersionElement.innerHTML = `الإصدار: <span id="appVersionDisplay">${appVersion}</span>`;
-                // إعادة إسناد DOM.appVersionDisplay إذا تم إنشاؤه ديناميكيًا
-                DOM.appVersionDisplay = document.getElementById('appVersionDisplay');
+            const aboutPageVersionElement = document.querySelector('#aboutPage .glass-card p:nth-child(2)');
+            if (aboutPageVersionElement && aboutPageVersionElement.textContent.includes('Version:')) {
+                aboutPageVersionElement.innerHTML = `Version: <span id="appVersionDisplay">${appVersion}</span>`;
+                DOM.appVersionDisplay = document.getElementById('appVersionDisplay'); // Re-assign if recreated
             }
         });
     }
     
-    // --- معالجات الأحداث لواجهة إضافة العناصر المدمجة ---
-    if(DOM.integratedSelectFilesButton) DOM.integratedSelectFilesButton.addEventListener('click', () => { if (ipcRenderer) ipcRenderer.send('open-file-dialog-for-files'); else showAppNotification('هذه الميزة متاحة فقط في تطبيق سطح المكتب.', 'warning'); });
-    if(DOM.integratedAddFolderLinkButton) DOM.integratedAddFolderLinkButton.addEventListener('click', () => { if (ipcRenderer) ipcRenderer.send('open-folder-dialog-for-link'); else showAppNotification('هذه الميزة متاحة فقط في تطبيق سطح المكتب.', 'warning'); });
-    if(DOM.integratedImportFromFolderButton) DOM.integratedImportFromFolderButton.addEventListener('click', () => { if (ipcRenderer) ipcRenderer.send('open-folder-dialog-for-import'); else showAppNotification('هذه الميزة متاحة فقط في تطبيق سطح المكتب.', 'warning'); });
+    // --- Event Listeners for Integrated Add Item Section ---
+    if(DOM.integratedSelectFilesButton) DOM.integratedSelectFilesButton.addEventListener('click', () => { if (ipcRenderer) ipcRenderer.send('open-file-dialog-for-files'); else showAppNotification('This feature is available in the desktop app only.', 'warning'); });
+    if(DOM.integratedAddFolderLinkButton) DOM.integratedAddFolderLinkButton.addEventListener('click', () => { if (ipcRenderer) ipcRenderer.send('open-folder-dialog-for-link'); else showAppNotification('This feature is available in the desktop app only.', 'warning'); });
+    if(DOM.integratedImportFromFolderButton) DOM.integratedImportFromFolderButton.addEventListener('click', () => { if (ipcRenderer) ipcRenderer.send('open-folder-dialog-for-import'); else showAppNotification('This feature is available in the desktop app only.', 'warning'); });
     if(DOM.integratedPastePathButton) DOM.integratedPastePathButton.addEventListener('click', async () => {
         let clipboardText = '';
         try { 
@@ -1586,57 +1586,56 @@
             } else if (navigator.clipboard && navigator.clipboard.readText) { 
                 clipboardText = await navigator.clipboard.readText(); 
             } else { 
-                showAppNotification('واجهة برمجة تطبيقات الحافظة غير متاحة.', 'warning'); return; 
+                showAppNotification('Clipboard API not available.', 'warning'); return; 
             } 
             if(DOM.integratedPathInput) DOM.integratedPathInput.value = clipboardText; 
-            showAppNotification(clipboardText ? 'تم لصق المسار.' : 'الحافظة فارغة.', clipboardText ? 'success' : 'warning');
+            showAppNotification(clipboardText ? 'Path pasted.' : 'Clipboard is empty.', clipboardText ? 'success' : 'warning');
         } catch (err) { 
             console.error('[Renderer] Failed to read clipboard: ', err); 
-            showAppNotification('فشل اللصق من الحافظة. تأكد من الإذن إذا طُلب منك ذلك.', 'error'); 
+            showAppNotification('Failed to paste from clipboard. Ensure permission if prompted.', 'error'); 
         }
     });
     if(DOM.integratedAddPastedPathButton) DOM.integratedAddPastedPathButton.addEventListener('click', () => {
         const pathValue = DOM.integratedPathInput.value.trim(); 
-        if (!pathValue) { showAppNotification('الرجاء إدخال أو لصق مسار أولاً.', 'warning'); return; }
+        if (!pathValue) { showAppNotification('Please enter or paste a path first.', 'warning'); return; }
         
-        stagedFilePaths = []; // مسح المسارات القديمة قبل معالجة مسار جديد ملصق
+        stagedFilePaths = []; 
         if(DOM.integratedSelectedFilesDisplay) DOM.integratedSelectedFilesDisplay.textContent = '';
 
         if (pathValue.toLowerCase().startsWith('http://') || pathValue.toLowerCase().startsWith('https://')) { 
-            updateStagedPathsDisplay([pathValue], 'websiteLink', 'رابط موقع جاهز: '); 
-            processSingleItemFromStaged(); // إضافة الرابط مباشرة
+            updateStagedPathsDisplay([pathValue], 'websiteLink', 'Website link ready: '); 
+            processSingleItemFromStaged(); 
         } else if (ipcRenderer) { 
-            if(DOM.integratedSelectedFilesDisplay) DOM.integratedSelectedFilesDisplay.textContent = `جاري المعالجة: ${pathValue.substring(pathValue.lastIndexOf(/[/\\]/) + 1)}`; 
-            ipcRenderer.send('process-pasted-path', pathValue); // سيتم التعامل مع الرد في setupIpcListeners وإضافة العنصر من هناك
+            if(DOM.integratedSelectedFilesDisplay) DOM.integratedSelectedFilesDisplay.textContent = `Processing: ${pathValue.substring(pathValue.lastIndexOf(/[/\\]/) + 1)}`; 
+            ipcRenderer.send('process-pasted-path', pathValue); 
         } else { 
-            showAppNotification('إضافة المسارات المحلية متاحة فقط في تطبيق سطح المكتب.', 'warning'); 
+            showAppNotification('Adding local paths is available in the desktop app only.', 'warning'); 
         }
     });
     if(DOM.integratedAddItemsButton) DOM.integratedAddItemsButton.addEventListener('click', handleProcessStagedItems);
     
-    // إضافة وظيفة Enter
     if(DOM.integratedPathInput) DOM.integratedPathInput.addEventListener('keydown', e => { 
         if (e.key === 'Enter') {
-            e.preventDefault(); // منع السلوك الافتراضي لـ Enter في حقول الإدخال
-            DOM.integratedAddPastedPathButton.click(); // محاكاة النقر على زر "إضافة مسار"
+            e.preventDefault(); 
+            DOM.integratedAddPastedPathButton.click(); 
         }
     });
     if(DOM.integratedProjectNameInput) DOM.integratedProjectNameInput.addEventListener('keydown', e => { 
         if (e.key === 'Enter') {
             e.preventDefault();
-            if (stagedFilePaths.length > 0 || DOM.integratedPathInput.value.trim()) { // تحقق إذا كان هناك شيء للإضافة
+            if (stagedFilePaths.length > 0 || DOM.integratedPathInput.value.trim()) { 
                  handleProcessStagedItems();
             } else {
-                showAppNotification('لا يوجد شيء للإضافة. الرجاء تحديد ملفات أو لصق مسار أولاً.', 'warning');
+                showAppNotification('Nothing to add. Please select files or paste a path first.', 'warning');
             }
         }
     });
     
     document.addEventListener('DOMContentLoaded', () => {
-        document.documentElement.dir = 'rtl'; document.documentElement.lang = 'ar'; // تعيين اتجاه ولغة الصفحة
+        document.documentElement.dir = 'ltr'; document.documentElement.lang = 'en';
         setupIpcListeners(); 
-        loadData(); // تحميل البيانات أولاً
-        loadCategoryStates(); // ثم تحميل حالات الفئات التي قد تعتمد على appCategories
+        loadData(); 
+        loadCategoryStates(); 
         showPage('pathsPage'); 
         if (window.innerWidth > 768) { if(DOM.sidebar) DOM.sidebar.classList.remove('collapsed'); if(DOM.mainContent) DOM.mainContent.classList.remove('expanded'); } 
         else { if(DOM.sidebar) DOM.sidebar.classList.add('collapsed'); if(DOM.mainContent) DOM.mainContent.classList.add('expanded'); }
@@ -1658,11 +1657,11 @@
         if(DOM.checkForUpdatesBtn) DOM.checkForUpdatesBtn.addEventListener('click', () => {
             if (ipcRenderer) {
                 ipcRenderer.send('check-for-updates');
-                if(DOM.updateStatusMessage) DOM.updateStatusMessage.textContent = 'جاري التحقق من وجود تحديثات...';
+                if(DOM.updateStatusMessage) DOM.updateStatusMessage.textContent = 'Checking for updates...';
                 if(DOM.updateActionButtonsContainer) DOM.updateActionButtonsContainer.innerHTML = ''; 
                 showDownloadProgressBar(false); 
             } else {
-                showAppNotification('التحقق من التحديثات متاح فقط في تطبيق سطح المكتب.', 'warning');
+                showAppNotification('Update checking is available in the desktop app only.', 'warning');
             }
         });
 
@@ -1687,7 +1686,7 @@
                 if (itemIdToParse) {
                     const id = parseFloat(itemIdToParse);
                     const item = projectFiles.find(pf => pf.id === id); 
-                    if (!item) { console.warn(`Item with id ${id} not found`); showAppNotification('خطأ: العنصر غير موجود.', 'error'); return; }
+                    if (!item) { console.warn(`Item with id ${id} not found`); showAppNotification('Error: Item not found.', 'error'); return; }
                     
                     if (action === 'options') { handleOptionsMenu(e); } 
                     else { 
@@ -1699,14 +1698,22 @@
                         else if (action === 'delete') deleteItemEntry(item.id);
                     }
                 } else if (categoryKeyForAction && action) {
-                     // لا يوجد إجراء محدد هنا، تم التعامل معه مباشرة في renderProjectFilesUI
+                     // Actions like edit-category-name, delete-category-header, toggle-category-on-off
+                     // are handled directly by their event listeners set up in renderProjectFilesUI
                 }
             }
         });
         if(DOM.newManagedCategoryInput) DOM.newManagedCategoryInput.addEventListener('keydown', e => { if (e.key === 'Enter' && DOM.addManagedCategoryBtn) DOM.addManagedCategoryBtn.click(); }); 
+        
+        // Add Drag and Drop listeners to main content area
+        if (DOM.mainContent) {
+            DOM.mainContent.addEventListener('dragover', handleDragOver);
+            DOM.mainContent.addEventListener('dragleave', handleDragLeave);
+            DOM.mainContent.addEventListener('drop', handleDrop); 
+        }
     });
-    window.addEventListener('error', e => { console.error('[Renderer] Unhandled Error:', e); showAppNotification('حدث خطأ غير متوقع!', 'error'); });
-    window.addEventListener('unhandledrejection', event => { console.error('[Renderer] Unhandled Rejection:', event.reason); showAppNotification('حدث خطأ غير متوقع غير متزامن!', 'error'); });
+    window.addEventListener('error', e => { console.error('[Renderer] Unhandled Error:', e); showAppNotification('An unexpected error occurred!', 'error'); });
+    window.addEventListener('unhandledrejection', event => { console.error('[Renderer] Unhandled Rejection:', event.reason); showAppNotification('An unexpected async error occurred!', 'error'); });
     </script>
 </body>
 </html>
