@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl"> <head>
+<html lang="en" dir="ltr"> <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مدير مسارات هيمو</title>
+    <title>Hemo Paths Manager</title>
     </head>
+
     <style>
         /* --- Base Styles --- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -17,9 +18,9 @@
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #0f0f23; border-radius: 12px; }
-        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 12px; border: 2px solid #0f0f23; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.25); }
-        html { scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.15) #0f0f23; }
+        ::-webkit-scrollbar-thumb { background: rgba(120, 120, 120, 0.3); border-radius: 12px; border: 2px solid #0f0f23; } /* Lightened thumb */
+        ::-webkit-scrollbar-thumb:hover { background: rgba(150, 150, 150, 0.4); }
+        html { scrollbar-width: thin; scrollbar-color: rgba(120, 120, 120, 0.3) #0f0f23; }
 
         /* --- Custom Draggable Title Bar --- */
         .custom-title-bar {
@@ -27,34 +28,26 @@
             background-color: #1c1e2b; 
             -webkit-app-region: drag; 
             z-index: 100000; display: flex; align-items: center;
-            justify-content: space-between; padding: 0 10px 0 0; /* Adjusted for RTL */
+            justify-content: space-between; padding: 0 0 0 10px; 
             user-select: none;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
-        }
-        html[dir="rtl"] .custom-title-bar {
-            padding: 0 10px 0 0; /* Ensure RTL padding */
         }
         .window-app-title { 
             color: #c5c6c7; 
             font-size: 0.8rem; 
             font-weight: 400; 
             -webkit-app-region: no-drag;
-            padding-right: 5px; /* Adjusted for RTL */
+            padding-left: 5px;
             line-height: 32px; 
         }
-        html[dir="rtl"] .window-app-title {
-             padding-left: initial; /* Reset LTR padding */
-             padding-right: 5px;
-        }
-
 
         /* --- Window Controls (Windows Style) --- */
         .window-controls {
             position: static; -webkit-app-region: no-drag;
             display: flex; height: 100%; 
-            margin-right: auto; /* Adjusted for RTL */
+            margin-left: auto; 
         }
-        html[dir="rtl"] .window-controls { margin-left: auto; margin-right: initial; } /* This should be margin-left: auto for RTL */
+        html[dir="rtl"] .window-controls { margin-right: auto; margin-left: initial; }
         
         .window-btn {
             width: 46px; 
@@ -95,25 +88,21 @@
 
         /* --- Sidebar --- */
         .sidebar {
-            position: fixed; right: 0; top: 32px; /* Changed left to right for RTL */
+            position: fixed; left: 0; top: 32px; 
             width: 250px; height: calc(100vh - 32px); 
             background: rgba(10, 12, 28, 0.88); backdrop-filter: blur(18px); 
-            border-left: 1px solid rgba(255, 255, 255, 0.08); /* Changed border-right to border-left */
-            border-right: none; /* Remove old border */
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
             padding: 15px; transition: all 0.3s ease; z-index: 9999;
             display: flex; flex-direction: column;
         }
-        html[dir="rtl"] .sidebar.collapsed .nav-text,
-        html[dir="rtl"] .sidebar.collapsed .logo h2,
-        html[dir="rtl"] .sidebar.collapsed .logo p { display: none; }
-
-        html[dir="rtl"] .sidebar:not(.collapsed) .logo,
-        html[dir="rtl"] .sidebar:not(.collapsed) .nav-text { opacity: 1; transition: opacity 0.2s 0.1s ease-in-out; }
-
-        html[dir="rtl"] .sidebar.collapsed .logo,
-        html[dir="rtl"] .sidebar.collapsed .nav-text { opacity: 0; pointer-events: none; }
-
         .sidebar.collapsed { width: 70px; }
+        html[dir="ltr"] .sidebar.collapsed .nav-text,
+        html[dir="ltr"] .sidebar.collapsed .logo h2,
+        html[dir="ltr"] .sidebar.collapsed .logo p { display: none; }
+        html[dir="ltr"] .sidebar:not(.collapsed) .logo,
+        html[dir="ltr"] .sidebar:not(.collapsed) .nav-text { opacity: 1; transition: opacity 0.2s 0.1s ease-in-out; }
+        html[dir="ltr"] .sidebar.collapsed .logo,
+        html[dir="ltr"] .sidebar.collapsed .nav-text { opacity: 0; pointer-events: none; }
         .sidebar-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 25px; padding-top: 10px; }
         .logo { opacity: 1; transition: opacity 0.3s ease; }
         .sidebar.collapsed .logo { opacity: 0; pointer-events: none; }
@@ -129,10 +118,7 @@
             align-items: center; justify-content: center; -webkit-app-region: no-drag;
         }
         .menu-toggle:hover { background: rgba(255, 255, 255, 0.1); color: white; }
-        .sidebar.collapsed .menu-toggle { margin-left: auto; margin-right: auto; } /* Centering toggle in collapsed sidebar */
-        html[dir="rtl"] .sidebar.collapsed .menu-toggle { margin-right: auto; margin-left: auto; }
-
-
+        .sidebar.collapsed .menu-toggle { margin-left: auto; margin-right: auto; }
         .nav-menu { list-style: none; padding: 0; }
         .nav-item { margin-bottom: 6px; }
         .nav-link {
@@ -145,21 +131,17 @@
             background: linear-gradient(90deg, #1e3a8a, #3b82f6, #6366f1); color: white;
             box-shadow: 0 3px 12px rgba(59, 130, 246, 0.2);
         }
-        .nav-icon { margin-left: 12px; margin-right:0; width: 18px; height: 18px; flex-shrink: 0; } /* Adjusted for RTL */
-        html[dir="rtl"] .sidebar.collapsed .nav-link { justify-content: center; }
-        html[dir="rtl"] .sidebar.collapsed .nav-icon { margin-left: 0; margin-right:0; }
-
+        .nav-icon { margin-right: 12px; width: 18px; height: 18px; flex-shrink: 0; }
+        .sidebar.collapsed .nav-link { justify-content: center; }
+        .sidebar.collapsed .nav-icon { margin-right: 0; }
 
         /* --- Main Content Area --- */
         .main-content {
-            margin-right: 250px; /* Changed margin-left to margin-right for RTL */
-            margin-left: 0; /* Clear old margin */
-            padding: 20px;
-            padding-top: calc(20px + 32px); transition: margin-right 0.3s ease; min-height: 100vh;
+            margin-left: 250px; padding: 20px;
+            padding-top: calc(20px + 32px); transition: margin-left 0.3s ease; min-height: 100vh;
             overflow-y: auto; height: calc(100vh - 32px);
         }
-        .main-content.expanded { margin-right: 70px; margin-left:0; } /* Adjusted for RTL */
-        
+        .main-content.expanded { margin-left: 70px; }
         .page { display: none; animation: fadeInContent 0.4s ease-out; }
         .page.active { display: block; }
         @keyframes fadeInContent { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -181,15 +163,12 @@
             backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 12px; box-shadow: 0 6px 25px 0 rgba(0, 0, 0, 0.3); overflow: hidden;
         }
-        .header { padding: 20px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
-        .header h1 {
-            font-size: 2rem; font-weight: 700;
-            background: linear-gradient(45deg, #ffffff, #e3f2fd, #bbdefb);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            background-clip: text; text-fill-color: transparent;
-            margin-bottom: 6px; text-transform: capitalize;
+        .header { 
+            /* padding: 20px; */ /* Original padding, adjusted in HTML */
+            text-align: center; 
+            /* border-bottom: 1px solid rgba(255, 255, 255, 0.08); */ /* Original border, adjusted in HTML */
         }
-        .header p { color: #64b5f6; font-size: 0.9rem; }
+        /* H1 and P from header are removed, so no specific styles needed for them here */
         
         .add-item-panel-page {
             background: rgba(15, 15, 35, 0.35);
@@ -226,9 +205,10 @@
             background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2364b5f6%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
             background-repeat: no-repeat; background-size: 10px; 
         }
+        html[dir="ltr"] .add-item-panel-page #categorySelectInputPage { background-position: right 10px center; padding-right: 30px; }
         html[dir="rtl"] .add-item-panel-page #categorySelectInputPage { background-position: left 10px center; padding-left: 30px; padding-right: 14px; }
         .add-item-panel-page #categorySelectInputPage option { background: #1a1a2e; color: white; }
-        .add-item-panel-page .add-item-page-actions { text-align: left; margin-top:15px; display:flex; justify-content: flex-start; gap: 10px;} /* Adjusted for RTL */
+        .add-item-panel-page .add-item-page-actions { text-align: right; margin-top:15px; display:flex; justify-content: flex-end; gap: 10px;}
 
 
         .top-actions-bar {
@@ -237,12 +217,13 @@
             flex-wrap: wrap; gap: 10px;
         }
         .stats { font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; color: #90a4ae; }
-        .stats svg { margin-left: 8px; margin-right:0; width: 16px; height: 16px; vertical-align: middle; fill: #64b5f6; } /* Adjusted for RTL */
+        .stats svg { margin-right: 8px; width: 16px; height: 16px; vertical-align: middle; fill: #64b5f6; } 
 
         .btn {
             padding: 9px 18px; border: none; border-radius: 8px; font-size: 0.85rem; font-weight: 600;
             cursor: pointer; transition: all 0.25s ease; text-decoration: none; display: inline-flex;
             align-items: center; gap: 7px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); text-transform: none;
+            color: #e0e0e0; /* Default light text for buttons */
         }
         .btn svg { width: 15px; height: 15px; fill: currentColor; }
         .btn:hover { transform: translateY(-1px); box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25); }
@@ -258,7 +239,7 @@
         }
         .btn-primary:hover { box-shadow: 0 5px 18px rgba(33, 150, 243, 0.35); }
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.08); color: #90a4ae; border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.08); color: #b0bec5; border: 1px solid rgba(255, 255, 255, 0.15);
         }
         .btn-secondary:hover { background: rgba(255, 255, 255, 0.12); color: white; }
         .btn-danger {
@@ -272,12 +253,15 @@
         }
         .btn-success:hover { background: linear-gradient(45deg, #1b5e20, #2e7d32, #388e3c); box-shadow: 0 5px 18px rgba(76, 175, 80, 0.35); }
         .btn-icon {
-            background: transparent; border: none; color: #90a4ae; padding: 7px; line-height: 1;
+            background: rgba(255, 255, 255, 0.05); /* Slight background for better visibility */
+            border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border */
+            color: #b0bec5; /* Lighter icon color */
+            padding: 7px; line-height: 1;
             border-radius: 6px; transition: all 0.2s ease;
         }
-        .btn-icon:hover { color: white; background-color: rgba(255, 255, 255, 0.08); }
-        .btn-icon svg { width: 16px; height: 16px; }
-        .btn-icon:disabled { color: #5f6770 !important; background-color: transparent !important; cursor: not-allowed;}
+        .btn-icon:hover { color: white; background-color: rgba(255, 255, 255, 0.15); }
+        .btn-icon svg { width: 16px; height: 16px; fill:currentColor; }
+        .btn-icon:disabled { color: #5f6770 !important; background-color: transparent !important; cursor: not-allowed; border-color: rgba(95,103,112,0.5) !important;}
         .btn-icon:disabled svg { fill: #5f6770 !important; }
         .btn-sm { padding: 6px 12px; font-size: 0.75rem; } 
         
@@ -340,7 +324,7 @@
             opacity: 0.5;
             border: 2px dashed #4fc3f7; 
         }
-        .category-section.drag-over-item { /* Style for when an item is dragged over a category */
+        .category-section.drag-over-item { 
             background-color: rgba(79, 195, 247, 0.15) !important;
             border-color: #4fc3f7 !important;
         }
@@ -360,27 +344,31 @@
         .category-header:hover .category-title { color: #64b5f6; } 
         .category-title-container { display: flex; align-items: center; gap: 10px; flex-grow: 1; cursor: pointer; }
         .category-toggle-icon svg { width: 11px; height: 11px; fill: #90a4ae; transition: transform 0.25s ease-in-out; }
-        html[dir="rtl"] .category-section:not(.collapsed) .category-toggle-icon svg { transform: rotate(-90deg); }
-        html[dir="ltr"] .category-section:not(.collapsed) .category-toggle-icon svg { transform: rotate(90deg); } /* Keep LTR for chevron direction */
+        html[dir="ltr"] .category-section:not(.collapsed) .category-toggle-icon svg { transform: rotate(90deg); }
+        html[dir="rtl"] .category-section:not(.collapsed) .category-toggle-icon svg { transform: rotate(-90deg); } 
 
         .category-title { font-size: 1.1rem; font-weight: 600; color: white; text-transform: capitalize;}
         .category-item-count {
             background: rgba(255, 255, 255, 0.08); color: #64b5f6; padding: 2px 9px;
-            border-radius: 18px; font-size: 0.7rem; margin-right: 8px; margin-left:0; /* Adjusted for RTL */
+            border-radius: 18px; font-size: 0.7rem; margin-left: 8px; 
         }
         
-        .category-controls { display: flex; align-items: center; gap: 6px; }
+        .category-controls { display: flex; align-items: center; gap: 8px; } /* Increased gap slightly */
         .category-controls .btn-icon { 
-            padding: 6px; 
-            background-color: rgba(255, 255, 255, 0.05); /* Slight background for visibility */
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 7px; /* Consistent padding */
+            background-color: rgba(255, 255, 255, 0.07); 
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #b0bec5;
         }
         .category-controls .btn-icon:hover { 
-            background-color: rgba(255, 255, 255, 0.15); 
+            background-color: rgba(255, 255, 255, 0.18); 
             color:white;
         }
-        .category-controls .btn-icon.btn-rename-category-header:hover { color: #64b5f6; }
-        .category-controls .btn-icon.btn-delete-category-header:hover { color: #f44336; }
+        .category-controls .btn-icon.btn-rename-category-header:hover svg { fill: #64b5f6; }
+        .category-controls .btn-icon.btn-delete-category-header:hover svg { fill: #f44336; }
+        .category-controls .btn-icon.btn-save-inline-header-edit:hover svg { fill: #4caf50; }
+        .category-controls .btn-icon.btn-cancel-inline-header-edit:hover svg { fill: #f44336; }
+
 
         .category-controls .btn-icon svg { width: 14px; height: 14px; }
         .category-controls .btn-open-all-in-category { padding: 6px 10px; font-size: 0.75rem; }
@@ -422,10 +410,12 @@
             padding: 16px; box-shadow: 0 3px 12px rgba(0,0,0,0.18);
             transition: all 0.25s ease; display: flex; flex-direction: column;
             justify-content: space-between; position: relative; min-height: 130px; 
+            cursor: grab; /* Indicate draggable items */
         }
-        .item-card.dragging { /* Style for the item being dragged */
+        .item-card.dragging { 
             opacity: 0.4;
             border: 2px dashed #64b5f6;
+            cursor: grabbing;
         }
         .item-card:hover {
             background: rgba(10, 10, 25, 0.75); border-color: rgba(255, 255, 255, 0.12);
@@ -448,7 +438,7 @@
         .item-card-date { font-size: 0.65rem; color: #78828c; }
         .item-card-actions-trigger { -webkit-app-region: no-drag; }
         .item-card-actions-trigger svg { width: 16px; height: 16px; }
-        .item-card-direct-open { -webkit-app-region: no-drag; margin-right: 8px; margin-left:0; flex-shrink: 0; } /* Adjusted for RTL */
+        .item-card-direct-open { -webkit-app-region: no-drag; margin-left: 8px; flex-shrink: 0; } 
 
 
         .item-actions-menu {
@@ -458,14 +448,15 @@
             z-index: 500; min-width: 190px; overflow: hidden; padding: 6px; 
         }
         .item-actions-menu.show { display: block; animation: fadeIn 0.15s ease-out; }
+        html[dir="ltr"] .item-actions-menu { left: 8px; right:auto; } 
         html[dir="rtl"] .item-actions-menu { right: 8px; left:auto; } 
         .item-actions-menu button {
             display: flex; align-items: center; gap: 8px; width: 100%; padding: 9px 12px;
             background: none; border: none; cursor: pointer; font-size: 0.8rem;
-            color: #b0bec5; transition: all 0.15s ease; text-align: right; /* Adjusted for RTL */
+            color: #b0bec5; transition: all 0.15s ease; text-align: left; 
             border-radius: 6px; margin: 0; 
         }
-        .item-actions-menu button svg { width: 14px; height: 14px; fill: currentColor; margin-left: 8px; margin-right:0; } /* Adjusted for RTL */
+        .item-actions-menu button svg { width: 14px; height: 14px; fill: currentColor; margin-right: 8px; margin-left:0; } 
         .item-actions-menu button:hover { background-color: rgba(33, 150, 243, 0.18); color: #64b5f6; }
         .item-actions-menu button:hover svg { fill: #64b5f6; }
         .item-actions-menu button[data-action="delete"]:hover { background-color: rgba(244, 67, 54, 0.18); color: #f44336; }
@@ -483,9 +474,9 @@
             z-index: 10000; opacity: 0; transform: translateY(18px) scale(0.96);
             transition: opacity 0.25s ease-out, transform 0.25s ease-out;
             max-width: 340px; font-size: 0.88rem;
-            border-right: 3px solid transparent; border-left:none; /* Adjusted for RTL */
+            border-left: 3px solid transparent; border-right:none; 
         }
-        html[dir="rtl"] .notification-toast { right: 18px; left: auto; }
+        html[dir="rtl"] .notification-toast { right: 18px; left: auto; border-right: 3px solid transparent; border-left:none; }
         .notification-toast.show { opacity: 1; transform: translateY(0) scale(1); }
         .notification-toast.success { border-color: #4caf50; } 
         .notification-toast.error { border-color: #f44336; } 
@@ -498,7 +489,7 @@
             z-index: 99998; opacity: 0; visibility: hidden;
             transition: opacity 0.25s ease-out, visibility 0s 0.25s linear;
         }
-        #confirmModalBackdrop { z-index: 100001; } 
+        #confirmModalBackdrop, #moveToCategoryModal { z-index: 100001; } 
         .loading-indicator.show, .modal-backdrop.show { opacity: 1; visibility: visible; transition-delay: 0s; }
         .spinner {
             width: 32px; height: 32px; border: 3.5px solid rgba(255, 255, 255, 0.18); 
@@ -583,7 +574,8 @@
             transition: all 0.25s ease;
         }
         .todo-item:hover { background: rgba(255, 255, 255, 0.08); }
-        .todo-item.completed { background: rgba(76, 175, 80, 0.08); border-right-color: #4caf50; border-left-color:rgba(255,255,255,0.08); } /* Adjusted for RTL */
+        .todo-item.completed { background: rgba(76, 175, 80, 0.08); border-left-color: #4caf50; }
+        html[dir="rtl"] .todo-item.completed { border-right-color: #4caf50; border-left-color: rgba(255,255,255,0.08); }
         .todo-item-left { display: flex; align-items: center; gap: 8px; flex-grow: 1; }
         .todo-checkbox {
             width: 18px; height: 18px; border: 1.5px solid #64b5f6; border-radius: 5px;
@@ -600,7 +592,8 @@
             border-radius: 4px; padding: 4px 8px; font-size: 0.9rem;
         }
 
-        .todo-date { font-size: 0.7rem; color: #90a4ae; margin-right: auto; padding-right: 8px; margin-left:0; padding-left:0; flex-shrink: 0;} /* Adjusted for RTL */
+        .todo-date { font-size: 0.7rem; color: #90a4ae; margin-left: auto; padding-left: 8px; flex-shrink: 0;}
+        html[dir="rtl"] .todo-date { margin-right: auto; padding-right: 8px; margin-left:0; padding-left:0;}
         .todo-item-actions { display:flex; gap: 6px; } 
         .todo-item .btn-icon { padding: 5px; } 
         .todo-item .btn-icon svg { width: 13px; height: 13px; }
@@ -627,7 +620,7 @@
         }
         #optionsPage .options-group .btn { margin-top: 8px;} 
         #optionsPage .input-row { margin-bottom: 12px;} 
-        #optionsPage .input-row label { font-size: 0.85rem; color: #b0bec5; margin-left: 10px; margin-right:0; min-width: 120px; } /* Adjusted for RTL */
+        #optionsPage .input-row label { font-size: 0.85rem; color: #b0bec5; margin-right: 10px; min-width: 120px; } 
 
 
         #extensionMappingsContainer { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; max-height: 220px; overflow-y: auto; padding:10px; background: rgba(0,0,0,0.1); border-radius: 6px;}
@@ -683,7 +676,7 @@
         #aboutPage h4 {
             font-size: 1.1rem; color: #81c784; margin-top: 20px; margin-bottom: 10px;
         }
-        #aboutPage ul { list-style-position: inside; padding-right: 0; text-align: right; max-width: 400px; margin: 0 auto;} /* Adjusted for RTL */
+        #aboutPage ul { list-style-position: inside; padding-left: 0; text-align: left; max-width: 400px; margin: 0 auto;} 
         #aboutPage li { margin-bottom: 8px; color: #b0bec5;}
 
 
@@ -715,28 +708,31 @@
 
         @media (max-width: 768px) {
             body { padding: 0; font-size:13px; }
-            .main-content { margin-right: 0; margin-left:0; padding:10px; padding-top: calc(10px + 32px); } /* Adjusted for RTL */
-            .main-content.expanded { margin-right: 0; margin-left:0; } 
-            .sidebar { transform: translateX(100%); box-shadow: -3px 0 12px rgba(0,0,0,0.15); top: 32px; height: calc(100vh - 32px);} /* Adjusted for RTL */
+            .main-content { margin-left: 0; margin-right:0; padding:10px; padding-top: calc(10px + 32px); } 
+            .main-content.expanded { margin-left: 0; margin-right:0; } 
+            .sidebar { transform: translateX(-100%); box-shadow: 3px 0 12px rgba(0,0,0,0.15); top: 32px; height: calc(100vh - 32px);} 
+            html[dir="rtl"] .sidebar { transform: translateX(100%); box-shadow: -3px 0 12px rgba(0,0,0,0.15); }
             .sidebar.show { transform: translateX(0); }
             .container { margin: 8px; width:auto; }
-            .header { padding: 18px 12px; } .header h1 { font-size: 1.7rem; }
+            .header { padding: 18px 12px; } /* Re-add if header content comes back */
             .top-actions-bar, .add-item-panel-page .input-group { padding: 12px; } 
             .top-actions-bar { flex-direction: column; align-items: stretch; }
             .top-actions-bar .btn { width: 100%; margin-bottom: 8px; }
             .add-item-panel-page .input-row, .input-row { flex-direction: column; gap: 12px; } 
             .items-grid { grid-template-columns: 1fr; gap: 12px;} 
             .item-card { min-height: auto; padding: 12px; } 
-            .notification-toast { max-width: calc(100% - 20px); bottom: 8px; right:10px; left:10px;} /* Adjusted for RTL */
+            .notification-toast { max-width: calc(100% - 20px); bottom: 8px; left:10px; right:10px;} 
             .category-manager-content { max-width: 96%; padding: 18px;}
             .modal-dialog { max-width: 92%; padding: 18px; }
             #optionsPage .options-group { padding-bottom: 15px; margin-bottom: 20px; }
+            .category-controls { flex-wrap: wrap; justify-content: flex-start; } /* Allow controls to wrap */
+            .category-controls .btn { margin-bottom: 5px;}
         }
         @media (max-width: 480px) {
-            .custom-title-bar { height: 30px; padding: 0 8px 0 6px; } /* Adjusted for RTL */
+            .custom-title-bar { height: 30px; padding: 0 6px 0 8px; } 
             .sidebar { top: 30px; height: calc(100vh - 30px); }
             .main-content { padding-top: calc(10px + 30px); height: calc(100vh - 30px); }
-            .header h1 { font-size: 1.5rem; } .header p { font-size: 0.8rem; }
+            /* .header h1 { font-size: 1.5rem; } .header p { font-size: 0.8rem; } */ /* If header content is restored */
             .btn { font-size: 0.8rem; padding: 8px 14px; } .btn-primary { padding: 9px 18px; }
             .category-title { font-size: 1rem; }
             .category-item-count { font-size: 0.65rem; padding: 2px 7px;}
@@ -744,21 +740,23 @@
             .category-controls .category-on-off-toggle { font-size: 0.65rem; padding: 4px 8px; min-width: 60px;}
             .category-manager-content h2 { font-size: 1.4rem; }
             .sidebar.collapsed { width: 55px; } 
-            .main-content.expanded { margin-right: 55px; margin-left:0; } /* Adjusted for RTL */
+            .main-content.expanded { margin-left: 55px; } 
+            html[dir="rtl"] .main-content.expanded { margin-right: 55px; margin-left:0; }
             #optionsPage .options-group h3 { font-size: 1.1rem; }
             .add-item-panel-page h2 { font-size: 1.3rem; }
         }
 
 </style>
 
+    
 <body>
     <div class="custom-title-bar">
-        <span class="window-app-title">مدير مسارات هيمو</span>
+        <span class="window-app-title">Hemo Paths Manager</span>
         <div class="window-controls">
-            <button class="window-btn minimize-btn" onclick="handleMinimizeWindow()" title="تصغير">
+            <button class="window-btn minimize-btn" onclick="handleMinimizeWindow()" title="Minimize">
                 <svg viewBox="0 0 10 10"><path d="M0 4h10v2H0z"/></svg>
             </button>
-            <button class="window-btn close-btn" onclick="handleCloseWindow()" title="إغلاق">
+            <button class="window-btn close-btn" onclick="handleCloseWindow()" title="Close">
                 <svg viewBox="0 0 10 10"><path d="M0 0l10 10M10 0l-10 10" stroke="currentColor" stroke-width="1.5" /></svg>
             </button>
         </div>
@@ -767,10 +765,10 @@
     <nav class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="logo">
-                <h2>مسارات هيمو</h2>
-                <p>المدير</p>
+                <h2>Hemo Paths</h2>
+                <p>Manager</p>
             </div>
-            <button class="menu-toggle" onclick="toggleSidebar()" title="تبديل القائمة">
+            <button class="menu-toggle" onclick="toggleSidebar()" title="Toggle Menu">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
                 </svg>
@@ -781,28 +779,28 @@
             <li class="nav-item">
                 <a href="#" class="nav-link active" onclick="showPage('pathsPage')">
                     <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><use xlink:href="#icon-folder"></use></svg>
-                    <span class="nav-text">مدير المسارات</span>
+                    <span class="nav-text">Path Manager</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a href="#" class="nav-link" onclick="showPage('todosPage')">
-                    <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><use xlink:href="#icon-check"></use></svg> <span class="nav-text">قائمة المهام</span>
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><use xlink:href="#icon-check"></use></svg> <span class="nav-text">To-Do List</span>
                 </a>
             </li>
              <li class="nav-item"> 
                 <a href="#" class="nav-link" onclick="showPage('fileOperationsPage')">
-                     <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><use xlink:href="#icon-save"></use></svg> <span class="nav-text">ملف</span>
+                     <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><use xlink:href="#icon-save"></use></svg> <span class="nav-text">File</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a href="#" class="nav-link" onclick="showPage('optionsPage')"> 
-                    <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"> <use xlink:href="#icon-settings-alt"></use></svg> <span class="nav-text">الخيارات</span>
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"> <use xlink:href="#icon-settings-alt"></use></svg> <span class="nav-text">Options</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a href="#" class="nav-link" onclick="showPage('aboutPage')">
                     <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"> <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/> </svg>
-                    <span class="nav-text">حول</span>
+                    <span class="nav-text">About</span>
                 </a>
             </li>
         </ul>
@@ -811,43 +809,41 @@
     <main class="main-content" id="mainContent">
         <div id="pathsPage" class="page active">
             <div class="container">
-                <div class="header">
-                    <h1>مدير ملفات المشروع</h1> <p>نظم وأدر ملفات مشروعك بكفاءة</p> 
-                </div>
+                <div class="header" style="padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.08);"> </div>
 
                 <div class="add-item-panel-page">
-                    <h2>إضافة عنصر/عناصر جديدة</h2>
+                    <h2>Add New Item(s)</h2>
                     <div class="input-group">
                         <div class="input-row">
                             <button id="selectFilesButtonPage" class="btn btn-secondary">
-                                <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>إضافة ملفات
+                                <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>Add Files
                             </button>
                             <button id="addFolderLinkButtonPage" class="btn btn-secondary">
-                                <svg viewBox="0 0 24 24"><use xlink:href="#icon-folder"></use></svg>إضافة رابط مجلد
+                                <svg viewBox="0 0 24 24"><use xlink:href="#icon-folder"></use></svg>Add Folder Link
                             </button>
                             <button id="importFromFolderButtonPage" class="btn btn-secondary">
-                                <svg viewBox="0 0 24 24"><use xlink:href="#icon-folder"></use></svg>استيراد من مجلد
+                                <svg viewBox="0 0 24 24"><use xlink:href="#icon-folder"></use></svg>Import From Folder
                             </button>
                         </div>
                         <div class="input-row paste-path-group">
-                            <input type="text" id="pathInputPage" class="input-field" placeholder="أو الصق مسار ملف/مجلد/موقع هنا">
+                            <input type="text" id="pathInputPage" class="input-field" placeholder="Or paste a file/folder/website path here">
                             <button id="pastePathButtonPage" class="btn btn-secondary">
-                                <svg viewBox="0 0 24 24"><use xlink:href="#icon-paste"></use></svg>لصق
+                                <svg viewBox="0 0 24 24"><use xlink:href="#icon-paste"></use></svg>Paste
                             </button>
                             <button id="addPastedPathButtonPage" class="btn btn-primary">
-                                <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>إضافة المسار
+                                <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>Add Path
                             </button>
                         </div>
                         <div class="input-row">
-                            <input type="text" id="projectNameInputPage" class="input-field" placeholder="اسم وصفي للعنصر (اختياري)">
+                            <input type="text" id="projectNameInputPage" class="input-field" placeholder="Descriptive name for the item(s) (optional)">
                             <select id="categorySelectInputPage" class="input-field"></select>
                         </div>
                         <div id="selectedFilesDisplayPage"></div>
                          <div class="add-item-page-actions">
                             <button id="addItemsButtonPage" class="btn btn-success">
-                                <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>إضافة إلى القائمة
+                                <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>Add to List
                             </button>
-                             <button id="clearInputsButtonPage" class="btn btn-secondary">مسح المدخلات</button>
+                             <button id="clearInputsButtonPage" class="btn btn-secondary">Clear Inputs</button>
                         </div>
                     </div>
                 </div>
@@ -855,12 +851,15 @@
                 <div class="top-actions-bar">
                     <div class="stats">
                         <svg viewBox="0 0 24 24"><use xlink:href="#icon-folder"></use></svg>
-                        إجمالي العناصر: <span id="fileCount">0</span> 
+                        Total Items: <span id="fileCount">0</span> 
                     </div>
                     <div>
+                         <button id="addEmptyCategoryBtn" class="btn btn-secondary">
+                            <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>Add Empty Category
+                        </button>
                         <button id="openAllBtn" class="btn btn-primary">
                             <svg viewBox="0 0 24 24"><use xlink:href="#icon-rocket"></use></svg>
-                            فتح الكل (المفعل)
+                            Open All (Enabled)
                         </button>
                     </div>
                 </div>
@@ -872,17 +871,18 @@
         <div id="todosPage" class="page">
             <div class="page-header-container">
                 <div>
-                    <h1 class="page-title">قائمة المهام</h1>
-                    <p class="page-subtitle">تتبع مهامك ومشاريعك</p>
+                    <h1 class="page-title">To-Do List</h1>
+                    <p class="page-subtitle">Keep track of your tasks and projects</p>
                 </div>
             </div>
             <div class="glass-card">
                 <div class="todo-input-container">
-                    <input type="text" id="todoInput" class="input-field todo-input" placeholder="أضف مهمة جديدة...">
+                    <input type="text" id="todoInput" class="input-field todo-input" placeholder="Add a new task...">
                     <button id="addTodoBtn" class="btn btn-primary">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="margin-left: 8px; margin-right:0;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px; margin-left:0;">
+                            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
                         </svg>
-                        إضافة مهمة
+                        Add Task
                     </button>
                 </div>
                 <div id="todosContainer"></div>
@@ -892,34 +892,34 @@
         <div id="fileOperationsPage" class="page">
             <div class="page-header-container">
                 <div>
-                    <h1 class="page-title">عمليات الملفات</h1>
-                    <p class="page-subtitle">إدارة ملفات بيانات مشروعك</p>
+                    <h1 class="page-title">File Operations</h1>
+                    <p class="page-subtitle">Manage your project data files</p>
                 </div>
             </div>
             <div class="glass-card">
                 <div class="options-group">
-                    <h3>ملف المشروع</h3>
-                    <p>احفظ جميع المسارات والفئات والمهام الحالية في ملف، أو قم بتحميلها من ملف محفوظ مسبقًا.</p>
+                    <h3>Project File</h3>
+                    <p>Save all current paths, categories, and tasks to a file, or load them from a previously saved file.</p>
                     <div style="display: flex; gap: 10px; margin-top:10px; flex-wrap:wrap;">
                         <button id="saveProjectAsBtn" class="btn btn-primary">
-                            <svg viewBox="0 0 24 24"><use xlink:href="#icon-save"></use></svg> حفظ المشروع باسم...
+                            <svg viewBox="0 0 24 24"><use xlink:href="#icon-save"></use></svg> Save Project As...
                         </button>
                         <button id="importProjectBtn" class="btn btn-secondary">
-                            <svg viewBox="0 0 24 24"><use xlink:href="#icon-open"></use></svg> استيراد مشروع...
+                            <svg viewBox="0 0 24 24"><use xlink:href="#icon-open"></use></svg> Import Project...
                         </button>
-                         <button id="saveActiveProjectBtn" class="btn btn-success" disabled> <svg viewBox="0 0 24 24"><use xlink:href="#icon-save"></use></svg> حفظ المشروع الحالي
+                         <button id="saveActiveProjectBtn" class="btn btn-success" disabled> <svg viewBox="0 0 24 24"><use xlink:href="#icon-save"></use></svg> Save Current Project
                         </button>
                     </div>
-                     <p id="activeProjectInfo" style="font-size: 0.8rem; color: #90a4ae; margin-top: 10px;">لا يوجد ملف مشروع نشط.</p>
+                     <p id="activeProjectInfo" style="font-size: 0.8rem; color: #90a4ae; margin-top: 10px;">No active project file.</p>
                 </div>
                 <div class="options-group">
                     <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 5px;">
-                        <h3>السجل</h3>
-                        <button id="clearHistoryBtn" class="btn btn-danger btn-icon" title="مسح السجل">
+                        <h3>History</h3>
+                        <button id="clearHistoryBtn" class="btn btn-danger btn-icon" title="Clear History">
                              <svg viewBox="0 0 24 24"><use xlink:href="#icon-clear-all"></use></svg>
                         </button>
                     </div>
-                    <p>ملفات المشاريع المفتوحة أو المحفوظة مؤخرًا.</p>
+                    <p>Recently opened or saved project files.</p>
                     <div id="projectHistoryContainer" style="max-height: 200px; overflow-y: auto; padding: 5px; background: rgba(255,255,255,0.03); border-radius: 6px;">
                         </div>
                 </div>
@@ -930,61 +930,61 @@
         <div id="optionsPage" class="page">
             <div class="page-header-container">
                 <div>
-                    <h1 class="page-title">الخيارات</h1>
-                    <p class="page-subtitle">تكوين إعدادات وتفضيلات التطبيق</p>
+                    <h1 class="page-title">Options</h1>
+                    <p class="page-subtitle">Configure application settings and preferences</p>
                 </div>
             </div>
             <div class="glass-card">
                 <div class="options-group">
-                    <h3>إدارة الفئات</h3>
-                    <p>نظم كيفية تجميع عناصرك.</p>
+                    <h3>Category Management</h3>
+                    <p>Organize how your items are grouped.</p>
                     <button id="manageCategoriesBtn" class="btn btn-secondary">
-                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-settings-alt"></use></svg> إدارة الفئات
+                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-settings-alt"></use></svg> Manage Categories
                     </button>
                 </div>
 
                 <div class="options-group">
-                    <h3>ربط امتدادات الملفات</h3>
-                    <p>قم بتعيين الفئات تلقائيًا بناءً على امتدادات الملفات.</p>
+                    <h3>File Extension Mappings</h3>
+                    <p>Automatically assign categories based on file extensions.</p>
                     <div class="input-row" style="margin-bottom: 10px;">
-                        <input type="text" id="newExtensionInput" class="input-field" placeholder=".example (مثال: .txt, .doc)">
-                        <input type="text" id="newExtensionCategoryNameInput" class="input-field" placeholder="اسم عرض الفئة (مثال: ملفات نصية)">
+                        <input type="text" id="newExtensionInput" class="input-field" placeholder=".example (e.g., .txt, .doc)">
+                        <input type="text" id="newExtensionCategoryNameInput" class="input-field" placeholder="Category Display Name (e.g., Text Files)">
                     </div>
                     <button id="addExtensionMappingBtn" class="btn btn-success">
                         <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>
-                        إضافة ربط امتداد
+                        Add Extension Mapping
                     </button>
                     <div id="extensionMappingsContainer" style="margin-top: 15px;"></div>
                 </div>
 
                 <div class="options-group">
-                    <h3>فاصل زمني لفتح عناصر متعددة</h3>
-                    <p>اضبط التأخير (بالثواني) بين فتح كل عنصر عند استخدام "فتح الكل" أو "فتح الكل في الفئة".</p>
+                    <h3>Open Multiple Items Interval</h3>
+                    <p>Set the delay (in seconds) between opening each item when using "Open All" or "Open All in Category".</p>
                      <div class="input-row" style="max-width: 300px;">
-                        <label for="openIntervalInput" style="white-space: nowrap; align-self: center;">الفاصل (ثواني):</label>
+                        <label for="openIntervalInput" style="white-space: nowrap; align-self: center;">Interval (seconds):</label>
                         <input type="number" id="openIntervalInput" class="input-field" value="0.3" min="0.05" step="0.05">
                     </div>
                     <button id="saveOpenIntervalBtn" class="btn btn-success" style="margin-top:10px;">
-                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-save"></use></svg> حفظ الفاصل
+                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-save"></use></svg> Save Interval
                     </button>
                 </div>
 
                 <div class="options-group">
-                    <h3>تحديثات التطبيق</h3>
-                    <p>تحقق من أحدث إصدار من مدير مسارات هيمو.</p>
+                    <h3>Application Updates</h3>
+                    <p>Check for the latest version of Hemo Paths Manager.</p>
                     <button id="checkForUpdatesBtn" class="btn btn-secondary">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-left:8px; margin-right:0;"><path d="M12 2.5c-5.25 0-9.5 4.25-9.5 9.5s4.25 9.5 9.5 9.5 9.5-4.25 9.5-9.5S17.25 2.5 12 2.5zm0 2c4.14 0 7.5 3.36 7.5 7.5s-3.36 7.5-7.5 7.5-7.5-3.36-7.5-7.5S7.86 4.5 12 4.5zm-1 11.5h2v2h-2v-2zm0-8h2v6h-2V8z"/></svg>
-                        التحقق من وجود تحديثات
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right:8px; margin-left:0;"><path d="M12 2.5c-5.25 0-9.5 4.25-9.5 9.5s4.25 9.5 9.5 9.5 9.5-4.25 9.5-9.5S17.25 2.5 12 2.5zm0 2c4.14 0 7.5 3.36 7.5 7.5s-3.36 7.5-7.5 7.5-7.5-3.36-7.5-7.5S7.86 4.5 12 4.5zm-1 11.5h2v2h-2v-2zm0-8h2v6h-2V8z"/></svg>
+                        Check for Updates
                     </button>
                     <p id="updateStatusMessage" style="font-size: 0.8rem; color: #90a4ae; margin-top: 10px;"></p>
                 </div>
 
 
                 <div class="options-group">
-                    <h3>إدارة البيانات</h3>
-                     <p>إدارة جميع بيانات التطبيق المخزنة.</p>
+                    <h3>Data Management</h3>
+                     <p>Manage all stored application data.</p>
                     <button id="clearAllDataBtnOptionsPage" class="btn btn-danger"> <svg viewBox="0 0 24 24"><use xlink:href="#icon-clear-all"></use></svg>
-                        مسح جميع بيانات التطبيق
+                        Clear All Application Data
                     </button>
                 </div>
             </div>
@@ -993,22 +993,22 @@
 
         <div id="aboutPage" class="page">
             <div class="glass-card">
-                <h3>مدير مسارات هيمو</h3>
-                <p>الإصدار: 1.9 (تحسينات واجهة المستخدم وميزات جديدة)</p>
-                <p>تم تطويره لتبسيط إدارة مسارات ملفات مشروعك وروابط المواقع والمهام.</p>
+                <h3>Hemo Paths Manager</h3>
+                <p>Version: 1.9 (UI Refinements & Features)</p>
+                <p>Developed to streamline the management of your project file paths, website links, and tasks.</p>
                 <br>
-                <h4>الميزات الرئيسية:</h4>
+                <h4>Key Features:</h4>
                 <ul>
-                    <li>إضافة وتصنيف مسارات الملفات وروابط المجلدات وعناوين URL للمواقع بسهولة.</li>
-                    <li>فتح الملفات والمجلدات والمواقع مباشرة من التطبيق.</li>
-                    <li>إدارة الفئات المخصصة وربط امتدادات الملفات لتنظيم أفضل.</li>
-                    <li>قائمة مهام مدمجة مع وظيفة التعديل لتتبع مهامك.</li>
-                    <li>حفظ وتحميل إعدادات المشروع بالكامل كملفات `.hpmt`.</li>
-                    <li>سجل لملفات المشاريع المستخدمة مؤخرًا.</li>
-                    <li>واجهة مستخدم حديثة وجذابة مع نافذة بدون إطار.</li>
+                    <li>Easily add and categorize file paths, folder links, and website URLs.</li>
+                    <li>Directly open files, folders, and websites from the application.</li>
+                    <li>Manage custom categories and file extension mappings for better organization.</li>
+                    <li>Integrated To-Do list with edit functionality to track your tasks.</li>
+                    <li>Save and load entire project setups as `.hpmt` files.</li>
+                    <li>History of recently used project files.</li>
+                    <li>Modern and attractive user interface with frameless window.</li>
                 </ul>
                 <br>
-                <h5>v 2.0.4 - 202564</h5>
+                <h5>v 2.0.5 - 202565</h5>
             </div>
         </div>
     </main>
@@ -1041,12 +1041,27 @@
         <symbol id="icon-close" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></symbol>
         <symbol id="icon-check" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></symbol>
         <symbol id="icon-history" viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7v2c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.25 2.52.77-1.28-3.52-2.09V8H12z"/></symbol>
-        <symbol id="icon-drag-handle" viewBox="0 0 24 24"><path fill="currentColor" d="M20 9H4v2h16V9zM4 15h16v-2H4v2z"/></symbol> </svg>
+        <symbol id="icon-drag-handle" viewBox="0 0 24 24"><path fill="currentColor" d="M20 9H4v2h16V9zM4 15h16v-2H4v2z"/></symbol> 
+        <symbol id="icon-move-to" viewBox="0 0 24 24"><path fill="currentColor" d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></symbol>
+
+
+    </svg>
 
     <div id="notificationToast" class="notification-toast"></div>
-    <div id="confirmModalBackdrop" class="modal-backdrop"> <div class="modal-dialog"> <p id="confirmModalMessage"></p> <div class="modal-dialog-actions"> <button id="confirmModalYesBtn" class="btn btn-danger">نعم</button> <button id="confirmModalNoBtn" class="btn btn-primary">لا</button> </div> </div> </div>
-    <div id="categoryManagerModal" class="modal-backdrop"> <div class="category-manager-content"> <h2>إدارة الفئات</h2> <div id="categoryListContainer"></div> <div class="add-category-form"> <input type="text" id="newManagedCategoryInput" class="input-field" placeholder="اسم الفئة الجديدة"> <button id="addManagedCategoryBtn" class="btn btn-success"> <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>إضافة فئة </button> </div> <div class="category-manager-actions"> <button id="closeCategoryManagerBtn" class="btn btn-secondary">إغلاق</button> </div> </div> </div>
+    <div id="confirmModalBackdrop" class="modal-backdrop"> <div class="modal-dialog"> <p id="confirmModalMessage"></p> <div class="modal-dialog-actions"> <button id="confirmModalYesBtn" class="btn btn-danger">Yes</button> <button id="confirmModalNoBtn" class="btn btn-primary">No</button> </div> </div> </div>
+    <div id="categoryManagerModal" class="modal-backdrop"> <div class="category-manager-content"> <h2>Manage Categories</h2> <div id="categoryListContainer"></div> <div class="add-category-form"> <input type="text" id="newManagedCategoryInput" class="input-field" placeholder="New category name"> <button id="addManagedCategoryBtn" class="btn btn-success"> <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>Add Category </button> </div> <div class="category-manager-actions"> <button id="closeCategoryManagerBtn" class="btn btn-secondary">Close</button> </div> </div> </div>
     <div class="loading-indicator" id="loadingOverlay"> <div class="spinner"></div></div>
+    <div id="moveToCategoryModal" class="modal-backdrop" style="display: none; align-items: flex-start; padding-top: 10%;">
+        <div class="modal-dialog" style="min-width: 300px; max-width: 400px;">
+            <h3 style="margin-bottom: 15px; color: #b3e5fc;">Move Item To:</h3>
+            <select id="moveToCategorySelect" class="input-field" style="width: 100%; margin-bottom: 15px;"></select>
+            <div class="modal-dialog-actions">
+                <button id="confirmMoveToCategoryBtn" class="btn btn-primary">Move</button>
+                <button id="cancelMoveToCategoryBtn" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
 
     <script>
     // Electron and Node.js modules
@@ -1063,10 +1078,9 @@
     let projectHistory = [];
     let activeFilePath = null;
     let openInterval = 0.3; 
-
-    // Store the element being dragged for category reordering or item moving
     let draggedElement = null; 
     let draggedElementType = null; // 'category' or 'item'
+    let itemToMoveId = null; // For "Move to Category" modal
 
     const DOM = {
         sidebar: document.getElementById('sidebar'), mainContent: document.getElementById('mainContent'),
@@ -1081,6 +1095,7 @@
         addItemsButtonPage: document.getElementById('addItemsButtonPage'),
         selectedFilesDisplayPage: document.getElementById('selectedFilesDisplayPage'),
         clearInputsButtonPage: document.getElementById('clearInputsButtonPage'),
+        addEmptyCategoryBtn: document.getElementById('addEmptyCategoryBtn'), // New button
 
         filesDisplayContainer: document.getElementById('itemsDisplayArea'),
         fileCountDisplay: document.getElementById('fileCount'),
@@ -1108,27 +1123,30 @@
         saveOpenIntervalBtn: document.getElementById('saveOpenIntervalBtn'),
         clearHistoryBtn: document.getElementById('clearHistoryBtn'),
         checkForUpdatesBtn: document.getElementById('checkForUpdatesBtn'), 
-        updateStatusMessage: document.getElementById('updateStatusMessage') 
+        updateStatusMessage: document.getElementById('updateStatusMessage'),
+        moveToCategoryModal: document.getElementById('moveToCategoryModal'),
+        moveToCategorySelect: document.getElementById('moveToCategorySelect'),
+        confirmMoveToCategoryBtn: document.getElementById('confirmMoveToCategoryBtn'),
+        cancelMoveToCategoryBtn: document.getElementById('cancelMoveToCategoryBtn')
     };
 
-    const STORAGE_ITEMS_KEY = 'projectFileManagerData_v1.9_UI_DragDrop'; 
-    const STORAGE_CATEGORIES_KEY = 'projectFileManagerCategories_v1.9_UI_DragDrop';
-    const STORAGE_TODOS_KEY = 'projectFileManagerTodos_v1.9_UI_DragDrop';
-    const STORAGE_EXTENSION_MAPPINGS_KEY = 'projectFileManagerExtMappings_v1.4_UI_DragDrop';
-    const STORAGE_PROJECT_HISTORY_KEY = 'projectFileManagerHistory_v1.3_UI_DragDrop';
-    const STORAGE_OPEN_INTERVAL_KEY = 'projectFileManagerOpenInterval_v1.2_UI_DragDrop';
+    const STORAGE_ITEMS_KEY = 'projectFileManagerData_v2.0_Eng_Features'; 
+    const STORAGE_CATEGORIES_KEY = 'projectFileManagerCategories_v2.0_Eng_Features';
+    const STORAGE_TODOS_KEY = 'projectFileManagerTodos_v2.0_Eng_Features';
+    const STORAGE_EXTENSION_MAPPINGS_KEY = 'projectFileManagerExtMappings_v1.5_Eng_Features';
+    const STORAGE_PROJECT_HISTORY_KEY = 'projectFileManagerHistory_v1.4_Eng_Features';
+    const STORAGE_OPEN_INTERVAL_KEY = 'projectFileManagerOpenInterval_v1.3_Eng_Features';
     const DEFAULT_OPEN_INTERVAL = 0.3; 
     const MAX_HISTORY_ITEMS = 10;
 
-
     const DEFAULT_CATEGORIES_STRUCTURE = [
-        { key: 'auto_detect', display: '--- كشف تلقائي للفئة ---', isCustom: false, isDefaultOption: true, order: 0, isEditable: false, isDeletable: false, isOpenEnabled: true, isCollapsed: false },
-        { key: 'photoshop', display: 'مشاريع فوتوشوب', isCustom: false, order: 1, isEditable: true, isDeletable: false, isOpenEnabled: true, isCollapsed: true },
-        { key: 'aftereffects', display: 'مشاريع أفترإفكتس', isCustom: false, order: 2, isEditable: true, isDeletable: false, isOpenEnabled: true, isCollapsed: true },
-        { key: 'premiere', display: 'مشاريع بريمير برو', isCustom: false, order: 3, isEditable: true, isDeletable: false, isOpenEnabled: true, isCollapsed: true },
-        { key: 'folder', display: 'روابط المجلدات', isCustom: false, order: 4, isEditable: true, isDeletable: false, isOpenEnabled: true, isCollapsed: true },
-        { key: 'website', display: 'روابط المواقع', isCustom: false, order: 5, isEditable: true, isDeletable: false, isOpenEnabled: true, isCollapsed: true },
-        { key: 'general', display: 'ملفات عامة', isCustom: false, order: 6, isEditable: true, isDeletable: false, isOpenEnabled: true, isCollapsed: true },
+        { key: 'auto_detect', display: '--- Auto-Detect Category ---', isCustom: false, isDefaultOption: true, order: 0, isEditable: false, isDeletable: false, isOpenEnabled: true, isCollapsed: false },
+        { key: 'photoshop', display: 'Photoshop Projects', isCustom: false, order: 1, isEditable: true, isDeletable: false, isOpenEnabled: true, isCollapsed: true },
+        { key: 'aftereffects', display: 'After Effects Projects', isCustom: false, order: 2, isEditable: true, isDeletable: false, isOpenEnabled: true, isCollapsed: true },
+        { key: 'premiere', display: 'Premiere Pro Projects', isCustom: false, order: 3, isEditable: true, isDeletable: false, isOpenEnabled: true, isCollapsed: true },
+        { key: 'folder', display: 'Folder Links', isCustom: false, order: 4, isEditable: true, isDeletable: false, isOpenEnabled: true, isCollapsed: true },
+        { key: 'website', display: 'Website Links', isCustom: false, order: 5, isEditable: true, isDeletable: false, isOpenEnabled: true, isCollapsed: true },
+        { key: 'general', display: 'General Files', isCustom: false, order: 6, isEditable: true, isDeletable: false, isOpenEnabled: true, isCollapsed: true },
     ];
     const FILE_TYPE_TO_DEFAULT_CAT_KEY = { 'photoshop': 'photoshop', 'aftereffects': 'aftereffects', 'premiere': 'premiere', 'folderLink': 'folder', 'websiteLink': 'website' };
     
@@ -1148,8 +1166,8 @@
             populateCategoryDropdown(DOM.categorySelectInputPage);
         }
     }
-    function handleMinimizeWindow() { if (ipcRenderer) ipcRenderer.send('minimize-window'); else showAppNotification('ميزة التصغير متاحة في تطبيق سطح المكتب فقط.', 'warning'); }
-    function handleCloseWindow() { if (ipcRenderer) ipcRenderer.send('close-window'); else showAppCustomConfirm("هل أنت متأكد أنك تريد إغلاق علامة التبويب هذه؟", (confirmed) => { if (confirmed) window.close(); }); }
+    function handleMinimizeWindow() { if (ipcRenderer) ipcRenderer.send('minimize-window'); else showAppNotification('Minimize feature is available in the desktop app only.', 'warning'); }
+    function handleCloseWindow() { if (ipcRenderer) ipcRenderer.send('close-window'); else showAppCustomConfirm("Are you sure you want to close this tab?", (confirmed) => { if (confirmed) window.close(); }); }
     function escapeHTML(str) { return typeof str === 'string' ? str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'})[m]) : String(str); }
     function escapeAttr(str) { return typeof str === 'string' ? str.replace(/"/g, '&quot;') : String(str); }
     function showAppNotification(message, type = 'success') { const el = DOM.notification; if(el){ el.textContent = message; el.className = `notification-toast ${type} show`; if (el.timeoutId) clearTimeout(el.timeoutId); el.timeoutId = setTimeout(() => el.classList.remove('show'), 3500); } else { console.warn("Notification element not found for:", message); } }
@@ -1184,7 +1202,7 @@
 
     function populateCategoryDropdown(selectElement = DOM.categorySelectInputPage) { 
         if (!selectElement) return;
-        const currentCategoryValue = selectElement.value; // Preserve selection if possible
+        const currentCategoryValue = selectElement.value; 
         selectElement.innerHTML = '';
         const sortedForDropdown = [...appCategories].sort((a,b) => (a.order ?? Infinity) - (b.order ?? Infinity));
         sortedForDropdown.forEach(cat => { const option = document.createElement('option'); option.value = cat.key; option.textContent = cat.display; selectElement.appendChild(option); });
@@ -1230,7 +1248,7 @@
             const itemDiv = document.createElement('div'); itemDiv.className = 'category-manager-item'; itemDiv.dataset.categoryKey = cat.key; 
             const isMinOrder = cat.order === minOrder; const isMaxOrder = cat.order === maxOrder;
             const canMoveUp = !isMinOrder && manageableCategories.length > 1; const canMoveDown = !isMaxOrder && manageableCategories.length > 1;
-            itemDiv.innerHTML = `<div class="category-manager-item-name-container"><span class="category-tag ${cat.isCustom ? 'custom' : ''}">${cat.isCustom ? 'مخصص' : 'افتراضي'}</span><span class="category-manager-item-name">${escapeHTML(cat.display)}</span></div><div class="category-manager-item-controls"><button class="btn-icon btn-move-managed-category-up" data-key="${escapeAttr(cat.key)}" title="تحريك لأعلى" ${!canMoveUp ? 'disabled' : ''}><svg viewBox="0 0 24 24"><use xlink:href="#icon-arrow-up"></use></svg></button><button class="btn-icon btn-move-managed-category-down" data-key="${escapeAttr(cat.key)}" title="تحريك لأسفل" ${!canMoveDown ? 'disabled' : ''}><svg viewBox="0 0 24 24"><use xlink:href="#icon-arrow-down"></use></svg></button><button class="btn-icon btn-edit-managed-category" data-key="${escapeAttr(cat.key)}" title="تعديل الاسم" ${(!cat.isCustom && !cat.isEditable) ? 'disabled' : ''}><svg viewBox="0 0 24 24"><use xlink:href="#icon-edit"></use></svg></button><button class="btn-icon btn-delete-managed-category" data-key="${escapeAttr(cat.key)}" title="حذف الفئة" ${!cat.isCustom || !cat.isDeletable ? 'disabled' : ''}><svg viewBox="0 0 24 24"><use xlink:href="#icon-delete"></use></svg></button><button class="btn-icon btn-save-inline-edit" data-key="${escapeAttr(cat.key)}" title="حفظ التعديلات" style="display:none;"><svg viewBox="0 0 24 24"><use xlink:href="#icon-save"></use></svg></button><button class="btn-icon btn-cancel-inline-edit" data-key="${escapeAttr(cat.key)}" title="إلغاء التعديل" style="display:none;"><svg viewBox="0 0 24 24"><use xlink:href="#icon-cancel"></use></svg></button></div>`;
+            itemDiv.innerHTML = `<div class="category-manager-item-name-container"><span class="category-tag ${cat.isCustom ? 'custom' : ''}">${cat.isCustom ? 'Custom' : 'Default'}</span><span class="category-manager-item-name">${escapeHTML(cat.display)}</span></div><div class="category-manager-item-controls"><button class="btn-icon btn-move-managed-category-up" data-key="${escapeAttr(cat.key)}" title="Move Up" ${!canMoveUp ? 'disabled' : ''}><svg viewBox="0 0 24 24"><use xlink:href="#icon-arrow-up"></use></svg></button><button class="btn-icon btn-move-managed-category-down" data-key="${escapeAttr(cat.key)}" title="Move Down" ${!canMoveDown ? 'disabled' : ''}><svg viewBox="0 0 24 24"><use xlink:href="#icon-arrow-down"></use></svg></button><button class="btn-icon btn-edit-managed-category" data-key="${escapeAttr(cat.key)}" title="Edit Name" ${(!cat.isCustom && !cat.isEditable) ? 'disabled' : ''}><svg viewBox="0 0 24 24"><use xlink:href="#icon-edit"></use></svg></button><button class="btn-icon btn-delete-managed-category" data-key="${escapeAttr(cat.key)}" title="Delete Category" ${!cat.isCustom || !cat.isDeletable ? 'disabled' : ''}><svg viewBox="0 0 24 24"><use xlink:href="#icon-delete"></use></svg></button><button class="btn-icon btn-save-inline-edit" data-key="${escapeAttr(cat.key)}" title="Save Changes" style="display:none;"><svg viewBox="0 0 24 24"><use xlink:href="#icon-save"></use></svg></button><button class="btn-icon btn-cancel-inline-edit" data-key="${escapeAttr(cat.key)}" title="Cancel Edit" style="display:none;"><svg viewBox="0 0 24 24"><use xlink:href="#icon-cancel"></use></svg></button></div>`;
             itemDiv.querySelector('.btn-edit-managed-category').addEventListener('click', (e) => activateInlineEdit(e.currentTarget.dataset.key, itemDiv));
             itemDiv.querySelector('.btn-delete-managed-category').addEventListener('click', (e) => handleDeleteManagedCategory(e.currentTarget.dataset.key));
             itemDiv.querySelector('.btn-move-managed-category-up').addEventListener('click', (e) => handleMoveCategory(e.currentTarget.dataset.key, 'up', true));
@@ -1274,24 +1292,22 @@
 
         if (isHeader) {
             const controlsDiv = itemDivOrHeader.querySelector('.category-controls');
-            // Hide original edit/delete, keep ON/OFF and Open All
             const originalRenameBtn = controlsDiv.querySelector('.btn-rename-category-header');
             const originalDeleteBtn = controlsDiv.querySelector('.btn-delete-category-header');
             if(originalRenameBtn) originalRenameBtn.style.display = 'none';
             if(originalDeleteBtn) originalDeleteBtn.style.display = 'none';
 
-            // Remove existing temp save/cancel if any
             controlsDiv.querySelectorAll('.btn-save-inline-header-edit, .btn-cancel-inline-header-edit').forEach(btn => btn.remove());
             
             const saveBtn = document.createElement('button');
-            saveBtn.className = 'btn btn-icon btn-save-inline-header-edit'; // Added 'btn' for base styling
-            saveBtn.title = 'حفظ الاسم';
+            saveBtn.className = 'btn btn-icon btn-save-inline-header-edit'; 
+            saveBtn.title = 'Save Name';
             saveBtn.innerHTML = '<svg viewBox="0 0 24 24"><use xlink:href="#icon-save"></use></svg>';
             saveBtn.onclick = () => saveInlineEdit(categoryKey, itemDivOrHeader, true);
             
             const cancelBtn = document.createElement('button');
-            cancelBtn.className = 'btn btn-icon btn-cancel-inline-header-edit'; // Added 'btn' for base styling
-            cancelBtn.title = 'إلغاء التعديل';
+            cancelBtn.className = 'btn btn-icon btn-cancel-inline-header-edit'; 
+            cancelBtn.title = 'Cancel Edit';
             cancelBtn.innerHTML = '<svg viewBox="0 0 24 24"><use xlink:href="#icon-cancel"></use></svg>';
             cancelBtn.onclick = () => cancelInlineEdit(categoryKey, itemDivOrHeader, true);
 
@@ -1319,9 +1335,9 @@
         const newDisplayName = inputField.value.trim();
         const originalName = inputField.dataset.originalName;
 
-        if (!newDisplayName) { showAppNotification("اسم الفئة لا يمكن أن يكون فارغًا.", "warning"); inputField.focus(); return; }
+        if (!newDisplayName) { showAppNotification("Category name cannot be empty.", "warning"); inputField.focus(); return; }
         if (newDisplayName !== originalName && appCategories.some(cat => cat.key !== categoryKey && cat.display.toLowerCase() === newDisplayName.toLowerCase())) { 
-            showAppNotification(`اسم الفئة "${newDisplayName}" موجود بالفعل.`, 'warning'); inputField.focus(); return; 
+            showAppNotification(`Category name "${newDisplayName}" already exists.`, 'warning'); inputField.focus(); return; 
         }
         
         category.display = newDisplayName;
@@ -1332,7 +1348,7 @@
         if (!isHeader) { 
             renderCategoryManagerList(); 
         }
-        showAppNotification("تم تحديث اسم الفئة.", "success");
+        showAppNotification("Category name updated.", "success");
     }
 
     function cancelInlineEdit(categoryKey, itemDivOrHeader, isHeader = false) {
@@ -1343,7 +1359,7 @@
             renderProjectFilesUI(); 
         } else { 
             const nameContainer = itemDivOrHeader.querySelector('.category-manager-item-name-container');
-            nameContainer.innerHTML = `<span class="category-tag ${category.isCustom ? 'custom' : ''}">${category.isCustom ? 'مخصص' : 'افتراضي'}</span><span class="category-manager-item-name">${escapeHTML(category.display)}</span>`;
+            nameContainer.innerHTML = `<span class="category-tag ${category.isCustom ? 'custom' : ''}">${category.isCustom ? 'Custom' : 'Default'}</span><span class="category-manager-item-name">${escapeHTML(category.display)}</span>`;
             itemDivOrHeader.querySelector('.btn-edit-managed-category').style.display = 'inline-flex';
             itemDivOrHeader.querySelector('.btn-delete-managed-category').style.display = 'inline-flex';
             itemDivOrHeader.querySelector('.btn-move-managed-category-up').style.display = 'inline-flex';
@@ -1353,22 +1369,50 @@
         }
     }
 
-    function handleAddManagedCategory() {
+    function handleAddManagedCategory() { // From Category Manager Modal
         const displayName = DOM.newManagedCategoryInput.value.trim();
-        if (!displayName) { showAppNotification("اسم الفئة لا يمكن أن يكون فارغًا.", "warning"); DOM.newManagedCategoryInput.focus(); return; }
-        if (appCategories.some(cat => cat.display.toLowerCase() === displayName.toLowerCase())) { showAppNotification(`اسم الفئة "${displayName}" موجود بالفعل.`, 'warning'); DOM.newManagedCategoryInput.focus(); return; }
+        if (!displayName) { showAppNotification("Category name cannot be empty.", "warning"); DOM.newManagedCategoryInput.focus(); return; }
+        if (appCategories.some(cat => cat.display.toLowerCase() === displayName.toLowerCase())) { showAppNotification(`Category name "${displayName}" already exists.`, 'warning'); DOM.newManagedCategoryInput.focus(); return; }
+        
+        addCategoryLogic(displayName); // Use common logic
+        DOM.newManagedCategoryInput.value = ''; 
+        DOM.newManagedCategoryInput.focus();
+    }
+
+    function handleAddEmptyCategoryFromPage() { // From Path Manager Page Button
+        const displayName = prompt("Enter name for the new empty category:", "New Category");
+        if (displayName === null) return; // User cancelled
+        if (!displayName.trim()) { showAppNotification("Category name cannot be empty.", "warning"); return; }
+        if (appCategories.some(cat => cat.display.toLowerCase() === displayName.trim().toLowerCase())) { showAppNotification(`Category name "${displayName.trim()}" already exists.`, 'warning'); return; }
+        
+        addCategoryLogic(displayName.trim());
+    }
+
+    function addCategoryLogic(displayName) {
         const nonAutoDetectCategories = appCategories.filter(c => c.key !== 'auto_detect');
         const orders = nonAutoDetectCategories.map(c => c.order).filter(o => typeof o === 'number');
         const maxOrder = orders.length > 0 ? Math.max(0, ...orders) : -1; 
         const newKey = `custom_${displayName.toLowerCase().replace(/\s+/g, '_')}_${Date.now().toString().slice(-5)}`;
         appCategories.push({ key: newKey, display: displayName, isCustom: true, order: maxOrder + 1, isEditable: true, isDeletable: true, isOpenEnabled: true, isCollapsed: false });
-        saveCategoriesToStorage(); renderCategoryManagerList(); populateCategoryDropdown(DOM.categorySelectInputPage); 
-        DOM.newManagedCategoryInput.value = ''; DOM.newManagedCategoryInput.focus(); showAppNotification(`تمت إضافة الفئة "${displayName}".`, 'success');
+        saveCategoriesToStorage(); 
+        if(DOM.categoryManagerModal.classList.contains('show')) renderCategoryManagerList(); // If manager is open
+        populateCategoryDropdown(DOM.categorySelectInputPage); 
+        renderProjectFilesUI();
+        showAppNotification(`Category "${displayName}" added.`, 'success');
     }
+
+
     function handleDeleteManagedCategory(categoryKey, isFromHeader = false) {
         const category = appCategories.find(cat => cat.key === categoryKey);
-        if (!category || (!category.isCustom || !category.isDeletable)) { showAppNotification("يمكن إزالة الفئات المخصصة القابلة للحذف فقط.", "warning"); return; }
-        showAppCustomConfirm(`هل أنت متأكد أنك تريد حذف الفئة "${category.display}"؟ سيتم نقل العناصر في هذه الفئة إلى "ملفات عامة".`, (confirmed) => {
+        // Ensure the category can actually be deleted (custom and deletable flag)
+        if (!category || !category.isCustom || !category.isDeletable) { 
+            showAppNotification("Only custom, deletable categories can be removed.", "warning"); 
+            // Ensure button state is correct if somehow clicked while disabled
+            if (isFromHeader) renderProjectFilesUI(); 
+            else renderCategoryManagerList();
+            return; 
+        }
+        showAppCustomConfirm(`Are you sure you want to delete category "${category.display}"? Items in this category will be moved to "General Files".`, (confirmed) => {
             if (confirmed) {
                 projectFiles.forEach(item => { if (item.category === categoryKey) item.category = 'general'; });
                 appCategories = appCategories.filter(cat => cat.key !== categoryKey);
@@ -1376,7 +1420,7 @@
                 saveItemsToStorage(); saveCategoriesToStorage(); 
                 if (!isFromHeader) renderCategoryManagerList();
                 populateCategoryDropdown(DOM.categorySelectInputPage); renderProjectFilesUI();
-                showAppNotification(`تم حذف الفئة "${category.display}".`, "success");
+                showAppNotification(`Category "${category.display}" deleted.`, "success");
             }
         });
     }
@@ -1416,18 +1460,15 @@
         if (isFromEnter && DOM.pathInputPage.value.trim()) {
             const pathValue = DOM.pathInputPage.value.trim();
             const nameValue = DOM.projectNameInputPage.value.trim() || (pathModule ? pathModule.basename(pathValue) : pathValue.substring(pathValue.lastIndexOf(/[/\\]/) + 1));
-            let entryType = 'file'; // Default
+            let entryType = 'file'; 
             if (pathValue.toLowerCase().startsWith('http://') || pathValue.toLowerCase().startsWith('https://')) {
                 entryType = 'websiteLink';
             }
-            // For local paths, we'd ideally check if it's a folder.
-            // This requires Electron IPC for accuracy, which is complex for a quick Enter press.
-            // We'll assume 'file' unless it's clearly a URL.
             itemsToAdd.push({ path: pathValue, name: nameValue, entryType: entryType });
         } else if (!isFromEnter && stagedFilePaths && stagedFilePaths.length > 0) {
             itemsToAdd = [...stagedFilePaths];
         } else {
-            showAppNotification('الرجاء تحديد أو لصق العناصر أولاً.', 'warning');
+            showAppNotification('Please select or paste items first.', 'warning');
             return;
         }
 
@@ -1436,19 +1477,19 @@
         itemsToAdd.forEach(itemInfo => {
             const { path, name, entryType = 'file' } = itemInfo; 
             if (!path || typeof path !== 'string' || projectFiles.some(pf => pf.location.toLowerCase() === path.toLowerCase())) {
-                if (projectFiles.some(pf => pf.location.toLowerCase() === path.toLowerCase())) { showAppNotification(`العنصر "${name}" موجود بالفعل.`, 'warning'); } return; 
+                if (projectFiles.some(pf => pf.location.toLowerCase() === path.toLowerCase())) { showAppNotification(`Item "${name}" already exists.`, 'warning'); } return; 
             }
             const itemType = getFileType(path, entryType); 
             const catKey = determineItemCategoryKey(itemType, DOM.categorySelectInputPage.value); 
-            projectFiles.push({ id: Date.now() + Math.random(), name: groupName && !isFromEnter ? `${groupName} - ${name}` : name, actualName: name, location: path, type: itemType, category: catKey, entryType, dateAdded: new Date().toLocaleString('ar-SA', { dateStyle: 'short', timeStyle: 'short' }) });
+            projectFiles.push({ id: Date.now() + Math.random(), name: groupName && !isFromEnter ? `${groupName} - ${name}` : name, actualName: name, location: path, type: itemType, category: catKey, entryType, dateAdded: new Date().toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' }) });
             addedCount++;
         });
         if (addedCount > 0) {
             saveItemsToStorage(); renderProjectFilesUI();
-            showAppNotification(`✨ تمت إضافة ${addedCount} عنصر/عناصر!`, 'success');
+            showAppNotification(`✨ Added ${addedCount} item(s)!`, 'success');
         }
         DOM.projectNameInputPage.value = ''; 
-        if (isFromEnter) DOM.pathInputPage.value = ''; // Clear path input only if added via Enter
+        if (isFromEnter) DOM.pathInputPage.value = ''; 
         clearStagedFilesDisplayPage();
         DOM.categorySelectInputPage.value = 'auto_detect'; 
         if (addedCount > 0 && DOM.projectNameInputPage) DOM.projectNameInputPage.focus(); 
@@ -1460,10 +1501,10 @@
             return;
         }
         DOM.fileCountDisplay.textContent = projectFiles.length; DOM.openAllBtn.disabled = projectFiles.length === 0; DOM.filesDisplayContainer.innerHTML = '';
-        if (projectFiles.length === 0) { DOM.filesDisplayContainer.innerHTML = `<div class="empty-placeholder"><div class="icon"><svg viewBox="0 0 24 24"><use xlink:href="#icon-empty-folder"></use></svg></div><h3>القائمة فارغة.</h3><p>ابدأ بإضافة ملفات أو مجلدات أو روابط مواقع.</p></div>`; return; }
+        if (projectFiles.length === 0) { DOM.filesDisplayContainer.innerHTML = `<div class="empty-placeholder"><div class="icon"><svg viewBox="0 0 24 24"><use xlink:href="#icon-empty-folder"></use></svg></div><h3>List is empty.</h3><p>Start by adding files, folders, or website links.</p></div>`; return; }
         
         const grouped = projectFiles.reduce((acc, item) => { const key = item.category || 'general'; if (!acc[key]) acc[key] = []; acc[key].push(item); return acc; }, {});
-        const sortedKeys = Object.keys(grouped).sort((a, b) => { const catA = appCategories.find(c => c.key === a) || { order: Infinity, display: a }; const catB = appCategories.find(c => c.key === b) || { order: Infinity, display: b }; return (catA.order ?? Infinity) - (catB.order ?? Infinity) || catA.display.localeCompare(catB.display, 'ar'); });
+        const sortedKeys = Object.keys(grouped).sort((a, b) => { const catA = appCategories.find(c => c.key === a) || { order: Infinity, display: a }; const catB = appCategories.find(c => c.key === b) || { order: Infinity, display: b }; return (catA.order ?? Infinity) - (catB.order ?? Infinity) || catA.display.localeCompare(catB.display, 'en'); });
         
         sortedKeys.forEach(catKey => {
             const items = grouped[catKey]; 
@@ -1484,13 +1525,13 @@
 
             const chevronIcon = document.dir === 'rtl' ? '#icon-chevron-left' : '#icon-chevron-right';
             
-            let controlsHTML = `<button class="btn btn-sm category-on-off-toggle" data-category-key="${escapeAttr(catKey)}" title="تبديل حالة الفئة (تشغيل/إيقاف)">الحالة: ${(categoryObject && categoryObject.isOpenEnabled !== false) ? 'تشغيل' : 'إيقاف'}</button>`;
+            let controlsHTML = `<button class="btn btn-sm category-on-off-toggle" data-category-key="${escapeAttr(catKey)}" title="Toggle Category On/Off">State: ${(categoryObject && categoryObject.isOpenEnabled !== false) ? 'ON' : 'OFF'}</button>`;
             
             if (catKey !== 'auto_detect') {
-                 controlsHTML += `<button class="btn btn-icon btn-rename-category-header" title="إعادة تسمية الفئة" data-category-key="${escapeAttr(catKey)}" ${(!categoryObject || (!categoryObject.isCustom && !categoryObject.isEditable)) ? 'disabled' : ''}><svg viewBox="0 0 24 24"><use xlink:href="#icon-edit"></use></svg></button>`;
-                 controlsHTML += `<button class="btn btn-icon btn-delete-category-header" title="حذف الفئة" data-category-key="${escapeAttr(catKey)}" ${(!categoryObject || !categoryObject.isCustom || !categoryObject.isDeletable) ? 'disabled' : ''}><svg viewBox="0 0 24 24"><use xlink:href="#icon-delete"></use></svg></button>`;
+                 controlsHTML += `<button class="btn btn-icon btn-rename-category-header" title="Rename Category" data-category-key="${escapeAttr(catKey)}" ${(!categoryObject || (!categoryObject.isCustom && !categoryObject.isEditable)) ? 'disabled' : ''}><svg viewBox="0 0 24 24"><use xlink:href="#icon-edit"></use></svg></button>`;
+                 controlsHTML += `<button class="btn btn-icon btn-delete-category-header" title="Delete Category" data-category-key="${escapeAttr(catKey)}" ${(!categoryObject || !categoryObject.isCustom || !categoryObject.isDeletable) ? 'disabled' : ''}><svg viewBox="0 0 24 24"><use xlink:href="#icon-delete"></use></svg></button>`;
             }
-            controlsHTML += `<button class="btn btn-secondary btn-sm btn-open-all-in-category" data-category-key="${escapeAttr(catKey)}"><svg viewBox="0 0 24 24"><use xlink:href="#icon-folder"></use></svg>فتح الكل في الفئة</button>`;
+            controlsHTML += `<button class="btn btn-secondary btn-sm btn-open-all-in-category" data-category-key="${escapeAttr(catKey)}"><svg viewBox="0 0 24 24"><use xlink:href="#icon-folder"></use></svg>Open All in Category</button>`;
 
             header.innerHTML = `
                 <div class="category-title-container">
@@ -1520,7 +1561,7 @@
 
             const grid = document.createElement('div'); grid.className = 'items-grid';
             items.forEach((item, idx) => { 
-                const cardElement = createFileCardElement(item, idx); // Use new function
+                const cardElement = createFileCardElement(item, idx); 
                 if (cardElement) { 
                     cardElement.classList.add('fade-in-item'); 
                     grid.appendChild(cardElement); 
@@ -1531,7 +1572,7 @@
             DOM.filesDisplayContainer.appendChild(section);
         });
         setupCategoryDragDrop();
-        setupItemDragDrop(); // Setup drag drop for items
+        setupItemDragDrop(); 
     }
 
     function toggleCategoryOnState(categoryKey, buttonElement) {
@@ -1539,8 +1580,8 @@
         if (category) {
             category.isOpenEnabled = category.isOpenEnabled === false; 
             saveCategoriesToStorage();
-            buttonElement.textContent = `الحالة: ${category.isOpenEnabled ? 'تشغيل' : 'إيقاف'}`;
-            showAppNotification(`الفئة "${getCategoryDisplay(categoryKey)}" الآن ${category.isOpenEnabled ? 'قيد التشغيل' : 'متوقفة'}.`, 'info');
+            buttonElement.textContent = `State: ${category.isOpenEnabled ? 'ON' : 'OFF'}`;
+            showAppNotification(`Category "${getCategoryDisplay(categoryKey)}" is now ${category.isOpenEnabled ? 'ON' : 'OFF'}.`, 'info');
         }
     }
     
@@ -1554,16 +1595,14 @@
             section.addEventListener('dragend', handleCategoryDragEnd);
         });
 
-        container.addEventListener('dragover', handleCategoryDragOver); // For reordering categories
-        // Drop for categories is handled by handleCategoryDrop
+        container.addEventListener('dragover', handleCategoryDragOver); 
+        container.addEventListener('drop', handleCategoryDrop); // For category reordering
     }
 
     function handleCategoryDragStart(e) {
-        // Ensure we are dragging a category header, not an item card within it
         if (!e.target.classList.contains('category-header') && !e.target.closest('.category-header')) {
-             // If dragging from within the header but not the header itself (e.g. a button), don't initiate category drag
             if (e.target.closest('.category-controls button') || e.target.closest('.category-title-container .category-name-input-inline')) {
-                e.preventDefault(); // Prevent drag for buttons/inputs inside header
+                e.preventDefault(); 
                 return;
             }
         }
@@ -1585,14 +1624,16 @@
         if(draggedElement && draggedElementType === 'category') {
             draggedElement.classList.remove('dragging');
         }
-        draggedElement = null;
-        draggedElementType = null;
+        if (draggedElementType === 'category') { // Only reset if it was a category drag
+            draggedElement = null;
+            draggedElementType = null;
+        }
         document.querySelectorAll('.drop-placeholder-before, .drop-placeholder-after, .category-section.drag-over-area').forEach(el => el.classList.remove('drop-placeholder-before', 'drop-placeholder-after', 'drag-over-area'));
     }
 
     function handleCategoryDragOver(e) {
-        e.preventDefault(); // Necessary to allow dropping
-        if (!draggedElement || draggedElementType !== 'category') return; // Only for category reordering
+        e.preventDefault(); 
+        if (!draggedElement || draggedElementType !== 'category') return; 
         
         const container = DOM.filesDisplayContainer;
         const afterElement = getDragAfterElement(container, e.clientY, '.category-section[draggable="true"]');
@@ -1601,16 +1642,16 @@
         if (afterElement == null) { 
             const lastDraggable = [...container.querySelectorAll('.category-section[draggable="true"]')].pop();
             if (lastDraggable && lastDraggable !== draggedElement) {
-                 // lastDraggable.classList.add('drop-placeholder-after'); // Visual cue
+                 // lastDraggable.classList.add('drop-placeholder-after'); 
             }
         } else { 
             if (afterElement !== draggedElement && afterElement.previousSibling !== draggedElement) {
-                 // afterElement.classList.add('drop-placeholder-before'); // Visual cue
+                 // afterElement.classList.add('drop-placeholder-before'); 
             }
         }
     }
     
-    function getDragAfterElement(container, y, selector) { // Added selector
+    function getDragAfterElement(container, y, selector) { 
         const draggableElements = [...container.querySelectorAll(`${selector}:not(.dragging)`)];
         return draggableElements.reduce((closest, child) => {
             const box = child.getBoundingClientRect();
@@ -1623,7 +1664,7 @@
         }, { offset: Number.NEGATIVE_INFINITY }).element;
     }
 
-    function handleCategoryDrop(e) { // This is for reordering categories
+    function handleCategoryDrop(e) { 
         e.preventDefault();
         if (!draggedElement || draggedElementType !== 'category') return;
 
@@ -1661,11 +1702,10 @@
 
         saveCategoriesToStorage();
         renderProjectFilesUI(); 
-        draggedElement = null; // Reset after drop
+        draggedElement = null; 
         draggedElementType = null;
     }
 
-    // --- Item Drag and Drop Logic ---
     function setupItemDragDrop() {
         const itemCards = DOM.filesDisplayContainer.querySelectorAll('.item-card');
         itemCards.forEach(card => {
@@ -1683,12 +1723,11 @@
     }
 
     function handleItemDragStart(e) {
-        // Check if the drag was initiated on a button inside the card
         if (e.target.closest('button') || e.target.closest('a')) {
-            e.preventDefault(); // Prevent dragging if a button was the origin
+            e.preventDefault(); 
             return;
         }
-        draggedElement = e.currentTarget; // The .item-card itself
+        draggedElement = e.currentTarget; 
         draggedElementType = 'item';
         e.dataTransfer.effectAllowed = 'move';
         e.dataTransfer.setData('text/json', JSON.stringify({ itemId: draggedElement.dataset.itemId, originalCategory: draggedElement.closest('.category-section').dataset.categoryKey }));
@@ -1701,7 +1740,6 @@
         if (draggedElement && draggedElementType === 'item') {
             draggedElement.classList.remove('dragging');
         }
-        // Reset shared drag variables if they were for an item
         if (draggedElementType === 'item') {
             draggedElement = null;
             draggedElementType = null;
@@ -1714,7 +1752,7 @@
         if (!draggedElement || draggedElementType !== 'item') return;
         const targetSection = e.currentTarget.closest('.category-section');
         if (targetSection && targetSection !== draggedElement.closest('.category-section')) {
-            targetSection.classList.add('drag-over-item'); // Visual cue for valid drop target
+            targetSection.classList.add('drag-over-item'); 
         }
     }
     
@@ -1727,7 +1765,7 @@
 
     function handleItemDropOnCategory(e) {
         e.preventDefault();
-        e.stopPropagation(); // Prevent category reorder drop from firing if item is dropped on header
+        e.stopPropagation(); 
         if (!draggedElement || draggedElementType !== 'item') return;
 
         const targetSection = e.currentTarget.closest('.category-section');
@@ -1744,31 +1782,30 @@
                 itemToMove.category = targetCategoryKey;
                 saveItemsToStorage();
                 renderProjectFilesUI();
-                showAppNotification(`تم نقل "${itemToMove.name}" إلى فئة "${getCategoryDisplay(targetCategoryKey)}"`, 'success');
+                showAppNotification(`Moved "${itemToMove.name}" to category "${getCategoryDisplay(targetCategoryKey)}"`, 'success');
             }
         } catch (err) {
             console.error("Error processing item drop:", err);
-            showAppNotification("خطأ في نقل العنصر.", "error");
+            showAppNotification("Error moving item.", "error");
         }
-        // Reset shared drag variables after item drop
-        draggedElement.classList.remove('dragging');
+        if (draggedElement) draggedElement.classList.remove('dragging'); // Ensure class is removed
         draggedElement = null;
         draggedElementType = null;
     }
 
 
-    function createFileCardElement(item, index) { // Changed from createFileCardHTML to return an element
-        let typeDisplay = 'ملف'; let iconId = 'icon-file';
-        if (item.entryType === 'folderLink') { typeDisplay = 'رابط مجلد'; iconId = 'icon-folder'; } 
-        else if (item.type === 'websiteLink') { typeDisplay = 'رابط موقع'; iconId = 'icon-website'; } 
+    function createFileCardElement(item, index) { 
+        let typeDisplay = 'File'; let iconId = 'icon-file';
+        if (item.entryType === 'folderLink') { typeDisplay = 'Folder Link'; iconId = 'icon-folder'; } 
+        else if (item.type === 'websiteLink') { typeDisplay = 'Website Link'; iconId = 'icon-website'; } 
         else if (FILE_TYPE_TO_DEFAULT_CAT_KEY[item.type]) { typeDisplay = getCategoryDisplay(FILE_TYPE_TO_DEFAULT_CAT_KEY[item.type]); if (item.type === 'photoshop') iconId = 'icon-photoshop'; else if (item.type === 'aftereffects') iconId = 'icon-aftereffects'; else if (item.type === 'premiere') iconId = 'icon-premiere'; }
-        const openActionText = item.type === 'websiteLink' ? 'فتح الموقع' : 'فتح';
+        const openActionText = item.type === 'websiteLink' ? 'Open Website' : 'Open';
         const openIcon = item.type === 'websiteLink' ? 'icon-website' : (item.entryType === 'folderLink' ? 'icon-folder' : 'icon-open');
         
         const cardDiv = document.createElement('div');
         cardDiv.className = 'item-card';
         cardDiv.style.setProperty('--card-index', index);
-        cardDiv.dataset.itemId = item.id; // For drag-and-drop identification
+        cardDiv.dataset.itemId = item.id; 
 
         cardDiv.innerHTML = `
             <div class="item-card-main">
@@ -1783,14 +1820,15 @@
             </div>
             <div class="item-card-path" title="${escapeAttr(item.location)}">${escapeHTML(item.location)}</div>
             <div class="item-card-footer">
-                <span class="item-card-date">أضيف: ${item.dateAdded}</span>
-                <button class="btn btn-icon path-card-options-btn" data-action="options" data-item-id="${item.id}" title="خيارات">
+                <span class="item-card-date">Added: ${item.dateAdded}</span>
+                <button class="btn btn-icon path-card-options-btn" data-action="options" data-item-id="${item.id}" title="Options">
                     <svg viewBox="0 0 24 24"><use xlink:href="#icon-options"></use></svg>
                 </button>
             </div>
             <div class="item-actions-menu" id="options-menu-${item.id}">
-                ${item.type !== 'websiteLink' ? `<button data-action="show-location" data-id="${item.id}"><svg viewBox="0 0 24 24"><use xlink:href="#icon-show-location"></use></svg>فتح موقع الملف</button>` : ''}
-                <button data-action="delete" data-id="${item.id}"><svg viewBox="0 0 24 24"><use xlink:href="#icon-delete"></use></svg>حذف من القائمة</button>
+                ${item.type !== 'websiteLink' ? `<button data-action="show-location" data-id="${item.id}"><svg viewBox="0 0 24 24"><use xlink:href="#icon-show-location"></use></svg>Open File Location</button>` : ''}
+                <button data-action="move-to-category" data-id="${item.id}"><svg viewBox="0 0 24 24"><use xlink:href="#icon-move-to"></use></svg>Move to Category</button>
+                <button data-action="delete" data-id="${item.id}"><svg viewBox="0 0 24 24"><use xlink:href="#icon-delete"></use></svg>Delete from List</button>
             </div>
         `;
         return cardDiv;
@@ -1800,12 +1838,12 @@
     function handleItemCardButton(event) {
         const button = event.currentTarget;
         const action = button.dataset.action;
-        const itemId = button.dataset.itemId || button.closest('.item-card').querySelector('.path-card-options-btn')?.dataset.itemId; 
+        const itemId = button.dataset.itemId || button.closest('.item-card').querySelector('.path-card-options-btn')?.dataset.itemId || button.dataset.id; 
         
         if (!itemId) return;
 
-        const item = projectFiles.find(pf => pf.id === parseFloat(itemId));
-        if (!item) { console.warn(`Item with id ${itemId} not found`); showAppNotification('خطأ: لم يتم العثور على العنصر.', 'error'); return; }
+        const item = projectFiles.find(pf => pf.id.toString() === itemId.toString()); // Ensure ID comparison is robust
+        if (!item) { console.warn(`Item with id ${itemId} not found`); showAppNotification('Error: Item not found.', 'error'); return; }
 
         if (action === 'options') {
             handleOptionsMenu(event);
@@ -1815,15 +1853,60 @@
             showItemInFolder(item.location, item.entryType);
         } else if (action === 'delete') {
             deleteItemEntry(item.id);
+        } else if (action === 'move-to-category') {
+            openMoveToCategoryModal(item.id);
         }
-        if (action !== 'options') {
+
+        if (action !== 'options') { // Close menu for direct actions
             const menu = button.closest('.item-actions-menu');
             if (menu) menu.classList.remove('show');
             else { 
-                const optionsMenu = document.getElementById(`options-menu-${itemId}`);
+                const optionsMenu = document.getElementById(`options-menu-${item.id}`);
                 if (optionsMenu) optionsMenu.classList.remove('show');
             }
         }
+    }
+
+    function openMoveToCategoryModal(itemIdToMove) {
+        itemToMoveId = itemIdToMove;
+        const item = projectFiles.find(pf => pf.id === itemToMoveId);
+        if (!item) return;
+
+        DOM.moveToCategorySelect.innerHTML = '';
+        appCategories
+            .filter(cat => cat.key !== 'auto_detect' && cat.key !== item.category) // Exclude current and auto-detect
+            .sort((a, b) => (a.order ?? Infinity) - (b.order ?? Infinity))
+            .forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat.key;
+                option.textContent = cat.display;
+                DOM.moveToCategorySelect.appendChild(option);
+            });
+        
+        if (DOM.moveToCategorySelect.options.length > 0) {
+            DOM.moveToCategoryModal.style.display = 'flex';
+        } else {
+            showAppNotification('No other categories available to move to.', 'info');
+        }
+    }
+
+    function closeMoveToCategoryModal() {
+        DOM.moveToCategoryModal.style.display = 'none';
+        itemToMoveId = null;
+    }
+
+    function confirmMoveItemToCategory() {
+        if (!itemToMoveId) return;
+        const item = projectFiles.find(pf => pf.id === itemToMoveId);
+        const newCategoryKey = DOM.moveToCategorySelect.value;
+
+        if (item && newCategoryKey) {
+            item.category = newCategoryKey;
+            saveItemsToStorage();
+            renderProjectFilesUI();
+            showAppNotification(`Item "${item.name}" moved to "${getCategoryDisplay(newCategoryKey)}".`, 'success');
+        }
+        closeMoveToCategoryModal();
     }
 
 
@@ -1849,24 +1932,24 @@
     document.addEventListener('click', e => { if (!e.target.closest('.path-card-options-btn') && !e.target.closest('.item-actions-menu') && !e.target.closest('.item-card-direct-open')) { document.querySelectorAll('.item-actions-menu.show').forEach(m => m.classList.remove('show')); } });
     
     function openItem(location, entryType = 'file', itemType = 'unknown') {
-        if (!shell && itemType !== 'websiteLink') { showAppNotification('هذه الميزة متاحة في تطبيق سطح المكتب فقط.', 'warning'); return; }
-        if (!location || typeof location !== 'string') { showAppNotification('❌ مسار/رابط غير صالح.', 'error'); return; }
-        if (itemType === 'websiteLink') { try { if (shell && shell.openExternal) { shell.openExternal(location); } else { window.open(location, '_blank', 'noopener,noreferrer'); } showAppNotification(`✅ جار فتح الموقع...`, 'success'); } catch (e) { showAppNotification(`❌ خطأ في فتح الموقع: ${e.message}`, 'error'); } return; }
+        if (!shell && itemType !== 'websiteLink') { showAppNotification('This feature is available in the desktop app only.', 'warning'); return; }
+        if (!location || typeof location !== 'string') { showAppNotification('❌ Invalid path/URL.', 'error'); return; }
+        if (itemType === 'websiteLink') { try { if (shell && shell.openExternal) { shell.openExternal(location); } else { window.open(location, '_blank', 'noopener,noreferrer'); } showAppNotification(`✅ Opening website...`, 'success'); } catch (e) { showAppNotification(`❌ Error opening website: ${e.message}`, 'error'); } return; }
         showAppLoading(true);
-        shell.openPath(location).then(errMessage => { showAppLoading(false); if (errMessage) { showAppNotification(`❌ خطأ في فتح ${entryType === 'folderLink' ? 'المجلد' : 'الملف'}: ${errMessage.split('\n')[0]}`, 'error');  } else { showAppNotification(`✅ تم فتح ${entryType === 'folderLink' ? 'المجلد' : 'الملف'}.`, 'success'); } }).catch(e => { showAppLoading(false); showAppNotification(`❌ استثناء عند فتح العنصر: ${e.message}`, 'error'); });
+        shell.openPath(location).then(errMessage => { showAppLoading(false); if (errMessage) { showAppNotification(`❌ Error opening ${entryType === 'folderLink' ? 'folder' : 'file'}: ${errMessage.split('\n')[0]}`, 'error');  } else { showAppNotification(`✅ Opened ${entryType === 'folderLink' ? 'folder' : 'file'}.`, 'success'); } }).catch(e => { showAppLoading(false); showAppNotification(`❌ Exception opening item: ${e.message}`, 'error'); });
     }
     function showItemInFolder(itemPath, entryType = 'file') {
-        if (entryType === 'websiteLink') { showAppNotification('هذا الإجراء غير قابل للتطبيق على روابط المواقع.', 'info'); return; }
-        if (!shell || !pathModule) { showAppNotification('هذه الميزة متاحة في تطبيق سطح المكتب فقط.', 'warning'); return; }
-        if (!itemPath || typeof itemPath !== 'string') { showAppNotification('❌ مسار غير صالح.', 'error'); return; }
+        if (entryType === 'websiteLink') { showAppNotification('This action is not applicable to website links.', 'info'); return; }
+        if (!shell || !pathModule) { showAppNotification('This feature is available in the desktop app only.', 'warning'); return; }
+        if (!itemPath || typeof itemPath !== 'string') { showAppNotification('❌ Invalid path.', 'error'); return; }
         showAppLoading(true);
-        setTimeout(() => { try { if (entryType === 'folderLink') { shell.openPath(itemPath).then(errMessage => { if (errMessage) showAppNotification('❌ خطأ في فتح موقع المجلد: ' + errMessage.split('\n')[0], 'error'); else showAppNotification('✅ تم فتح موقع المجلد.', 'success'); }).catch(e => showAppNotification('❌ استثناء عند فتح موقع المجلد: ' + e.message, 'error')); } else { shell.showItemInFolder(itemPath); showAppNotification('✅ تم عرض الملف في المجلد.', 'success'); } } catch (e) { try { shell.openPath(pathModule.dirname(itemPath)).then(errMessage => { if (errMessage) showAppNotification('❌ خطأ في فتح المجلد المحتوي: ' + errMessage.split('\n')[0], 'error'); else showAppNotification('✅ تم فتح المجلد المحتوي.', 'success'); }).catch(e2 => showAppNotification('❌ استثناء عند فتح المجلد المحتوي: ' + e2.message, 'error')); } catch (e2) { showAppNotification('❌ خطأ فادح في فتح الموقع.', 'error');} } showAppLoading(false); }, 100);
+        setTimeout(() => { try { if (entryType === 'folderLink') { shell.openPath(itemPath).then(errMessage => { if (errMessage) showAppNotification('❌ Error opening folder location: ' + errMessage.split('\n')[0], 'error'); else showAppNotification('✅ Opened folder location.', 'success'); }).catch(e => showAppNotification('❌ Exception opening folder location: ' + e.message, 'error')); } else { shell.showItemInFolder(itemPath); showAppNotification('✅ Shown file in folder.', 'success'); } } catch (e) { try { shell.openPath(pathModule.dirname(itemPath)).then(errMessage => { if (errMessage) showAppNotification('❌ Error opening containing folder: ' + errMessage.split('\n')[0], 'error'); else showAppNotification('✅ Opened containing folder.', 'success'); }).catch(e2 => showAppNotification('❌ Exception opening containing folder: ' + e2.message, 'error')); } catch (e2) { showAppNotification('❌ Critical error opening location.', 'error');} } showAppLoading(false); }, 100);
     }
-    function deleteItemEntry(id) { showAppCustomConfirm('هل أنت متأكد أنك تريد إزالة هذا الإدخال من القائمة؟ (لن يتم حذف الملف/المجلد/الموقع الفعلي).', conf => { if (conf) { projectFiles = projectFiles.filter(i => i.id !== id); saveItemsToStorage(); renderProjectFilesUI(); showAppNotification('🗑️ تمت إزالة الإدخال من القائمة.', 'success'); } }); }
-    function clearAllData() { showAppCustomConfirm('هل أنت متأكد أنك تريد حذف جميع البيانات (جميع العناصر المدرجة، الفئات المخصصة، المهام والسجل)؟ لا يمكن التراجع عن هذا الإجراء.', conf => { if (conf) { projectFiles = []; appCategories = DEFAULT_CATEGORIES_STRUCTURE.map(cat => ({...cat})); todos = []; customExtensionMappings = []; projectHistory = []; activeFilePath = null; updateActiveProjectInfo(); saveItemsToStorage(); saveCategoriesToStorage(); saveTodos(); saveCustomExtensionMappings(); saveProjectHistory(); populateCategoryDropdown(DOM.categorySelectInputPage); renderProjectFilesUI(); renderTodos(); renderCustomExtensionMappingsUI(); renderProjectHistoryUI(); clearStagedFilesDisplayPage(); if(DOM.pathInputPage) DOM.pathInputPage.value = ''; showAppNotification('🗑️ تم مسح جميع البيانات.', 'success'); } }); }
+    function deleteItemEntry(id) { showAppCustomConfirm('Are you sure you want to remove this entry from the list? (The actual file/folder/website will NOT be deleted).', conf => { if (conf) { projectFiles = projectFiles.filter(i => i.id !== id); saveItemsToStorage(); renderProjectFilesUI(); showAppNotification('🗑️ Entry removed from list.', 'success'); } }); }
+    function clearAllData() { showAppCustomConfirm('Are you sure you want to delete all data (all listed items, custom categories, tasks and history)? This action cannot be undone.', conf => { if (conf) { projectFiles = []; appCategories = DEFAULT_CATEGORIES_STRUCTURE.map(cat => ({...cat})); todos = []; customExtensionMappings = []; projectHistory = []; activeFilePath = null; updateActiveProjectInfo(); saveItemsToStorage(); saveCategoriesToStorage(); saveTodos(); saveCustomExtensionMappings(); saveProjectHistory(); populateCategoryDropdown(DOM.categorySelectInputPage); renderProjectFilesUI(); renderTodos(); renderCustomExtensionMappingsUI(); renderProjectHistoryUI(); clearStagedFilesDisplayPage(); if(DOM.pathInputPage) DOM.pathInputPage.value = ''; showAppNotification('🗑️ All data has been cleared.', 'success'); } }); }
     
     function openMultiple(itemsToOpen, itemEntryType, context) {
-        if (!shell && itemEntryType !== 'websiteLink') { showAppNotification('هذه الميزة متاحة في تطبيق سطح المكتب فقط.', 'warning'); return; }
+        if (!shell && itemEntryType !== 'websiteLink') { showAppNotification('This feature is available in the desktop app only.', 'warning'); return; }
         const validItems = itemsToOpen.filter(i => { 
             if (i.entryType === 'websiteLink') return i.location && typeof i.location === 'string' && (i.location.startsWith('https://') || i.location.startsWith('http://')); 
             return i.entryType === itemEntryType && i.location && typeof i.location === 'string'; 
@@ -1890,15 +1973,15 @@
         Promise.all(openPromises).then(() => { 
             showAppLoading(false); 
             let message = ''; 
-            const typeString = itemEntryType === 'file' ? 'ملف/ملفات' : itemEntryType === 'folderLink' ? 'مجلد/مجلدات' : 'موقع/مواقع'; 
-            if (successCount > 0) message += `✅ تمت محاولة فتح ${successCount} ${typeString}. `; 
-            if (failureCount > 0) message += `❌ فشل فتح ${failureCount} ${typeString}. `; 
+            const typeString = itemEntryType === 'file' ? 'file(s)' : itemEntryType === 'folderLink' ? 'folder(s)' : 'website(s)'; 
+            if (successCount > 0) message += `✅ Attempted to open ${successCount} ${typeString}. `; 
+            if (failureCount > 0) message += `❌ Failed to open ${failureCount} ${typeString}. `; 
             if (message.trim()) { showAppNotification(message.trim(), failureCount > 0 && successCount === 0 ? 'error' : failureCount > 0 ? 'warning' : 'success'); } 
         });
     }
 
     function handleOpenAllClick() {
-        if (projectFiles.length === 0) { showAppNotification("القائمة فارغة. لا يوجد شيء لفتحه.", "info"); return; }
+        if (projectFiles.length === 0) { showAppNotification("The list is empty. Nothing to open.", "info"); return; }
         
         const grouped = projectFiles.reduce((acc, item) => {
             const cat = appCategories.find(c => c.key === item.category);
@@ -1922,7 +2005,7 @@
         }
         
         if (itemsToOpenFiles.length === 0 && itemsToOpenFolders.length === 0 && itemsToOpenWebsites.length === 0) {
-             showAppNotification("لا توجد عناصر لفتحها في الفئات المفعلة.", "info");
+             showAppNotification("No items to open in enabled categories.", "info");
              return;
         }
 
@@ -1930,20 +2013,20 @@
         let currentDelay = 0;
 
         if (itemsToOpenFiles.length > 0) {
-            openMultiple(itemsToOpenFiles, 'file', 'الفئات المفعلة - ملفات');
+            openMultiple(itemsToOpenFiles, 'file', 'Enabled Categories - Files');
             currentDelay += itemsToOpenFiles.length * (openInterval * 1000) + delayBetweenTypes;
         }
         
         setTimeout(() => {
             if (itemsToOpenFolders.length > 0) {
-                openMultiple(itemsToOpenFolders, 'folderLink', 'الفئات المفعلة - مجلدات');
+                openMultiple(itemsToOpenFolders, 'folderLink', 'Enabled Categories - Folders');
             }
         }, currentDelay);
         currentDelay += itemsToOpenFolders.length * (openInterval * 1000) + delayBetweenTypes;
 
         setTimeout(() => {
             if (itemsToOpenWebsites.length > 0) {
-                openMultiple(itemsToOpenWebsites, 'websiteLink', 'الفئات المفعلة - مواقع');
+                openMultiple(itemsToOpenWebsites, 'websiteLink', 'Enabled Categories - Websites');
             }
         }, currentDelay);
     }
@@ -1954,12 +2037,12 @@
         const categoryDisplay = getCategoryDisplay(key);
 
         if (category && category.isOpenEnabled === false) {
-            showAppNotification(`الفئة "${categoryDisplay}" متوقفة. لا يمكن فتح العناصر.`, "info");
+            showAppNotification(`Category "${categoryDisplay}" is OFF. Cannot open items.`, "info");
             return;
         }
         
         const itemsInCategory = projectFiles.filter(i => i.category === key); 
-        if (itemsInCategory.length === 0) { showAppNotification(`لا توجد عناصر لفتحها في الفئة "${categoryDisplay}".`, "info"); return; }
+        if (itemsInCategory.length === 0) { showAppNotification(`No items to open in category "${categoryDisplay}".`, "info"); return; }
         
         const delayBetweenTypes = openInterval * 1000 * 1.5;
         let currentDelay = 0;
@@ -1986,10 +2069,10 @@
         }, currentDelay);
     }
     function loadTodos() { try { const storedTodos = localStorage.getItem(STORAGE_TODOS_KEY); todos = storedTodos ? JSON.parse(storedTodos) : []; } catch (e) { todos = []; console.error("[Renderer] Error parsing todos from LS", e); localStorage.removeItem(STORAGE_TODOS_KEY); } renderTodos(); }
-    function saveTodos() { try { localStorage.setItem(STORAGE_TODOS_KEY, JSON.stringify(todos)); } catch (e) { console.error('[Renderer] Error saving todos:', e); showAppNotification('خطأ في حفظ قائمة المهام!', 'error');} }
+    function saveTodos() { try { localStorage.setItem(STORAGE_TODOS_KEY, JSON.stringify(todos)); } catch (e) { console.error('[Renderer] Error saving todos:', e); showAppNotification('Error saving to-do list!', 'error');} }
     function renderTodos() {
         if (!DOM.todosContainer) return; DOM.todosContainer.innerHTML = '';
-        if (todos.length === 0) { DOM.todosContainer.innerHTML = `<p style="text-align:center; color: #90a4ae;">لا توجد مهام حتى الآن. أضف واحدة أعلاه!</p>`; return; }
+        if (todos.length === 0) { DOM.todosContainer.innerHTML = `<p style="text-align:center; color: #90a4ae;">No tasks yet. Add one above!</p>`; return; }
         todos.forEach(todo => {
             const todoItemDiv = document.createElement('div'); todoItemDiv.className = `todo-item ${todo.completed ? 'completed' : ''}`; todoItemDiv.dataset.id = todo.id;
             todoItemDiv.innerHTML = `
@@ -2002,16 +2085,16 @@
                 </div>
                 <div class="todo-item-actions">
                     <span class="todo-date">${todo.dateAdded}</span>
-                    <button class="btn-icon btn-edit-todo" id="btn-edit-todo-${todo.id}" onclick="handleEditTodo(${todo.id})" title="تعديل المهمة">
+                    <button class="btn-icon btn-edit-todo" id="btn-edit-todo-${todo.id}" onclick="handleEditTodo(${todo.id})" title="Edit Task">
                         <svg viewBox="0 0 24 24"><use xlink:href="#icon-edit"></use></svg>
                     </button>
-                    <button class="btn-icon btn-save-todo" id="btn-save-todo-${todo.id}" onclick="saveEditedTodo(${todo.id})" title="حفظ المهمة" style="display:none;">
+                    <button class="btn-icon btn-save-todo" id="btn-save-todo-${todo.id}" onclick="saveEditedTodo(${todo.id})" title="Save Task" style="display:none;">
                         <svg viewBox="0 0 24 24"><use xlink:href="#icon-save"></use></svg>
                     </button>
-                     <button class="btn-icon btn-cancel-todo-edit" id="btn-cancel-todo-${todo.id}" onclick="cancelEditTodo(${todo.id})" title="إلغاء التعديل" style="display:none;">
+                     <button class="btn-icon btn-cancel-todo-edit" id="btn-cancel-todo-${todo.id}" onclick="cancelEditTodo(${todo.id})" title="Cancel Edit" style="display:none;">
                         <svg viewBox="0 0 24 24"><use xlink:href="#icon-cancel"></use></svg>
                     </button>
-                    <button class="btn-icon btn-delete-todo" onclick="deleteTodo(${todo.id})" title="حذف المهمة">
+                    <button class="btn-icon btn-delete-todo" onclick="deleteTodo(${todo.id})" title="Delete Task">
                         <svg viewBox="0 0 24 24"><use xlink:href="#icon-delete"></use></svg>
                     </button>
                 </div>`;
@@ -2022,12 +2105,12 @@
     }
     function addTodo() {
         if (!DOM.todoInput) return; const text = DOM.todoInput.value.trim();
-        if (!text) { showAppNotification('لا يمكن أن تكون المهمة فارغة.', 'warning'); return; }
-        todos.push({ id: Date.now(), text: text, completed: false, dateAdded: new Date().toLocaleString('ar-SA', { dateStyle: 'short', timeStyle: 'short' }) });
-        DOM.todoInput.value = ''; saveTodos(); renderTodos(); showAppNotification('تمت إضافة المهمة!', 'success');
+        if (!text) { showAppNotification('Task cannot be empty.', 'warning'); return; }
+        todos.push({ id: Date.now(), text: text, completed: false, dateAdded: new Date().toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' }) });
+        DOM.todoInput.value = ''; saveTodos(); renderTodos(); showAppNotification('Task added!', 'success');
     }
     function toggleTodoComplete(id) { const todo = todos.find(t => t.id === id); if (todo) { todo.completed = !todo.completed; saveTodos(); renderTodos(); } }
-    function deleteTodo(id) { showAppCustomConfirm('هل أنت متأكد أنك تريد حذف هذه المهمة؟', (confirmed) => { if (confirmed) { todos = todos.filter(t => t.id !== id); saveTodos(); renderTodos(); showAppNotification('تم حذف المهمة.', 'success'); } }); }
+    function deleteTodo(id) { showAppCustomConfirm('Are you sure you want to delete this task?', (confirmed) => { if (confirmed) { todos = todos.filter(t => t.id !== id); saveTodos(); renderTodos(); showAppNotification('Task deleted.', 'success'); } }); }
     
     function handleEditTodo(id) {
         const textSpan = document.getElementById(`todo-text-${id}`); const editInput = document.getElementById(`todo-edit-input-${id}`);
@@ -2040,42 +2123,42 @@
     }
     function saveEditedTodo(id) {
         const editInput = document.getElementById(`todo-edit-input-${id}`); const newText = editInput.value.trim();
-        if (!newText) { showAppNotification('نص المهمة لا يمكن أن يكون فارغًا.', 'warning'); editInput.focus(); return; }
-        const todo = todos.find(t => t.id === id); if (todo) { todo.text = newText; saveTodos(); renderTodos(); showAppNotification('تم تحديث المهمة!', 'success'); }
+        if (!newText) { showAppNotification('Task text cannot be empty.', 'warning'); editInput.focus(); return; }
+        const todo = todos.find(t => t.id === id); if (todo) { todo.text = newText; saveTodos(); renderTodos(); showAppNotification('Task updated!', 'success'); }
     }
     function cancelEditTodo(id) { renderTodos(); }
 
     function loadCustomExtensionMappings() { try { const storedMappings = localStorage.getItem(STORAGE_EXTENSION_MAPPINGS_KEY); customExtensionMappings = storedMappings ? JSON.parse(storedMappings) : []; } catch (e) { customExtensionMappings = []; console.error("[Renderer] Error parsing custom extension mappings from LS", e); localStorage.removeItem(STORAGE_EXTENSION_MAPPINGS_KEY); } renderCustomExtensionMappingsUI(); }
-    function saveCustomExtensionMappings() { try { localStorage.setItem(STORAGE_EXTENSION_MAPPINGS_KEY, JSON.stringify(customExtensionMappings)); } catch (e) { console.error('[Renderer] Error saving custom extension mappings:', e); showAppNotification('خطأ في حفظ ربط الامتدادات!', 'error');} }
+    function saveCustomExtensionMappings() { try { localStorage.setItem(STORAGE_EXTENSION_MAPPINGS_KEY, JSON.stringify(customExtensionMappings)); } catch (e) { console.error('[Renderer] Error saving custom extension mappings:', e); showAppNotification('Error saving extension mappings!', 'error');} }
     function renderCustomExtensionMappingsUI() {
         if (!DOM.extensionMappingsContainer) return; DOM.extensionMappingsContainer.innerHTML = '';
-        if (customExtensionMappings.length === 0) { DOM.extensionMappingsContainer.innerHTML = `<p style="font-size:0.85rem; color:#90a4ae;">لا توجد عمليات ربط امتدادات مخصصة محددة حتى الآن.</p>`; return; }
+        if (customExtensionMappings.length === 0) { DOM.extensionMappingsContainer.innerHTML = `<p style="font-size:0.85rem; color:#90a4ae;">No custom extension mappings defined yet.</p>`; return; }
         customExtensionMappings.forEach((mapping, index) => {
-            const catDisplay = getCategoryDisplay(mapping.categoryKey) || 'فئة غير معروفة';
+            const catDisplay = getCategoryDisplay(mapping.categoryKey) || 'Unknown Category';
             const itemDiv = document.createElement('div'); itemDiv.className = 'extension-mapping-item';
-            itemDiv.innerHTML = `<span><strong>${escapeHTML(mapping.extension)}</strong> &rarr; ${escapeHTML(catDisplay)}</span><button class="btn-icon" onclick="handleDeleteCustomExtensionMapping(${index})" title="حذف الربط"><svg viewBox="0 0 24 24"><use xlink:href="#icon-delete"></use></svg></button>`;
+            itemDiv.innerHTML = `<span><strong>${escapeHTML(mapping.extension)}</strong> &rarr; ${escapeHTML(catDisplay)}</span><button class="btn-icon" onclick="handleDeleteCustomExtensionMapping(${index})" title="Delete Mapping"><svg viewBox="0 0 24 24"><use xlink:href="#icon-delete"></use></svg></button>`;
             DOM.extensionMappingsContainer.appendChild(itemDiv);
         });
     }
     function handleAddCustomExtensionMapping() {
         const extension = DOM.newExtensionInput.value.trim().toLowerCase(); const categoryDisplayName = DOM.newExtensionCategoryNameInput.value.trim();
-        if (!extension || !categoryDisplayName) { showAppNotification('لا يمكن أن يكون الامتداد واسم الفئة فارغين.', 'warning'); return; }
-        if (!extension.startsWith('.')) { showAppNotification('يجب أن يبدأ الامتداد بنقطة (مثال: .txt).', 'warning'); DOM.newExtensionInput.focus(); return; }
-        if (customExtensionMappings.some(m => m.extension === extension)) { showAppNotification(`الربط للامتداد "${extension}" موجود بالفعل. احذف القديم أولاً.`, 'warning'); return; }
+        if (!extension || !categoryDisplayName) { showAppNotification('Extension and Category Name cannot be empty.', 'warning'); return; }
+        if (!extension.startsWith('.')) { showAppNotification('Extension must start with a dot (e.g., .txt).', 'warning'); DOM.newExtensionInput.focus(); return; }
+        if (customExtensionMappings.some(m => m.extension === extension)) { showAppNotification(`Mapping for extension "${extension}" already exists. Delete the old one first.`, 'warning'); return; }
         let categoryKey = ''; const existingCategory = appCategories.find(cat => cat.display.toLowerCase() === categoryDisplayName.toLowerCase());
         if (existingCategory) { categoryKey = existingCategory.key; } 
-        else { const nonAutoDetectCategories = appCategories.filter(c => c.key !== 'auto_detect'); const orders = nonAutoDetectCategories.map(c => c.order).filter(o => typeof o === 'number'); const maxOrder = orders.length > 0 ? Math.max(0, ...orders) : -1; categoryKey = `custom_${categoryDisplayName.toLowerCase().replace(/\s+/g, '_')}_${Date.now().toString().slice(-5)}`; appCategories.push({ key: categoryKey, display: categoryDisplayName, isCustom: true, order: maxOrder + 1, isEditable: true, isDeletable: true, isOpenEnabled: true, isCollapsed: false }); saveCategoriesToStorage(); populateCategoryDropdown(DOM.categorySelectInputPage); if(document.getElementById('categoryManagerModal').classList.contains('show')) renderCategoryManagerList(); showAppNotification(`تم إنشاء فئة جديدة "${categoryDisplayName}".`, 'info'); }
+        else { const nonAutoDetectCategories = appCategories.filter(c => c.key !== 'auto_detect'); const orders = nonAutoDetectCategories.map(c => c.order).filter(o => typeof o === 'number'); const maxOrder = orders.length > 0 ? Math.max(0, ...orders) : -1; categoryKey = `custom_${categoryDisplayName.toLowerCase().replace(/\s+/g, '_')}_${Date.now().toString().slice(-5)}`; appCategories.push({ key: categoryKey, display: categoryDisplayName, isCustom: true, order: maxOrder + 1, isEditable: true, isDeletable: true, isOpenEnabled: true, isCollapsed: false }); saveCategoriesToStorage(); populateCategoryDropdown(DOM.categorySelectInputPage); if(document.getElementById('categoryManagerModal').classList.contains('show')) renderCategoryManagerList(); showAppNotification(`New category "${categoryDisplayName}" created.`, 'info'); }
         customExtensionMappings.push({ extension: extension, categoryKey: categoryKey });
         saveCustomExtensionMappings(); renderCustomExtensionMappingsUI(); DOM.newExtensionInput.value = ''; DOM.newExtensionCategoryNameInput.value = '';
-        showAppNotification(`تمت إضافة الربط لـ "${extension}" إلى "${categoryDisplayName}".`, 'success');
+        showAppNotification(`Mapping for "${extension}" to "${categoryDisplayName}" added.`, 'success');
     }
-    function handleDeleteCustomExtensionMapping(index) { if (index >= 0 && index < customExtensionMappings.length) { const mapping = customExtensionMappings[index]; showAppCustomConfirm(`هل أنت متأكد أنك تريد حذف الربط لـ "${mapping.extension}"؟`, (confirmed) => { if (confirmed) { customExtensionMappings.splice(index, 1); saveCustomExtensionMappings(); renderCustomExtensionMappingsUI(); showAppNotification(`تم حذف الربط لـ "${mapping.extension}".`, 'success'); } }); } }
+    function handleDeleteCustomExtensionMapping(index) { if (index >= 0 && index < customExtensionMappings.length) { const mapping = customExtensionMappings[index]; showAppCustomConfirm(`Are you sure you want to delete the mapping for "${mapping.extension}"?`, (confirmed) => { if (confirmed) { customExtensionMappings.splice(index, 1); saveCustomExtensionMappings(); renderCustomExtensionMappingsUI(); showAppNotification(`Mapping for "${mapping.extension}" deleted.`, 'success'); } }); } }
 
     const MAX_HISTORY_ITEMS_COUNT = 10; 
     function loadProjectHistory() { try { const storedHistory = localStorage.getItem(STORAGE_PROJECT_HISTORY_KEY); projectHistory = storedHistory ? JSON.parse(storedHistory) : []; } catch (e) { projectHistory = []; console.error("[Renderer] Error parsing project history from LS", e); localStorage.removeItem(STORAGE_PROJECT_HISTORY_KEY); } renderProjectHistoryUI(); }
     function saveProjectHistory() { try { localStorage.setItem(STORAGE_PROJECT_HISTORY_KEY, JSON.stringify(projectHistory)); } catch (e) { console.error('[Renderer] Error saving project history:', e); } }
     function addToProjectHistory(filePath, projectName = null) {
-        const now = new Date(); const entry = { path: filePath, name: projectName || (pathModule ? pathModule.basename(filePath) : filePath.split(/[/\\]/).pop()), timestamp: now.toISOString(), displayDate: now.toLocaleString('ar-SA', { dateStyle: 'medium', timeStyle: 'short' }) };
+        const now = new Date(); const entry = { path: filePath, name: projectName || (pathModule ? pathModule.basename(filePath) : filePath.split(/[/\\]/).pop()), timestamp: now.toISOString(), displayDate: new Date().toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }) };
         projectHistory = projectHistory.filter(item => item.path !== filePath); projectHistory.unshift(entry); 
         if (projectHistory.length > MAX_HISTORY_ITEMS_COUNT) { projectHistory.length = MAX_HISTORY_ITEMS_COUNT; }
         saveProjectHistory(); renderProjectHistoryUI();
@@ -2083,16 +2166,16 @@
     function renderProjectHistoryUI() {
         if (!DOM.projectHistoryContainer) return; DOM.projectHistoryContainer.innerHTML = '';
         if (projectHistory.length === 0) { 
-            DOM.projectHistoryContainer.innerHTML = `<div class="empty-history-message"><svg viewBox="0 0 24 24"><use xlink:href="#icon-empty-history"></use></svg><span>لا توجد ملفات مشاريع حديثة.</span></div>`; 
+            DOM.projectHistoryContainer.innerHTML = `<div class="empty-history-message"><svg viewBox="0 0 24 24"><use xlink:href="#icon-empty-history"></use></svg><span>No recent project files.</span></div>`; 
             return; 
         }
         projectHistory.forEach((item, index) => { 
             const itemDiv = document.createElement('div'); itemDiv.className = 'extension-mapping-item'; 
             itemDiv.innerHTML = `
-                <span style="flex-grow:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:pointer;" title="فتح: ${item.path}" onclick="handleLoadProjectFromPath('${item.path.replace(/\\/g, '\\\\')}')">
+                <span style="flex-grow:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:pointer;" title="Open: ${item.path}" onclick="handleLoadProjectFromPath('${item.path.replace(/\\/g, '\\\\')}')">
                     <strong>${escapeHTML(item.name)}</strong><br><small style="color:#78828c;">${item.displayDate}</small>
                 </span>
-                <button class="btn-icon" onclick="handleDeleteHistoryItem('${item.path.replace(/\\/g, '\\\\')}', event)" title="حذف من السجل">
+                <button class="btn-icon" onclick="handleDeleteHistoryItem('${item.path.replace(/\\/g, '\\\\')}', event)" title="Delete from History">
                     <svg viewBox="0 0 24 24"><use xlink:href="#icon-delete"></use></svg>
                 </button>
             `;
@@ -2104,15 +2187,15 @@
         projectHistory = projectHistory.filter(item => item.path !== filePath);
         saveProjectHistory();
         renderProjectHistoryUI();
-        showAppNotification('تمت إزالة عنصر السجل.', 'success');
+        showAppNotification('History item removed.', 'success');
     }
     function handleClearHistory() {
-        showAppCustomConfirm('هل أنت متأكد أنك تريد مسح كل سجل المشروع؟', (confirmed) => {
+        showAppCustomConfirm('Are you sure you want to clear all project history?', (confirmed) => {
             if (confirmed) {
                 projectHistory = [];
                 saveProjectHistory();
                 renderProjectHistoryUI();
-                showAppNotification('تم مسح سجل المشروع.', 'success');
+                showAppNotification('Project history cleared.', 'success');
             }
         });
     }
@@ -2120,52 +2203,52 @@
 
     function updateActiveProjectInfo() {
         if (DOM.activeProjectInfo) {
-            if (activeFilePath) { const fileName = pathModule ? pathModule.basename(activeFilePath) : activeFilePath.split(/[/\\]/).pop(); DOM.activeProjectInfo.textContent = `المشروع النشط: ${fileName}`; DOM.saveActiveProjectBtn.disabled = false; } 
-            else { DOM.activeProjectInfo.textContent = 'لا يوجد ملف مشروع نشط.'; DOM.saveActiveProjectBtn.disabled = true; }
+            if (activeFilePath) { const fileName = pathModule ? pathModule.basename(activeFilePath) : activeFilePath.split(/[/\\]/).pop(); DOM.activeProjectInfo.textContent = `Active Project: ${fileName}`; DOM.saveActiveProjectBtn.disabled = false; } 
+            else { DOM.activeProjectInfo.textContent = 'No active project file.'; DOM.saveActiveProjectBtn.disabled = true; }
         }
     }
     async function handleSaveProjectAs() {
-        if (!ipcRenderer) { showAppNotification('عمليات الملفات متاحة في تطبيق سطح المكتب فقط.', 'warning'); return; }
+        if (!ipcRenderer) { showAppNotification('File operations are available in the desktop app only.', 'warning'); return; }
         const projectData = { projectFiles, appCategories, todos, customExtensionMappings, openInterval, version: "1.0" };
         try {
             const filePath = await ipcRenderer.invoke('save-dialog', JSON.stringify(projectData));
-            if (filePath) { activeFilePath = filePath; addToProjectHistory(filePath); updateActiveProjectInfo(); showAppNotification(`تم حفظ المشروع في: ${pathModule ? pathModule.basename(filePath) : filePath}`, 'success'); }
-        } catch (error) { console.error('Error saving project:', error); showAppNotification(`خطأ في حفظ المشروع: ${error.message}`, 'error'); }
+            if (filePath) { activeFilePath = filePath; addToProjectHistory(filePath); updateActiveProjectInfo(); showAppNotification(`Project saved to: ${pathModule ? pathModule.basename(filePath) : filePath}`, 'success'); }
+        } catch (error) { console.error('Error saving project:', error); showAppNotification(`Error saving project: ${error.message}`, 'error'); }
     }
     async function handleSaveActiveProject(showNotification = true) {
-        if (!activeFilePath) { if (showNotification) showAppNotification('لا يوجد مشروع نشط لحفظه. استخدم "حفظ المشروع باسم..." أولاً.', 'warning'); return; }
-        if (!ipcRenderer) { showAppNotification('عمليات الملفات متاحة في تطبيق سطح المكتب فقط.', 'warning'); return; }
+        if (!activeFilePath) { if (showNotification) showAppNotification('No active project to save. Use "Save Project As..." first.', 'warning'); return; }
+        if (!ipcRenderer) { showAppNotification('File operations are available in the desktop app only.', 'warning'); return; }
         const projectData = { projectFiles, appCategories, todos, customExtensionMappings, openInterval, version: "1.0" };
         try {
             await ipcRenderer.invoke('save-file', {filePath: activeFilePath, data: JSON.stringify(projectData) });
-            if (showNotification) showAppNotification(`تم حفظ المشروع "${pathModule ? pathModule.basename(activeFilePath) : activeFilePath}".`, 'success');
+            if (showNotification) showAppNotification(`Project "${pathModule ? pathModule.basename(activeFilePath) : activeFilePath}" saved.`, 'success');
             addToProjectHistory(activeFilePath); 
-        } catch (error) { console.error('Error saving active project:', error); if (showNotification) showAppNotification(`خطأ في حفظ المشروع: ${error.message}`, 'error'); }
+        } catch (error) { console.error('Error saving active project:', error); if (showNotification) showAppNotification(`Error saving project: ${error.message}`, 'error'); }
     }
     async function handleImportProject() {
-        if (!ipcRenderer) { showAppNotification('عمليات الملفات متاحة في تطبيق سطح المكتب فقط.', 'warning'); return; }
+        if (!ipcRenderer) { showAppNotification('File operations are available in the desktop app only.', 'warning'); return; }
         try {
             const result = await ipcRenderer.invoke('open-dialog-for-hpmt');
             if (result && result.filePath && result.content) {
                 loadProjectData(JSON.parse(result.content));
                 activeFilePath = result.filePath; addToProjectHistory(result.filePath); updateActiveProjectInfo();
-                showAppNotification(`تم استيراد المشروع "${pathModule ? pathModule.basename(result.filePath) : result.filePath}" بنجاح!`, 'success');
+                showAppNotification(`Project "${pathModule ? pathModule.basename(result.filePath) : result.filePath}" imported successfully!`, 'success');
             }
-        } catch (error) { console.error('Error importing project:', error); showAppNotification(`خطأ في استيراد المشروع: ${error.message}`, 'error'); }
+        } catch (error) { console.error('Error importing project:', error); showAppNotification(`Error importing project: ${error.message}`, 'error'); }
     }
     async function handleLoadProjectFromPath(filePath) {
-        if (!ipcRenderer) { showAppNotification('عمليات الملفات متاحة في تطبيق سطح المكتب فقط.', 'warning'); return; }
+        if (!ipcRenderer) { showAppNotification('File operations are available in the desktop app only.', 'warning'); return; }
         try {
             const content = await ipcRenderer.invoke('read-file', filePath);
             if (content) {
                 loadProjectData(JSON.parse(content)); activeFilePath = filePath; addToProjectHistory(filePath); 
-                updateActiveProjectInfo(); showAppNotification(`تم تحميل المشروع "${pathModule ? pathModule.basename(filePath) : filePath}".`, 'success');
+                updateActiveProjectInfo(); showAppNotification(`Project "${pathModule ? pathModule.basename(filePath) : filePath}" loaded.`, 'success');
                 showPage('pathsPage'); 
             }
-        } catch (error) { console.error(`Error loading project from path "${filePath}":`, error); showAppNotification(`خطأ في تحميل المشروع: ${error.message}`, 'error'); projectHistory = projectHistory.filter(item => item.path !== filePath); saveProjectHistory(); renderProjectHistoryUI(); }
+        } catch (error) { console.error(`Error loading project from path "${filePath}":`, error); showAppNotification(`Error loading project: ${error.message}`, 'error'); projectHistory = projectHistory.filter(item => item.path !== filePath); saveProjectHistory(); renderProjectHistoryUI(); }
     }
     function loadProjectData(data) {
-        if (!data || typeof data !== 'object') { showAppNotification('تنسيق ملف المشروع غير صالح.', 'error'); return; }
+        if (!data || typeof data !== 'object') { showAppNotification('Invalid project file format.', 'error'); return; }
         projectFiles = Array.isArray(data.projectFiles) ? data.projectFiles : [];
         if (Array.isArray(data.appCategories)) {
             const loadedCats = data.appCategories;
@@ -2196,8 +2279,8 @@
         renderProjectFilesUI(); renderTodos(); renderCustomExtensionMappingsUI();
         if (document.getElementById('categoryManagerModal') && document.getElementById('categoryManagerModal').classList.contains('show')) { renderCategoryManagerList(); }
     }
-    function saveItemsToStorage() { try { localStorage.setItem(STORAGE_ITEMS_KEY, JSON.stringify(projectFiles)); } catch (e) { console.error('[Renderer] Error saving items:', e); showAppNotification('خطأ في حفظ العناصر!', 'error');} }
-    function saveCategoriesToStorage() { try { localStorage.setItem(STORAGE_CATEGORIES_KEY, JSON.stringify(appCategories)); } catch (e) { console.error('[Renderer] Error saving categories:', e); showAppNotification('خطأ في حفظ الفئات!', 'error');} }
+    function saveItemsToStorage() { try { localStorage.setItem(STORAGE_ITEMS_KEY, JSON.stringify(projectFiles)); } catch (e) { console.error('[Renderer] Error saving items:', e); showAppNotification('Error saving items!', 'error');} }
+    function saveCategoriesToStorage() { try { localStorage.setItem(STORAGE_CATEGORIES_KEY, JSON.stringify(appCategories)); } catch (e) { console.error('[Renderer] Error saving categories:', e); showAppNotification('Error saving categories!', 'error');} }
     
     function loadOpenInterval() {
         const storedInterval = localStorage.getItem(STORAGE_OPEN_INTERVAL_KEY);
@@ -2210,9 +2293,9 @@
             if (!isNaN(newInterval) && newInterval >= 0.05) {
                 openInterval = newInterval;
                 localStorage.setItem(STORAGE_OPEN_INTERVAL_KEY, openInterval.toString());
-                showAppNotification('تم حفظ الفاصل الزمني للفتح!', 'success');
+                showAppNotification('Open interval saved!', 'success');
             } else {
-                showAppNotification('قيمة الفاصل الزمني غير صالحة. يجب أن تكون 0.05 على الأقل.', 'warning');
+                showAppNotification('Invalid interval value. Must be at least 0.05.', 'warning');
                 DOM.openIntervalInput.value = openInterval; 
             }
         }
@@ -2282,7 +2365,7 @@
             electronOnlyButtons.forEach(btn => { 
                 if(btn) { 
                     btn.disabled = true; 
-                    btn.title = (btn.title || btn.textContent || btn.id) + ' (ميزة لتطبيق سطح المكتب فقط)'; 
+                    btn.title = (btn.title || btn.textContent || btn.id) + ' (Desktop app feature only)'; 
                     if (btn.style) { 
                         btn.style.opacity = "0.5"; 
                         btn.style.cursor = "not-allowed";
@@ -2292,20 +2375,20 @@
             return;
         }
 
-        ipcRenderer.on('selected-files-for-files', (event, paths) => updateStagedPathsPage(paths, 'file', 'الملفات جاهزة: '));
-        ipcRenderer.on('selected-folder-for-link', (event, paths) => updateStagedPathsPage(paths, 'folderLink', 'روابط المجلدات جاهزة: '));
-        ipcRenderer.on('selected-folder-for-import', (event, contents) => { if (contents && Array.isArray(contents) && contents.length > 0) { stagedFilePaths = contents.map(item => ({ ...item, entryType: 'file' })); let baseName = "المجلد المحدد"; if (pathModule && contents[0].path) { const parentDir = pathModule.dirname(contents[0].path); baseName = pathModule.basename(parentDir); if (!baseName && parentDir) baseName = parentDir; } if(DOM.selectedFilesDisplayPage) DOM.selectedFilesDisplayPage.textContent = `ملفات للاستيراد من "${baseName}" (${stagedFilePaths.length})`; if(DOM.pathInputPage) DOM.pathInputPage.value = ''; } else if (DOM.pathInputPage && !DOM.pathInputPage.value.trim()) clearStagedFilesDisplayPage(); });
+        ipcRenderer.on('selected-files-for-files', (event, paths) => updateStagedPathsPage(paths, 'file', 'Files ready: '));
+        ipcRenderer.on('selected-folder-for-link', (event, paths) => updateStagedPathsPage(paths, 'folderLink', 'Folder links ready: '));
+        ipcRenderer.on('selected-folder-for-import', (event, contents) => { if (contents && Array.isArray(contents) && contents.length > 0) { stagedFilePaths = contents.map(item => ({ ...item, entryType: 'file' })); let baseName = "Selected folder"; if (pathModule && contents[0].path) { const parentDir = pathModule.dirname(contents[0].path); baseName = pathModule.basename(parentDir); if (!baseName && parentDir) baseName = parentDir; } if(DOM.selectedFilesDisplayPage) DOM.selectedFilesDisplayPage.textContent = `Files to import from "${baseName}" (${stagedFilePaths.length})`; if(DOM.pathInputPage) DOM.pathInputPage.value = ''; } else if (DOM.pathInputPage && !DOM.pathInputPage.value.trim()) clearStagedFilesDisplayPage(); });
         ipcRenderer.on('pasted-path-processed', (event, { items, originalPath }) => { 
             if (items && Array.isArray(items) && items.length > 0) {
-                 if (items[0].entryType === 'websiteLink') { updateStagedPathsPage(items.map(i => i.path), 'websiteLink', 'رابط الموقع جاهز: '); } 
-                 else { stagedFilePaths = items; if(DOM.selectedFilesDisplayPage) DOM.selectedFilesDisplayPage.textContent = `تمت معالجة المسار. جاهز للإضافة: ${items.map(f => f.name).join(', ')}`;}
+                 if (items[0].entryType === 'websiteLink') { updateStagedPathsPage(items.map(i => i.path), 'websiteLink', 'Website link ready: '); } 
+                 else { stagedFilePaths = items; if(DOM.selectedFilesDisplayPage) DOM.selectedFilesDisplayPage.textContent = `Processed path. Ready to add: ${items.map(f => f.name).join(', ')}`;}
             } else { 
                 clearStagedFilesDisplayPage(); 
-                const name = (pathModule && originalPath) ? pathModule.basename(originalPath) : "المسار الملصق"; 
-                showAppNotification(`المسار "${name}" غير صالح أو فارغ أو لا يمكن الوصول إليه.`, 'error'); 
+                const name = (pathModule && originalPath) ? pathModule.basename(originalPath) : "Pasted path"; 
+                showAppNotification(`Path "${name}" is invalid, empty, or inaccessible.`, 'error'); 
             } 
         });
-        ipcRenderer.on('pasted-path-error', (event, { message, originalPath }) => { const name = (pathModule && originalPath) ? pathModule.basename(originalPath) : "المسار الملصق"; showAppNotification(`خطأ في معالجة "${name}": ${message}`, 'error'); clearStagedFilesDisplayPage(); });
+        ipcRenderer.on('pasted-path-error', (event, { message, originalPath }) => { const name = (pathModule && originalPath) ? pathModule.basename(originalPath) : "Pasted path"; showAppNotification(`Error processing "${name}": ${message}`, 'error'); clearStagedFilesDisplayPage(); });
         
         ipcRenderer.on('update-status-message', (event, message) => {
             if (DOM.updateStatusMessage) {
@@ -2316,34 +2399,33 @@
 
     }
     
-    if(DOM.selectFilesButtonPage) DOM.selectFilesButtonPage.addEventListener('click', () => { if (ipcRenderer) ipcRenderer.send('open-file-dialog-for-files'); else showAppNotification('هذه الميزة متاحة في تطبيق سطح المكتب فقط.', 'warning'); });
-    if(DOM.addFolderLinkButtonPage) DOM.addFolderLinkButtonPage.addEventListener('click', () => { if (ipcRenderer) ipcRenderer.send('open-folder-dialog-for-link'); else showAppNotification('هذه الميزة متاحة في تطبيق سطح المكتب فقط.', 'warning'); });
-    if(DOM.importFromFolderButtonPage) DOM.importFromFolderButtonPage.addEventListener('click', () => { if (ipcRenderer) ipcRenderer.send('open-folder-dialog-for-import'); else showAppNotification('هذه الميزة متاحة في تطبيق سطح المكتب فقط.', 'warning'); });
+    if(DOM.selectFilesButtonPage) DOM.selectFilesButtonPage.addEventListener('click', () => { if (ipcRenderer) ipcRenderer.send('open-file-dialog-for-files'); else showAppNotification('This feature is available in the desktop app only.', 'warning'); });
+    if(DOM.addFolderLinkButtonPage) DOM.addFolderLinkButtonPage.addEventListener('click', () => { if (ipcRenderer) ipcRenderer.send('open-folder-dialog-for-link'); else showAppNotification('This feature is available in the desktop app only.', 'warning'); });
+    if(DOM.importFromFolderButtonPage) DOM.importFromFolderButtonPage.addEventListener('click', () => { if (ipcRenderer) ipcRenderer.send('open-folder-dialog-for-import'); else showAppNotification('This feature is available in the desktop app only.', 'warning'); });
     if(DOM.pastePathButtonPage) DOM.pastePathButtonPage.addEventListener('click', async () => {
         let clipboardText = '';
-        try { if (electronClipboard) { clipboardText = electronClipboard.readText(); } else if (navigator.clipboard && navigator.clipboard.readText) { clipboardText = await navigator.clipboard.readText(); } else { showAppNotification('واجهة برمجة تطبيقات الحافظة غير متاحة.', 'warning'); return; } if(DOM.pathInputPage) DOM.pathInputPage.value = clipboardText; showAppNotification(clipboardText ? 'تم لصق المسار.' : 'الحافظة فارغة.', clipboardText ? 'success' : 'warning');
-        } catch (err) { console.error('[Renderer] Failed to read clipboard: ', err); showAppNotification('فشل اللصق من الحافظة. تأكد من الإذن إذا طُلب منك.', 'error'); }
+        try { if (electronClipboard) { clipboardText = electronClipboard.readText(); } else if (navigator.clipboard && navigator.clipboard.readText) { clipboardText = await navigator.clipboard.readText(); } else { showAppNotification('Clipboard API not available.', 'warning'); return; } if(DOM.pathInputPage) DOM.pathInputPage.value = clipboardText; showAppNotification(clipboardText ? 'Path pasted.' : 'Clipboard is empty.', clipboardText ? 'success' : 'warning');
+        } catch (err) { console.error('[Renderer] Failed to read clipboard: ', err); showAppNotification('Failed to paste from clipboard. Ensure permission if prompted.', 'error'); }
     });
     if(DOM.addPastedPathButtonPage) DOM.addPastedPathButtonPage.addEventListener('click', () => {
-        const pathValue = DOM.pathInputPage.value.trim(); if (!pathValue) { showAppNotification('الرجاء إدخال أو لصق مسار أولاً.', 'warning'); return; }
+        const pathValue = DOM.pathInputPage.value.trim(); if (!pathValue) { showAppNotification('Please enter or paste a path first.', 'warning'); return; }
         if (pathValue.toLowerCase().startsWith('http://') || pathValue.toLowerCase().startsWith('https://')) { 
-            updateStagedPathsPage([pathValue], 'websiteLink', 'رابط الموقع جاهز: '); 
+            updateStagedPathsPage([pathValue], 'websiteLink', 'Website link ready: '); 
         }
-        else if (ipcRenderer) { stagedFilePaths = []; if(DOM.selectedFilesDisplayPage) DOM.selectedFilesDisplayPage.textContent = `جار المعالجة: ${pathValue.substring(pathValue.lastIndexOf(/[/\\]/) + 1)}`; ipcRenderer.send('process-pasted-path', pathValue); } 
-        else { showAppNotification('إضافة المسارات المحلية متاحة في تطبيق سطح المكتب فقط.', 'warning'); }
+        else if (ipcRenderer) { stagedFilePaths = []; if(DOM.selectedFilesDisplayPage) DOM.selectedFilesDisplayPage.textContent = `Processing: ${pathValue.substring(pathValue.lastIndexOf(/[/\\]/) + 1)}`; ipcRenderer.send('process-pasted-path', pathValue); } 
+        else { showAppNotification('Adding local paths is available in the desktop app only.', 'warning'); }
     });
     if(DOM.addItemsButtonPage) DOM.addItemsButtonPage.addEventListener('click', () => handleProcessStagedItemsFromPage(false));
     
     if(DOM.pathInputPage) DOM.pathInputPage.addEventListener('keydown', e => { 
         if (e.key === 'Enter') {
-            e.preventDefault(); // Prevent form submission if it's in a form
-            handleProcessStagedItemsFromPage(true); // Pass true to indicate it's from Enter key
+            e.preventDefault(); 
+            handleProcessStagedItemsFromPage(true); 
         }
     });
     if(DOM.projectNameInputPage) DOM.projectNameInputPage.addEventListener('keydown', e => { 
         if (e.key === 'Enter') {
              e.preventDefault();
-            // If pathInputPage also has value, prioritize adding that. Otherwise, if staged files exist, add them.
             if (DOM.pathInputPage.value.trim()) {
                 handleProcessStagedItemsFromPage(true);
             } else if (stagedFilePaths.length > 0) {
@@ -2357,43 +2439,40 @@
         if(DOM.projectNameInputPage) DOM.projectNameInputPage.value = '';
         if(DOM.categorySelectInputPage) DOM.categorySelectInputPage.value = 'auto_detect';
         clearStagedFilesDisplayPage();
-        showAppNotification('تم مسح المدخلات.', 'info');
+        showAppNotification('Inputs cleared.', 'info');
     });
     
-    // --- Main Drag and Drop for Adding Items ---
     async function handleDirectDropAdd(event) {
         event.preventDefault();
         event.stopPropagation();
-        if (DOM.mainContent) DOM.mainContent.classList.remove('dragover'); // Remove visual cue
+        if (DOM.mainContent) DOM.mainContent.classList.remove('dragover'); 
         showAppLoading(true);
 
         const files = event.dataTransfer.files;
         const itemsFromDrop = event.dataTransfer.items;
         let hpmtFileToProcess = null;
-        const addedItemsInfo = []; // To collect info about what's being added
+        const addedItemsInfo = []; 
 
-        // 1. Process dropped files
         if (files.length > 0) {
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
-                const filePath = file.path; // Electron-specific
+                const filePath = file.path; 
 
                 if (file.name.toLowerCase().endsWith('.hpmt') && !hpmtFileToProcess) {
                     hpmtFileToProcess = { fileObject: file, pathForReading: filePath };
                 } else {
                     addedItemsInfo.push({
-                        path: filePath || file.name, // Use path if available (Electron), else name (Browser)
+                        path: filePath || file.name, 
                         name: file.name,
-                        entryType: 'file', // Assume file, folder detection is tricky here
-                        fileObject: filePath ? null : file // Keep file object for browser reading if no path
+                        entryType: 'file', 
+                        fileObject: filePath ? null : file 
                     });
                 }
             }
         }
 
-        // 2. Process .hpmt file (takes precedence)
         if (hpmtFileToProcess) {
-            showAppNotification('جار معالجة ملف .hpmt...', 'info');
+            showAppNotification('Processing .hpmt file...', 'info');
             const { fileObject, pathForReading } = hpmtFileToProcess;
             try {
                 let content;
@@ -2411,16 +2490,15 @@
                 activeFilePath = pathForReading || fileObject.name;
                 addToProjectHistory(activeFilePath, pathModule && pathForReading ? pathModule.basename(activeFilePath) : fileObject.name);
                 updateActiveProjectInfo();
-                showAppNotification(`تم تحميل المشروع "${pathModule && pathForReading ? pathModule.basename(activeFilePath) : fileObject.name}" من الإفلات.`, 'success');
+                showAppNotification(`Project "${pathModule && pathForReading ? pathModule.basename(activeFilePath) : fileObject.name}" loaded from drop.`, 'success');
                 showPage('pathsPage');
             } catch (error) {
-                showAppNotification(`خطأ في تحميل .hpmt: ${error.message}`, 'error');
+                showAppNotification(`Error loading .hpmt: ${error.message}`, 'error');
             }
             showAppLoading(false);
             return;
         }
 
-        // 3. Try to get a dragged URL if no files or if files were not .hpmt
         if (addedItemsInfo.length === 0 && itemsFromDrop && itemsFromDrop.length > 0) {
              for (const item of itemsFromDrop) {
                 if (item.kind === 'string' && (item.type.includes('text/uri-list'))) {
@@ -2434,7 +2512,7 @@
                     }
                 }
             }
-            if (addedItemsInfo.length === 0) { // Fallback for plain text URLs
+            if (addedItemsInfo.length === 0) { 
                 const plainText = event.dataTransfer.getData('text/plain');
                 if (plainText) {
                     const potentialUrl = plainText.split(/\s/)[0].trim();
@@ -2445,17 +2523,16 @@
             }
         }
         
-        // 4. Add collected items
         if (addedItemsInfo.length > 0) {
             let addedCount = 0;
-            const currentCategoryKey = DOM.categorySelectInputPage.value; // Use current selection from on-page panel
-            const currentProjectName = DOM.projectNameInputPage.value.trim(); // Use current name from on-page panel
+            const currentCategoryKey = DOM.categorySelectInputPage.value; 
+            const currentProjectName = DOM.projectNameInputPage.value.trim(); 
 
             addedItemsInfo.forEach(itemInfo => {
                 const { path, name, entryType } = itemInfo;
                 if (!path || projectFiles.some(pf => pf.location.toLowerCase() === path.toLowerCase())) {
                     if (projectFiles.some(pf => pf.location.toLowerCase() === path.toLowerCase())) {
-                        showAppNotification(`العنصر "${name}" موجود بالفعل.`, 'warning');
+                        showAppNotification(`Item "${name}" already exists.`, 'warning');
                     }
                     return;
                 }
@@ -2471,7 +2548,7 @@
                     type: itemType,
                     category: catKey,
                     entryType,
-                    dateAdded: new Date().toLocaleString('ar-SA', { dateStyle: 'short', timeStyle: 'short' })
+                    dateAdded: new Date().toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' })
                 });
                 addedCount++;
             });
@@ -2479,27 +2556,24 @@
             if (addedCount > 0) {
                 saveItemsToStorage();
                 renderProjectFilesUI();
-                showAppNotification(`✨ تمت إضافة ${addedCount} عنصر/عناصر مباشرة!`, 'success');
-                // Optionally clear the on-page panel inputs
-                // DOM.projectNameInputPage.value = '';
-                // DOM.pathInputPage.value = '';
-                // clearStagedFilesDisplayPage();
+                showAppNotification(`✨ Added ${addedCount} item(s) directly!`, 'success');
             }
         } else {
-            showAppNotification('لم يتم العثور على ملفات أو روابط متوافقة في الإفلات.', 'info');
+            showAppNotification('No compatible files or URLs found in drop.', 'info');
         }
         showAppLoading(false);
     }
 
 
     document.addEventListener('DOMContentLoaded', () => {
-        document.documentElement.dir = 'rtl'; 
-        document.documentElement.lang = 'ar';
+        document.documentElement.dir = 'ltr'; 
+        document.documentElement.lang = 'en';
         setupIpcListeners(); loadData(); showPage('pathsPage'); 
         if (window.innerWidth > 768) { if(DOM.sidebar) DOM.sidebar.classList.remove('collapsed'); if(DOM.mainContent) DOM.mainContent.classList.remove('expanded'); } 
         else { if(DOM.sidebar) DOM.sidebar.classList.add('collapsed'); if(DOM.mainContent) DOM.mainContent.classList.add('expanded'); }
         
         if(DOM.openAllBtn) DOM.openAllBtn.addEventListener('click', handleOpenAllClick);
+        if(DOM.addEmptyCategoryBtn) DOM.addEmptyCategoryBtn.addEventListener('click', handleAddEmptyCategoryFromPage);
         
         if(DOM.manageCategoriesBtn) DOM.manageCategoriesBtn.addEventListener('click', openCategoryManagerModal);
         if(DOM.closeCategoryManagerBtn) DOM.closeCategoryManagerBtn.addEventListener('click', closeCategoryManagerModal);
@@ -2516,21 +2590,31 @@
         if(DOM.checkForUpdatesBtn) DOM.checkForUpdatesBtn.addEventListener('click', () => {
             if (ipcRenderer) {
                 ipcRenderer.send('check-for-updates');
-                if(DOM.updateStatusMessage) DOM.updateStatusMessage.textContent = 'جار التحقق من وجود تحديثات...';
+                if(DOM.updateStatusMessage) DOM.updateStatusMessage.textContent = 'Checking for updates...';
             } else {
-                showAppNotification('التحقق من التحديثات متاح في تطبيق سطح المكتب فقط.', 'warning');
+                showAppNotification('Update checking is available in the desktop app only.', 'warning');
             }
         });
 
-        // Event listeners for item card actions are now added in renderProjectFilesUI
+        if(DOM.confirmMoveToCategoryBtn) DOM.confirmMoveToCategoryBtn.addEventListener('click', confirmMoveItemToCategory);
+        if(DOM.cancelMoveToCategoryBtn) DOM.cancelMoveToCategoryBtn.addEventListener('click', closeMoveToCategoryModal);
+
+        // Event listeners for item card actions are now added in renderProjectFilesUI (or via delegation if preferred)
+        if(DOM.filesDisplayContainer) {
+            DOM.filesDisplayContainer.addEventListener('click', e => {
+                const button = e.target.closest('.item-actions-menu button[data-action], .item-card-direct-open[data-action], .path-card-options-btn');
+                if (button) {
+                    handleItemCardButton(e); // Delegate to the unified handler
+                }
+            });
+        }
+
         if(DOM.newManagedCategoryInput) DOM.newManagedCategoryInput.addEventListener('keydown', e => { if (e.key === 'Enter' && DOM.addManagedCategoryBtn) DOM.addManagedCategoryBtn.click(); }); 
         
         if (DOM.mainContent) {
             DOM.mainContent.addEventListener('dragover', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                // Only add dragover class if not dragging an internal element (category or item)
-                // This helps distinguish external drops for adding items.
                 if (!draggedElement) { 
                     DOM.mainContent.classList.add('dragover');
                 }
@@ -2539,16 +2623,27 @@
             DOM.mainContent.addEventListener('dragleave', (e) => {
                  e.preventDefault();
                  e.stopPropagation();
-                // Check if the leave is to an internal element before removing class
                 if (!e.relatedTarget || !DOM.mainContent.contains(e.relatedTarget)) {
                     DOM.mainContent.classList.remove('dragover');
                 }
             });
             DOM.mainContent.addEventListener('drop', handleDirectDropAdd); 
         }
+
+        // Ctrl+S Save Functionality
+        document.addEventListener('keydown', (event) => {
+            if (event.ctrlKey && event.key.toLowerCase() === 's') {
+                event.preventDefault(); 
+                if (!activeFilePath) {
+                    handleSaveProjectAs();
+                } else {
+                    handleSaveActiveProject(true); 
+                }
+            }
+        });
     });
-    window.addEventListener('error', e => { console.error('[Renderer] Unhandled Error:', e); showAppNotification('حدث خطأ غير متوقع!', 'error'); });
-    window.addEventListener('unhandledrejection', event => { console.error('[Renderer] Unhandled Rejection:', event.reason); showAppNotification('حدث خطأ غير متوقع غير متزامن!', 'error'); });
+    window.addEventListener('error', e => { console.error('[Renderer] Unhandled Error:', e); showAppNotification('An unexpected error occurred!', 'error'); });
+    window.addEventListener('unhandledrejection', event => { console.error('[Renderer] Unhandled Rejection:', event.reason); showAppNotification('An unexpected async error occurred!', 'error'); });
     </script>
 </body>
 </html>
