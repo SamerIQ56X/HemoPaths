@@ -1,1 +1,1911 @@
-ابلع يل هطف
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hemo Paths Manager</title>
+    </head>
+    <style>
+                /* --- Base Styles --- */
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a, #1a1a2e, #16213e, #0f0f23);
+            min-height: 100vh; color: white; overflow: hidden;
+            line-height: 1.6; font-size: 14px;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0f0f23; border-radius: 12px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 12px; border: 2px solid #0f0f23; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.25); }
+        html { scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.15) #0f0f23; }
+
+        /* --- Custom Draggable Title Bar --- */
+        .custom-title-bar {
+            position: fixed; top: 0; left: 0; width: 100%; height: 32px; 
+            background-color: #1c1e2b; 
+            -webkit-app-region: drag; 
+            z-index: 100000; display: flex; align-items: center;
+            justify-content: space-between; padding: 0 0 0 10px; 
+            user-select: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
+        }
+        .window-app-title { 
+            color: #c5c6c7; 
+            font-size: 0.8rem; 
+            font-weight: 400; 
+            -webkit-app-region: no-drag;
+            padding-left: 5px;
+            line-height: 32px; 
+        }
+
+        /* --- Window Controls (Windows Style) --- */
+        .window-controls {
+            position: static; -webkit-app-region: no-drag;
+            display: flex; height: 100%; 
+            margin-left: auto; 
+        }
+        html[dir="rtl"] .window-controls { margin-right: auto; margin-left: initial; }
+        
+        .window-btn {
+            width: 46px; 
+            height: 100%; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: transparent;
+            border: none;
+            color: #c5c6c7; 
+            cursor: pointer;
+            transition: background-color 0.15s ease, color 0.15s ease; 
+            -webkit-app-region: no-drag;
+            padding: 0;
+            border-radius: 0; 
+        }
+        .window-btn svg {
+            width: 10px;
+            height: 10px;
+            fill: currentColor;
+        }
+        .window-btn:hover {
+            background-color: rgba(255, 255, 255, 0.12); 
+            color: white;
+        }
+        .close-btn:hover {
+            background-color: #e81123; 
+            color: white;
+        }
+        .minimize-btn:active, .close-btn:active {
+             background-color: rgba(255, 255, 255, 0.2);
+        }
+        .close-btn:active {
+            background-color: #f1707a; 
+            color: white; 
+        }
+
+
+        /* --- Sidebar --- */
+        .sidebar {
+            position: fixed; left: 0; top: 32px; 
+            width: 250px; height: calc(100vh - 32px); 
+            background: rgba(10, 12, 28, 0.88); backdrop-filter: blur(18px); 
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 15px; transition: all 0.3s ease; z-index: 9999;
+            display: flex; flex-direction: column;
+        }
+        .sidebar.collapsed { width: 70px; }
+        html[dir="ltr"] .sidebar.collapsed .nav-text,
+        html[dir="ltr"] .sidebar.collapsed .logo h2,
+        html[dir="ltr"] .sidebar.collapsed .logo p { display: none; }
+        html[dir="ltr"] .sidebar:not(.collapsed) .logo,
+        html[dir="ltr"] .sidebar:not(.collapsed) .nav-text { opacity: 1; transition: opacity 0.2s 0.1s ease-in-out; }
+        html[dir="ltr"] .sidebar.collapsed .logo,
+        html[dir="ltr"] .sidebar.collapsed .nav-text { opacity: 0; pointer-events: none; }
+        .sidebar-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 25px; padding-top: 10px; }
+        .logo { opacity: 1; transition: opacity 0.3s ease; }
+        .sidebar.collapsed .logo { opacity: 0; pointer-events: none; }
+        .logo h2 {
+            font-size: 20px; background: linear-gradient(45deg, #4fc3f7, #29b6f6, #03a9f4, #0288d1);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; text-fill-color: transparent; white-space: nowrap;
+        }
+        .logo p { color: #64b5f6; font-size: 10px; margin-top: -4px; white-space: nowrap; }
+        .menu-toggle {
+            background: none; border: none; color: #90a4ae; cursor: pointer; padding: 8px;
+            border-radius: 8px; transition: all 0.3s ease; display: flex;
+            align-items: center; justify-content: center; -webkit-app-region: no-drag;
+        }
+        .menu-toggle:hover { background: rgba(255, 255, 255, 0.1); color: white; }
+        .sidebar.collapsed .menu-toggle { margin-left: auto; margin-right: auto; }
+        .nav-menu { list-style: none; padding: 0; }
+        .nav-item { margin-bottom: 6px; }
+        .nav-link {
+            display: flex; align-items: center; padding: 10px 15px; color: #90a4ae;
+            text-decoration: none; border-radius: 8px; transition: all 0.2s ease;
+            cursor: pointer; white-space: nowrap;
+        }
+        .nav-link:hover, .nav-link.active:hover { background: rgba(255, 255, 255, 0.1); color: white; }
+        .nav-link.active {
+            background: linear-gradient(90deg, #1e3a8a, #3b82f6, #6366f1); color: white;
+            box-shadow: 0 3px 12px rgba(59, 130, 246, 0.2);
+        }
+        .nav-icon { margin-right: 12px; width: 18px; height: 18px; flex-shrink: 0; }
+        .sidebar.collapsed .nav-link { justify-content: center; }
+        .sidebar.collapsed .nav-icon { margin-right: 0; }
+
+        /* --- Main Content Area --- */
+        .main-content {
+            margin-left: 250px; padding: 20px;
+            padding-top: calc(20px + 32px); transition: margin-left 0.3s ease; min-height: 100vh;
+            overflow-y: auto; height: calc(100vh - 32px);
+        }
+        .main-content.expanded { margin-left: 70px; }
+        .page { display: none; animation: fadeInContent 0.4s ease-out; }
+        .page.active { display: block; }
+        @keyframes fadeInContent { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .page-header-container {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 25px;
+        }
+        .page-header-container .page-title {
+            font-size: 1.8rem; font-weight: 700;
+            background: linear-gradient(45deg, #ffffff, #e3f2fd, #bbdefb);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; text-fill-color: transparent; margin-bottom: 4px;
+        }
+        .page-header-container .page-subtitle { color: #64b5f6; font-size: 0.9rem; }
+
+        .container { /* For Path Manager content */
+            max-width: 100%; margin: 0 auto; background: rgba(10, 10, 30, 0.45); 
+            backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px; box-shadow: 0 6px 25px 0 rgba(0, 0, 0, 0.3); overflow: hidden;
+        }
+        .header { padding: 20px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+        .header h1 {
+            font-size: 2rem; font-weight: 700;
+            background: linear-gradient(45deg, #ffffff, #e3f2fd, #bbdefb);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; text-fill-color: transparent;
+            margin-bottom: 6px; text-transform: capitalize;
+        }
+        .header p { color: #64b5f6; font-size: 0.9rem; }
+        .top-actions-bar {
+            display: flex; justify-content: space-between; align-items: center; padding: 12px 18px;
+            background: rgba(15, 15, 35, 0.35); border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+            flex-wrap: wrap; gap: 10px;
+        }
+        .stats { font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; color: #90a4ae; }
+        .stats svg { margin-right: 8px; width: 16px; height: 16px; vertical-align: middle; fill: #64b5f6; }
+
+        .btn {
+            padding: 9px 18px; border: none; border-radius: 8px; font-size: 0.85rem; font-weight: 600;
+            cursor: pointer; transition: all 0.25s ease; text-decoration: none; display: inline-flex;
+            align-items: center; gap: 7px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); text-transform: none;
+        }
+        .btn svg { width: 15px; height: 15px; fill: currentColor; }
+        .btn:hover { transform: translateY(-1px); box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25); }
+        .btn:active { transform: translateY(0px); box-shadow: 0 1px 4px rgba(0,0,0,0.15); }
+        .btn:disabled {
+            background: rgba(120, 120, 120, 0.15) !important; border-color: rgba(120, 120, 120, 0.15) !important;
+            color: #6c7a86 !important; cursor: not-allowed; opacity: 0.5;
+            transform: translateY(0); box-shadow: none;
+        }
+        .btn-primary {
+            background: linear-gradient(45deg, #1565c0, #1976d2, #1e88e5, #2196f3); color: white;
+            box-shadow: 0 3px 12px rgba(33, 150, 243, 0.25); padding: 10px 22px; border-radius: 10px;
+        }
+        .btn-primary:hover { box-shadow: 0 5px 18px rgba(33, 150, 243, 0.35); }
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08); color: #90a4ae; border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.12); color: white; }
+        .btn-danger {
+            background: linear-gradient(45deg, #d32f2f, #e53935, #f44336); color: white;
+            box-shadow: 0 3px 12px rgba(244, 67, 54, 0.25);
+        }
+        .btn-danger:hover { background: linear-gradient(45deg, #c62828, #d32f2f, #e53935); box-shadow: 0 5px 18px rgba(244, 67, 54, 0.35); }
+        .btn-success {
+            background: linear-gradient(45deg, #2e7d32, #388e3c, #43a047, #4caf50); color: white;
+            box-shadow: 0 3px 12px rgba(76, 175, 80, 0.25);
+        }
+        .btn-success:hover { background: linear-gradient(45deg, #1b5e20, #2e7d32, #388e3c); box-shadow: 0 5px 18px rgba(76, 175, 80, 0.35); }
+        .btn-icon {
+            background: transparent; border: none; color: #90a4ae; padding: 7px; line-height: 1;
+            border-radius: 6px; transition: all 0.2s ease;
+        }
+        .btn-icon:hover { color: white; background-color: rgba(255, 255, 255, 0.08); }
+        .btn-icon svg { width: 16px; height: 16px; }
+        .btn-icon:disabled { color: #5f6770 !important; background-color: transparent !important; cursor: not-allowed;}
+        .btn-icon:disabled svg { fill: #5f6770 !important; }
+
+        .add-item-fab {
+            position: fixed; bottom: 25px; right: 25px; 
+            background: linear-gradient(45deg, #1e88e5, #2196f3, #42a5f5); color: white;
+            width: 56px; height: 56px; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; font-size: 24px;
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.4); cursor: pointer;
+            transition: all 0.3s ease; z-index: 9990;
+        }
+        html[dir="rtl"] .add-item-fab { left: 25px; right: auto; }
+        .add-item-fab:hover { transform: scale(1.05) translateY(-2px); box-shadow: 0 6px 20px rgba(33, 150, 243, 0.5); }
+        .add-item-fab svg { width: 24px; height: 24px; }
+
+        #addItemModal { z-index: 100001; } 
+        .add-item-modal-content {
+            background: rgba(15, 15, 35, 0.95); backdrop-filter: blur(25px);
+            padding: 25px; border-radius: 16px; width: 90%; max-width: 650px;
+            border: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            transform: scale(0.95) translateY(10px);
+            transition: transform 0.3s ease-out, opacity 0.3s ease-out; opacity: 0;
+        }
+        .modal-backdrop.show .add-item-modal-content { transform: scale(1) translateY(0); opacity: 1; }
+        .add-item-modal-content h2 {
+            text-align: center; font-size: 1.7rem; font-weight: 700; margin-bottom: 22px;
+            background: linear-gradient(45deg, #4fc3f7, #29b6f6, #03a9f4); 
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; text-fill-color: transparent;
+        }
+        .add-item-modal-content .input-group { display: flex; flex-direction: column; gap: 15px; } 
+        .add-item-modal-content .input-row { display: flex; gap: 12px; flex-wrap: wrap; }
+        
+        /* Corrected Input Field Styles */
+        .input-field, 
+        #categorySelectInputModal, 
+        .category-name-input-inline, 
+        #newManagedCategoryInput, 
+        #todoInput, 
+        #newExtensionInput, 
+        #newExtensionCategoryNameInput,
+        #openIntervalInput { 
+            flex: 1; 
+            padding: 12px 15px; 
+            border: 1px solid rgba(100, 110, 130, 0.5); 
+            border-radius: 8px; 
+            font-size: 0.9rem; 
+            min-width: 150px; 
+            background-color: rgba(25, 28, 48, 0.75); 
+            color: #e8eaf6; 
+            transition: all 0.25s ease;
+            outline: none; 
+        }
+        .input-field::placeholder, 
+        #todoInput::placeholder, 
+        #newExtensionInput::placeholder, 
+        #newExtensionCategoryNameInput::placeholder,
+        #openIntervalInput::placeholder { 
+            color: #8a9bb8; 
+            opacity: 0.9; 
+        }
+        .input-field:focus, 
+        #categorySelectInputModal:focus, 
+        .category-name-input-inline:focus, 
+        #newManagedCategoryInput:focus, 
+        #todoInput:focus, 
+        #newExtensionInput:focus, 
+        #newExtensionCategoryNameInput:focus,
+        #openIntervalInput:focus {
+            border-color: #42a5f5; 
+            background-color: rgba(35, 38, 60, 0.85); 
+            box-shadow: 0 0 0 3px rgba(66, 165, 245, 0.3); 
+        }
+
+        #categorySelectInputModal { 
+            appearance: none; -webkit-appearance: none; -moz-appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2364b5f6%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat; background-size: 11px; 
+        }
+        html[dir="ltr"] #categorySelectInputModal { background-position: right 12px center; padding-right: 35px; }
+        html[dir="rtl"] #categorySelectInputModal { background-position: left 12px center; padding-left: 35px; }
+        #categorySelectInputModal option { background: #1a1a2e; color: white; }
+        .add-item-modal-actions { text-align: right; margin-top:20px; display:flex; justify-content: flex-end; gap: 10px;}
+        html[dir="rtl"] .add-item-modal-actions { text-align: left; justify-content: flex-start;}
+
+
+        #selectedFilesDisplayModal { margin-top: 10px; font-size: 0.75rem; color: #90a4ae; max-height: 50px; overflow-y: auto;}
+        #itemsDisplayArea { padding: 18px; }
+
+        .category-section {
+            margin-bottom: 20px; background: rgba(5, 5, 20, 0.45); 
+            backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 10px; box-shadow: 0 3px 18px rgba(0,0,0,0.2); transition: all 0.25s ease;
+        }
+        .category-section:hover { background: rgba(10, 10, 25, 0.55); border-color: rgba(255, 255, 255, 0.1); }
+        .category-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 18px; border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+            cursor: pointer; user-select: none; background-color: rgba(20, 20, 40, 0.45); 
+            border-top-left-radius: 10px; border-top-right-radius: 10px; transition: background-color 0.25s ease;
+        }
+        .category-header:hover { background-color: rgba(25, 25, 45, 0.55); }
+        .category-header:hover .category-title { color: #64b5f6; } 
+        .category-title-container { display: flex; align-items: center; gap: 10px; flex-grow: 1; }
+        .category-toggle-icon svg { width: 11px; height: 11px; fill: #90a4ae; transition: transform 0.25s ease-in-out; }
+        html[dir="ltr"] .category-section:not(.collapsed) .category-toggle-icon svg { transform: rotate(90deg); }
+        html[dir="rtl"] .category-section:not(.collapsed) .category-toggle-icon svg { transform: rotate(-90deg); }
+        .category-title { font-size: 1.1rem; font-weight: 600; color: white; text-transform: capitalize;}
+        .category-item-count {
+            background: rgba(255, 255, 255, 0.08); color: #64b5f6; padding: 2px 9px;
+            border-radius: 18px; font-size: 0.7rem; margin-left: 8px;
+        }
+        html[dir="rtl"] .category-item-count { margin-right: 8px; margin-left: 0; }
+        
+        .category-controls { display: flex; align-items: center; gap: 8px; }
+        .category-controls .btn-icon { padding: 6px; }
+        .category-controls .btn-icon svg { width: 14px; height: 14px; }
+        .category-controls .btn-open-all-in-category { padding: 6px 12px; font-size: 0.75rem; }
+        .category-controls .btn-open-all-in-category svg { width: 13px; height: 13px;}
+
+        .items-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); 
+            gap: 18px; padding: 18px; max-height: 1200px; overflow-y: auto; opacity: 1;
+            transition: max-height 0.25s ease-out, opacity 0.25s ease-out, padding 0.25s ease-out;
+        }
+        .category-section.collapsed .items-grid { max-height: 0; opacity: 0; padding-top: 0; padding-bottom: 0; margin-top:0; overflow: hidden; }
+        .category-section.collapsed .category-header { border-bottom-color: transparent; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; }
+
+        .item-card {
+            background: rgba(5, 5, 20, 0.65); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.07); border-radius: 10px; 
+            padding: 16px; box-shadow: 0 3px 12px rgba(0,0,0,0.18);
+            transition: all 0.25s ease; display: flex; flex-direction: column;
+            justify-content: space-between; position: relative; min-height: 130px; 
+        }
+        .item-card:hover {
+            background: rgba(10, 10, 25, 0.75); border-color: rgba(255, 255, 255, 0.12);
+            transform: translateY(-2px); box-shadow: 0 5px 18px rgba(0,0,0,0.28);
+        }
+        .item-card-main { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .item-card-icon svg { width: 28px; height: 28px; fill: #64b5f6; flex-shrink: 0; }
+        .item-card-info { overflow: hidden; flex-grow: 1; }
+        .item-card-name { font-size: 0.95rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: white; }
+        .item-card-filetype { font-size: 0.75rem; color: #90a4ae; } 
+        .item-card-path {
+            font-size: 0.7rem; color: #64b5f6; margin: 6px 0; word-break: break-all;
+            max-height: 2.8em; overflow: hidden; text-overflow: ellipsis;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+        }
+        .item-card-footer {
+            margin-top: auto; display: flex; justify-content: space-between; align-items: center;
+            padding-top: 8px; border-top: 1px solid rgba(255, 255, 255, 0.07);
+        }
+        .item-card-date { font-size: 0.65rem; color: #78828c; }
+        .item-card-actions-trigger { -webkit-app-region: no-drag; }
+        .item-card-actions-trigger svg { width: 16px; height: 16px; }
+        .item-card-direct-open { -webkit-app-region: no-drag; margin-left: 8px; flex-shrink: 0; }
+        html[dir="rtl"] .item-card-direct-open { margin-right: 8px; margin-left: 0; }
+
+
+        .item-actions-menu {
+            display: none; position: absolute; background-color: rgba(20, 20, 40, 0.88); 
+            backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 8px; box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+            z-index: 500; min-width: 190px; overflow: hidden; padding: 6px; 
+        }
+        .item-actions-menu.show { display: block; animation: fadeIn 0.15s ease-out; }
+        html[dir="ltr"] .item-actions-menu { left: 8px; right:auto; } 
+        html[dir="rtl"] .item-actions-menu { right: 8px; left:auto; } 
+        .item-actions-menu button {
+            display: flex; align-items: center; gap: 8px; width: 100%; padding: 9px 12px;
+            background: none; border: none; cursor: pointer; font-size: 0.8rem;
+            color: #b0bec5; transition: all 0.15s ease; text-align: left; 
+            border-radius: 6px; margin: 0; 
+        }
+        html[dir="rtl"] .item-actions-menu button { text-align: right; }
+        .item-actions-menu button svg { width: 14px; height: 14px; fill: currentColor; margin-right: 8px; margin-left:0; } 
+        html[dir="rtl"] .item-actions-menu button svg { margin-left: 8px; margin-right: 0; }
+        .item-actions-menu button:hover { background-color: rgba(33, 150, 243, 0.18); color: #64b5f6; }
+        .item-actions-menu button:hover svg { fill: #64b5f6; }
+        .item-actions-menu button[data-action="delete"]:hover { background-color: rgba(244, 67, 54, 0.18); color: #f44336; }
+        .item-actions-menu button[data-action="delete"]:hover svg { fill: #f44336; }
+
+        .empty-placeholder { text-align: center; padding: 35px 18px; color: #90a4ae; }
+        .empty-placeholder .icon svg { width: 45px; height: 45px; fill: rgba(255,255,255,0.18); margin-bottom: 12px; }
+        .empty-placeholder h3 { font-size: 1.3rem; margin-bottom: 7px; color: white;}
+        .empty-placeholder p { font-size: 0.95rem; }
+
+        .notification-toast {
+            position: fixed; bottom: 18px; background-color: rgba(20, 20, 40, 0.82); 
+            backdrop-filter: blur(10px); color: white; padding: 14px 20px;
+            border-radius: 10px; box-shadow: 0 5px 18px rgba(0,0,0,0.28);
+            z-index: 10000; opacity: 0; transform: translateY(18px) scale(0.96);
+            transition: opacity 0.25s ease-out, transform 0.25s ease-out;
+            max-width: 340px; font-size: 0.88rem;
+            border-left: 3px solid transparent; border-right:none; 
+        }
+        html[dir="rtl"] .notification-toast { right: 18px; left: auto; border-right: 3px solid transparent; border-left:none; }
+        .notification-toast.show { opacity: 1; transform: translateY(0) scale(1); }
+        .notification-toast.success { border-color: #4caf50; } 
+        .notification-toast.error { border-color: #f44336; } 
+        .notification-toast.warning { border-color: #ffc107; } 
+        
+        .loading-indicator, .modal-backdrop {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.65); backdrop-filter: blur(8px);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 99998; opacity: 0; visibility: hidden;
+            transition: opacity 0.25s ease-out, visibility 0s 0.25s linear;
+        }
+        #confirmModalBackdrop, #addItemModal { z-index: 100001; } 
+        .loading-indicator.show, .modal-backdrop.show { opacity: 1; visibility: visible; transition-delay: 0s; }
+        .spinner {
+            width: 32px; height: 32px; border: 3.5px solid rgba(255, 255, 255, 0.18); 
+            border-top-color: #2196f3; border-radius: 50%; animation: spin 0.65s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .modal-dialog { 
+            background: rgba(10, 10, 30, 0.88); backdrop-filter: blur(18px);
+            padding: 22px 28px; border-radius: 14px; box-shadow: 0 7px 30px rgba(0,0,0,0.38);
+            text-align: center; max-width: 380px; 
+            transform: scale(0.96) translateY(8px);
+            transition: transform 0.25s ease-out, opacity 0.25s ease-out;
+            border: 1px solid rgba(255, 255, 255, 0.12); opacity: 0;
+        }
+        .modal-backdrop.show .modal-dialog { transform: scale(1) translateY(0); opacity: 1; }
+        .modal-dialog p { margin-bottom: 18px; font-size: 0.95rem; color: white; }
+        .modal-dialog-actions { display: flex; justify-content: center; gap: 12px; }
+        .modal-dialog-actions button { min-width: 90px; }
+
+        #categoryManagerModal { z-index: 100000; } 
+        .category-manager-content {
+            background: rgba(15, 15, 35, 0.92); backdrop-filter: blur(22px);
+            padding: 22px; border-radius: 14px; width: 90%; max-width: 580px; 
+            border: 1px solid rgba(255, 255, 255, 0.12); box-shadow: 0 8px 35px rgba(0,0,0,0.45);
+            transform: scale(0.96) translateY(8px);
+            transition: transform 0.25s ease-out, opacity 0.25s ease-out; opacity: 0;
+        }
+        .modal-backdrop.show .category-manager-content { transform: scale(1) translateY(0); opacity: 1; }
+        .category-manager-content h2 {
+            text-align: center; font-size: 1.7rem; font-weight: 700; margin-bottom: 22px;
+            background: linear-gradient(45deg, #4fc3f7, #29b6f6, #03a9f4); 
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; text-fill-color: transparent;
+        }
+        #categoryListContainer {
+            max-height: 330px; overflow-y: auto; margin-bottom: 22px;
+            border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px;
+            padding: 8px; background-color: rgba(5, 5, 20, 0.45); 
+        }
+        .category-manager-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+            font-size: 0.9rem; color: white; transition: background-color 0.15s ease;
+            border-radius: 7px; margin-bottom: 4px; 
+        }
+        .category-manager-item:hover { background-color: rgba(255,255,255,0.06); }
+        .category-manager-item:last-child { border-bottom: none; margin-bottom: 0; }
+        .category-manager-item-name-container { flex-grow: 1; display: flex; align-items: center; min-width: 0; gap: 8px; }
+        .category-manager-item-name { flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 2px 0; }
+        .category-name-input-inline { font-size: 0.9rem; padding: 7px 10px; margin: 0; height: auto; line-height: 1.4; width: 100%; }
+        .category-manager-item-controls { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+        .category-manager-item .btn-icon { margin-left: 0; margin-right: 0; padding: 7px; }
+        .category-manager-item .btn-icon.btn-edit-managed-category { color: #64b5f6; } 
+        .category-manager-item .btn-icon.btn-edit-managed-category:hover { background-color: rgba(33, 150, 243, 0.12); }
+        .category-manager-item .btn-icon.btn-delete-managed-category { color: #f44336; } 
+        .category-manager-item .btn-icon.btn-delete-managed-category:hover { background-color: rgba(244, 67, 54, 0.12); }
+        .category-manager-item .btn-icon.btn-save-inline-edit { color: #4caf50; } 
+        .category-manager-item .btn-icon.btn-save-inline-edit:hover { background-color: rgba(76, 175, 80, 0.12); }
+        .category-manager-item .btn-icon.btn-cancel-inline-edit { color: #90a4ae; }
+        .category-manager-item .btn-icon.btn-cancel-inline-edit:hover { background-color: rgba(144, 164, 174, 0.12); }
+        .category-manager-item .btn-icon svg { width: 15px; height: 15px; }
+        .category-tag {
+            font-size: 0.65rem; padding: 3px 9px; border-radius: 18px; 
+            color: white; background-color: rgba(255, 255, 255, 0.08);
+            font-weight: 500; flex-shrink: 0;
+        }
+        .category-tag.custom { background-color: rgba(33, 150, 243, 0.25); color: #e3f2fd; } 
+        .add-category-form { display: flex; gap: 12px; margin-top: 18px; padding-top: 18px; border-top: 1px solid rgba(255, 255, 255, 0.08); }
+        #newManagedCategoryInput { margin-bottom: 0; width: 100%; }
+        #addManagedCategoryBtn { flex-shrink: 0; }
+        .category-manager-actions { text-align: center; margin-top:25px;}
+
+        /* --- To-Do List Specific Styles --- */
+        .todo-input-container { display: flex; gap: 10px; margin-bottom: 18px; }
+        .todo-input { flex: 1; }
+        #todosContainer { display: flex; flex-direction: column; gap: 8px; }
+        .todo-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 10px 14px; background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 7px;
+            transition: all 0.25s ease;
+        }
+        .todo-item:hover { background: rgba(255, 255, 255, 0.08); }
+        .todo-item.completed { background: rgba(76, 175, 80, 0.08); border-left-color: #4caf50; }
+        html[dir="rtl"] .todo-item.completed { border-right-color: #4caf50; border-left-color: rgba(255,255,255,0.08); }
+        .todo-item-left { display: flex; align-items: center; gap: 8px; flex-grow: 1; }
+        .todo-checkbox {
+            width: 18px; height: 18px; border: 1.5px solid #64b5f6; border-radius: 5px;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            transition: all 0.25s ease; flex-shrink: 0;
+        }
+        .todo-checkbox svg { width: 11px; height: 11px; fill: white; opacity: 0; transition: opacity 0.15s; }
+        .todo-item.completed .todo-checkbox { background: #4caf50; border-color: #4caf50; }
+        .todo-item.completed .todo-checkbox svg { opacity: 1; }
+        .todo-text { color: white; transition: all 0.25s ease; word-break: break-word; font-size: 0.9rem; }
+        .todo-item.completed .todo-text { text-decoration: line-through; opacity: 0.65; }
+        .todo-text-edit-input { 
+            flex-grow: 1; background: rgba(35, 38, 60, 0.85); color: #e8eaf6; border: 1px solid #42a5f5;
+            border-radius: 4px; padding: 4px 8px; font-size: 0.9rem;
+        }
+
+        .todo-date { font-size: 0.7rem; color: #90a4ae; margin-left: auto; padding-left: 8px; flex-shrink: 0;}
+        html[dir="rtl"] .todo-date { margin-right: auto; padding-right: 8px; margin-left:0; padding-left:0;}
+        .todo-item-actions { display:flex; gap: 6px; } 
+        .todo-item .btn-icon { padding: 5px; } 
+        .todo-item .btn-icon svg { width: 13px; height: 13px; }
+
+        /* Options Page Specific Styles */
+        #optionsPage .glass-card { padding: 25px; }
+        #optionsPage .options-group {
+            margin-bottom: 30px; 
+            padding-bottom: 20px; 
+            border-bottom: 1px solid rgba(255,255,255,0.05); 
+        }
+        #optionsPage .options-group:last-child { border-bottom: none; margin-bottom: 0; }
+        #optionsPage .options-group h3 {
+            font-size: 1.3rem; 
+            color: #81c784; 
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+        }
+        #optionsPage .options-group p {
+            font-size: 0.85rem;
+            color: #b0bec5; 
+            margin-bottom: 15px; 
+            line-height: 1.5;
+        }
+        #optionsPage .options-group .btn { margin-top: 8px;} 
+        #optionsPage .input-row { margin-bottom: 12px;} 
+        #optionsPage .input-row label { font-size: 0.85rem; color: #b0bec5; margin-right: 10px; min-width: 120px; }
+
+
+        #extensionMappingsContainer { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; max-height: 220px; overflow-y: auto; padding:10px; background: rgba(0,0,0,0.1); border-radius: 6px;}
+        .extension-mapping-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 12px; background: rgba(255,255,255,0.03); border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.07);
+        }
+        .extension-mapping-item span { font-size: 0.9rem; }
+        .extension-mapping-item .btn-icon { padding: 4px; background-color: transparent;}
+        .extension-mapping-item .btn-icon:hover { background-color: rgba(255,82,82,0.1);}
+        .extension-mapping-item .btn-icon svg { width: 12px; height: 12px; fill: #ff8a80; }
+        .extension-mapping-item .btn-icon:hover svg { fill: #ff5252; }
+
+        /* File Operations Page: History List */
+        #projectHistoryContainer .extension-mapping-item { 
+            cursor: pointer;
+        }
+        #projectHistoryContainer .extension-mapping-item:hover {
+            background-color: rgba(255, 255, 255, 0.06);
+        }
+        #projectHistoryContainer .empty-history-message {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #90a4ae;
+            font-size: 0.9rem;
+        }
+        #projectHistoryContainer .empty-history-message svg {
+            width: 32px;
+            height: 32px;
+            fill: rgba(255,255,255,0.2);
+            margin-bottom: 10px;
+        }
+
+
+        /* About Page Centering */
+        #aboutPage .glass-card {
+            max-width: 700px; 
+            margin-left: auto;
+            margin-right: auto;
+            padding: 30px;
+            text-align: center; 
+        }
+        #aboutPage h3 {
+            font-size: 1.6rem; color: #64b5f6; margin-bottom: 15px;
+        }
+        #aboutPage p {
+            font-size: 1rem; color: #c5cae9; margin-bottom: 10px; line-height: 1.7;
+        }
+        #aboutPage h4 {
+            font-size: 1.1rem; color: #81c784; margin-top: 20px; margin-bottom: 10px;
+        }
+        #aboutPage ul { list-style-position: inside; padding-left: 0; text-align: left; max-width: 400px; margin: 0 auto;}
+        #aboutPage li { margin-bottom: 8px; color: #b0bec5;}
+
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .fade-in-item { animation: fadeIn 0.25s ease-out forwards; animation-delay: calc(var(--card-index, 0) * 0.04s); opacity: 0; }
+
+        /* Drag over visual feedback */
+        .main-content.dragover {
+             border: 2px dashed #64b5f6 !important; /* Ensure this overrides other borders */
+             background-color: rgba(100, 181, 246, 0.1) !important; /* Light blueish feedback */
+        }
+
+
+        @media (max-width: 768px) {
+            body { padding: 0; font-size:13px; }
+            .main-content { margin-left: 0; margin-right:0; padding:10px; padding-top: calc(10px + 32px); } /* Adjusted for title bar */
+            .main-content.expanded { margin-left: 0; margin-right:0; } 
+            .sidebar { transform: translateX(-100%); box-shadow: 3px 0 12px rgba(0,0,0,0.15); top: 32px; height: calc(100vh - 32px);} 
+            html[dir="rtl"] .sidebar { transform: translateX(100%); box-shadow: -3px 0 12px rgba(0,0,0,0.15); }
+            .sidebar.show { transform: translateX(0); }
+            .container { margin: 8px; width:auto; }
+            .header { padding: 18px 12px; } .header h1 { font-size: 1.7rem; }
+            .top-actions-bar, #addItemModal .add-item-section { padding: 12px; } 
+            .top-actions-bar { flex-direction: column; align-items: stretch; }
+            .top-actions-bar .btn { width: 100%; margin-bottom: 8px; }
+            .input-row { flex-direction: column; gap: 12px; }
+            .items-grid { grid-template-columns: 1fr; gap: 12px;} 
+            .item-card { min-height: auto; padding: 12px; } 
+            .notification-toast { max-width: calc(100% - 20px); bottom: 8px; left:10px; right:10px;}
+            .category-manager-content, .add-item-modal-content { max-width: 96%; padding: 18px;}
+            .modal-dialog { max-width: 92%; padding: 18px; }
+            #optionsPage .options-group { padding-bottom: 15px; margin-bottom: 20px; }
+        }
+        @media (max-width: 480px) {
+            .custom-title-bar { height: 30px; padding: 0 6px 0 8px; } /* Even smaller title bar */
+            .sidebar { top: 30px; height: calc(100vh - 30px); }
+            .main-content { padding-top: calc(10px + 30px); height: calc(100vh - 30px); }
+            .header h1 { font-size: 1.5rem; } .header p { font-size: 0.8rem; }
+            .btn { font-size: 0.8rem; padding: 8px 14px; } .btn-primary { padding: 9px 18px; }
+            .category-title { font-size: 1rem; }
+            .category-item-count { font-size: 0.65rem; padding: 2px 7px;}
+            .category-controls .btn-open-all-in-category { font-size: 0.7rem; padding: 5px 9px;}
+            .category-manager-content h2 { font-size: 1.4rem; }
+            .sidebar.collapsed { width: 55px; } 
+            .main-content.expanded { margin-left: 55px; } 
+            html[dir="rtl"] .main-content.expanded { margin-right: 55px; }
+            #optionsPage .options-group h3 { font-size: 1.1rem; }
+        }
+
+    </style>
+<body>
+    <div class="custom-title-bar">
+        <span class="window-app-title">Hemo Paths Manager</span>
+        <div class="window-controls">
+            <button class="window-btn minimize-btn" onclick="handleMinimizeWindow()" title="Minimize">
+                <svg viewBox="0 0 10 10"><path d="M0 4h10v2H0z"/></svg>
+            </button>
+            <button class="window-btn close-btn" onclick="handleCloseWindow()" title="Close">
+                <svg viewBox="0 0 10 10"><path d="M0 0l10 10M10 0l-10 10" stroke="currentColor" stroke-width="1.5" /></svg>
+            </button>
+        </div>
+    </div>
+
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <h2>Hemo Paths</h2>
+                <p>Manager</p>
+            </div>
+            <button class="menu-toggle" onclick="toggleSidebar()" title="Toggle Menu">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                </svg>
+            </button>
+        </div>
+        
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="#" class="nav-link active" onclick="showPage('pathsPage')">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><use xlink:href="#icon-folder"></use></svg>
+                    <span class="nav-text">Path Manager</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" onclick="showPage('todosPage')">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><use xlink:href="#icon-check"></use></svg> <span class="nav-text">To-Do List</span>
+                </a>
+            </li>
+             <li class="nav-item"> 
+                <a href="#" class="nav-link" onclick="showPage('fileOperationsPage')">
+                     <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"><use xlink:href="#icon-save"></use></svg> <span class="nav-text">File</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" onclick="showPage('optionsPage')"> 
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"> <use xlink:href="#icon-settings-alt"></use></svg> <span class="nav-text">Options</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" onclick="showPage('aboutPage')">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor"> <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/> </svg>
+                    <span class="nav-text">About</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <main class="main-content" id="mainContent">
+        <button class="add-item-fab" id="addItemFab" title="Add New Item">
+            <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>
+        </button>
+
+        <div id="pathsPage" class="page active">
+            <div class="container">
+                <div class="header">
+                    <h1>Project File Manager</h1> <p>Efficiently organize and manage your project files</p> </div>
+
+                <div class="top-actions-bar">
+                    <div class="stats">
+                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-folder"></use></svg>
+                        Total Items: <span id="fileCount">0</span> </div>
+                    <div>
+                        <button id="openAllBtn" class="btn btn-primary">
+                            <svg viewBox="0 0 24 24"><use xlink:href="#icon-rocket"></use></svg>
+                            Open All </button>
+                        </div>
+                </div>
+                <div id="itemsDisplayArea"></div>
+            </div>
+        </div>
+
+        <div id="todosPage" class="page">
+            <div class="page-header-container">
+                <div>
+                    <h1 class="page-title">To-Do List</h1>
+                    <p class="page-subtitle">Keep track of your tasks and projects</p>
+                </div>
+            </div>
+            <div class="glass-card">
+                <div class="todo-input-container">
+                    <input type="text" id="todoInput" class="input-field todo-input" placeholder="Add a new task...">
+                    <button id="addTodoBtn" class="btn btn-primary">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;">
+                            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                        </svg>
+                        Add Task
+                    </button>
+                </div>
+                <div id="todosContainer"></div>
+            </div>
+        </div>
+        
+        <div id="fileOperationsPage" class="page">
+            <div class="page-header-container">
+                <div>
+                    <h1 class="page-title">File Operations</h1>
+                    <p class="page-subtitle">Manage your project data files</p>
+                </div>
+            </div>
+            <div class="glass-card">
+                <div class="options-group">
+                    <h3>Project File</h3>
+                    <p>Save all current paths, categories, and tasks to a file, or load them from a previously saved file.</p>
+                    <div style="display: flex; gap: 10px; margin-top:10px; flex-wrap:wrap;">
+                        <button id="saveProjectAsBtn" class="btn btn-primary">
+                            <svg viewBox="0 0 24 24"><use xlink:href="#icon-save"></use></svg> Save Project As...
+                        </button>
+                        <button id="importProjectBtn" class="btn btn-secondary">
+                            <svg viewBox="0 0 24 24"><use xlink:href="#icon-open"></use></svg> Import Project...
+                        </button>
+                         <button id="saveActiveProjectBtn" class="btn btn-success" disabled> <svg viewBox="0 0 24 24"><use xlink:href="#icon-save"></use></svg> Save Current Project
+                        </button>
+                    </div>
+                     <p id="activeProjectInfo" style="font-size: 0.8rem; color: #90a4ae; margin-top: 10px;">No active project file.</p>
+                </div>
+                <div class="options-group">
+                    <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 5px;">
+                        <h3>History</h3>
+                        <button id="clearHistoryBtn" class="btn btn-danger btn-icon" title="Clear History">
+                             <svg viewBox="0 0 24 24"><use xlink:href="#icon-clear-all"></use></svg>
+                        </button>
+                    </div>
+                    <p>Recently opened or saved project files.</p>
+                    <div id="projectHistoryContainer" style="max-height: 200px; overflow-y: auto; padding: 5px; background: rgba(255,255,255,0.03); border-radius: 6px;">
+                        </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div id="optionsPage" class="page">
+            <div class="page-header-container">
+                <div>
+                    <h1 class="page-title">Options</h1>
+                    <p class="page-subtitle">Configure application settings and preferences</p>
+                </div>
+            </div>
+            <div class="glass-card">
+                <div class="options-group">
+                    <h3>Category Management</h3>
+                    <p>Organize how your items are grouped.</p>
+                    <button id="manageCategoriesBtn" class="btn btn-secondary">
+                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-settings-alt"></use></svg> Manage Categories
+                    </button>
+                </div>
+
+                <div class="options-group">
+                    <h3>File Extension Mappings</h3>
+                    <p>Automatically assign categories based on file extensions.</p>
+                    <div class="input-row" style="margin-bottom: 10px;">
+                        <input type="text" id="newExtensionInput" class="input-field" placeholder=".example (e.g., .txt, .doc)">
+                        <input type="text" id="newExtensionCategoryNameInput" class="input-field" placeholder="Category Display Name (e.g., Text Files)">
+                    </div>
+                    <button id="addExtensionMappingBtn" class="btn btn-success">
+                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>
+                        Add Extension Mapping
+                    </button>
+                    <div id="extensionMappingsContainer" style="margin-top: 15px;"></div>
+                </div>
+
+                <div class="options-group">
+                    <h3>Open Multiple Items Interval</h3>
+                    <p>Set the delay (in seconds) between opening each item when using "Open All" or "Open All in Category".</p>
+                     <div class="input-row" style="max-width: 300px;">
+                        <label for="openIntervalInput" style="white-space: nowrap; align-self: center;">Interval (seconds):</label>
+                        <input type="number" id="openIntervalInput" class="input-field" value="0.3" min="0.05" step="0.05">
+                    </div>
+                    <button id="saveOpenIntervalBtn" class="btn btn-success" style="margin-top:10px;">
+                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-save"></use></svg> Save Interval
+                    </button>
+                </div>
+
+                <div class="options-group">
+                    <h3>Application Updates</h3>
+                    <p>Check for the latest version of Hemo Paths Manager.</p>
+                    <button id="checkForUpdatesBtn" class="btn btn-secondary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right:8px;"><path d="M12 2.5c-5.25 0-9.5 4.25-9.5 9.5s4.25 9.5 9.5 9.5 9.5-4.25 9.5-9.5S17.25 2.5 12 2.5zm0 2c4.14 0 7.5 3.36 7.5 7.5s-3.36 7.5-7.5 7.5-7.5-3.36-7.5-7.5S7.86 4.5 12 4.5zm-1 11.5h2v2h-2v-2zm0-8h2v6h-2V8z"/></svg>
+                        Check for Updates
+                    </button>
+                    <p id="updateStatusMessage" style="font-size: 0.8rem; color: #90a4ae; margin-top: 10px;"></p>
+                </div>
+
+
+                <div class="options-group">
+                    <h3>Data Management</h3>
+                     <p>Manage all stored application data.</p>
+                    <button id="clearAllDataBtnOptionsPage" class="btn btn-danger"> <svg viewBox="0 0 24 24"><use xlink:href="#icon-clear-all"></use></svg>
+                        Clear All Application Data
+                    </button>
+                </div>
+            </div>
+        </div>
+
+
+        <div id="aboutPage" class="page">
+            <div class="glass-card">
+                <h3>Hemo Paths Manager</h3>
+                <p>Version: 1.7 (UI Refinements & Features)</p>
+                <p>Developed to streamline the management of your project file paths, website links, and tasks.</p>
+                <br>
+                <h4>Key Features:</h4>
+                <ul>
+                    <li>Easily add and categorize file paths, folder links, and website URLs via a unified popup.</li>
+                    <li>Directly open files, folders, and websites from the application.</li>
+                    <li>Manage custom categories and file extension mappings for better organization.</li>
+                    <li>Integrated To-Do list with edit functionality to track your tasks.</li>
+                    <li>Save and load entire project setups as `.hpmt` files.</li>
+                    <li>History of recently used project files.</li>
+                    <li>Modern and attractive user interface with frameless window.</li>
+                </ul>
+                <br>
+                <h5>v 2.0.2 - 202562</h5>
+            </div>
+        </div>
+    </main>
+    
+    <svg width="0" height="0" style="display:none;">
+        <symbol id="icon-folder" viewBox="0 0 24 24"><path d="M10 4H4c-1.11 0-2 .89-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></symbol>
+        <symbol id="icon-file" viewBox="0 0 24 24"><path d="M13 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V9l-7-7zm4 18H7V4h5v5h5v11z"/></symbol>
+        <symbol id="icon-website" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93s3.05-7.44 7-7.93v15.86zm2-15.86c1.03.13 2 .45 2.87.93L15 8h-3V4.07zm0 5.93H15l.8 2H12V10zm0 4h3l.87 2.07c-.87.48-1.84.8-2.87.93V14zm5.96-2H18v-2h1.96c.03.33.04.66.04 1s-.01.67-.04 1z"/></symbol>
+        <symbol id="icon-photoshop" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1.5 14.5V7.5h3V10l2.5-2.5L18.5 10l-2.5 2.5L18.5 15l-2.5 2.5-2.5-2.5V16.5h-3zM9 14.5v-5l-2.5 2.5L9 14.5z"/></symbol>
+        <symbol id="icon-aftereffects" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 15l-4-4h2.5v-3h3v3H16l-4 4zM8.5 9.5L12 6l3.5 3.5h-2v3h-3v-3h-2z"/></symbol>
+        <symbol id="icon-premiere" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM9.5 16.5L14.5 12L9.5 7.5v9zM15 16h-2V8h2v8z"/></symbol>
+        <symbol id="icon-options" viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></symbol>
+        <symbol id="icon-edit" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.39.39 0 00-.55 0l-1.83 1.83 3.75 3.75 1.83-1.83zM3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 000-1.41l-2.34-2.34a.996.996 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></symbol> 
+        <symbol id="icon-delete" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></symbol>
+        <symbol id="icon-open" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></symbol>
+        <symbol id="icon-show-location" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></symbol>
+        <symbol id="icon-add" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></symbol>
+        <symbol id="icon-save" viewBox="0 0 24 24"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/></symbol>
+        <symbol id="icon-cancel" viewBox="0 0 24 24"><path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></symbol>
+        <symbol id="icon-chevron-right" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></symbol> 
+        <symbol id="icon-chevron-left" viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></symbol>
+        <symbol id="icon-empty-folder" viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 10H6V8h12v8z"/></symbol>
+        <symbol id="icon-empty-history" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></symbol>
+        <symbol id="icon-rocket" viewBox="0 0 24 24"><path d="M13.12,2.25a1.5,1.5,0,0,0-2.24,0L3.54,9.59A4.48,4.48,0,0,0,3,12a4.48,4.48,0,0,0,.54,2.41L10.88,21.75a1.5,1.5,0,0,0,2.24,0l7.34-7.34A4.48,4.48,0,0,0,21,12a4.48,4.48,0,0,0-.54-2.41ZM12,14a2,2,0,1,1,2-2A2,2,0,0,1,12,14Z"/></symbol>
+        <symbol id="icon-clear-all" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM8 9h8v10H8V9zm7.5-5l-1-1h-5l-1 1H5v2h14V4z"/></symbol>
+        <symbol id="icon-paste" viewBox="0 0 24 24"><path d="M19 2h-4.18C14.4.84 13.3 0 12 0S9.6.84 9.18 2H5c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm7 18H5V4h2v2h10V4h2v16z"/></symbol>
+        <symbol id="icon-arrow-up" viewBox="0 0 24 24"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/></symbol>
+        <symbol id="icon-arrow-down" viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></symbol>
+        <symbol id="icon-settings-alt" viewBox="0 0 24 24"><path fill="currentColor" d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17-.59-1.69-.98l-2.49-1c-.23-.08-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12-.64l2 3.46c.12.22.39.3.61-.22l2.49-1c.52.4 1.08.73 1.69-.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38 2.65c.61-.25 1.17-.59-1.69-.98l2.49 1c.23.08.49 0 .61.22l2-3.46c.12-.22-.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></symbol>
+        <symbol id="icon-close" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></symbol>
+        <symbol id="icon-check" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></symbol>
+        <symbol id="icon-history" viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7v2c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.25 2.52.77-1.28-3.52-2.09V8H12z"/></symbol>
+    </svg>
+
+    <div id="addItemModal" class="modal-backdrop">
+        <div class="add-item-modal-content">
+            <h2>Add New Item(s)</h2>
+            <div class="input-group">
+                <div class="input-row">
+                    <button id="selectFilesButtonModal" class="btn btn-secondary">
+                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>Add Files
+                    </button>
+                    <button id="addFolderLinkButtonModal" class="btn btn-secondary">
+                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-folder"></use></svg>Add Folder Link
+                    </button>
+                    <button id="importFromFolderButtonModal" class="btn btn-secondary">
+                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-folder"></use></svg>Import From Folder
+                    </button>
+                </div>
+                <div class="input-row paste-path-group">
+                    <input type="text" id="pathInputModal" class="input-field" placeholder="Or paste a file/folder/website path here">
+                    <button id="pastePathButtonModal" class="btn btn-secondary" style="flex-shrink: 0;">
+                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-paste"></use></svg>Paste
+                    </button>
+                    <button id="addPastedPathButtonModal" class="btn btn-primary" style="flex-shrink: 0;">
+                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>Add Path
+                    </button>
+                </div>
+                <div class="input-row">
+                    <input type="text" id="projectNameInputModal" class="input-field" placeholder="Descriptive name for the item(s) (optional)">
+                    <select id="categorySelectInputModal" class="input-field"></select>
+                </div>
+                <div id="selectedFilesDisplayModal"></div>
+            </div>
+            <div class="add-item-modal-actions">
+                <button id="addItemsButtonModal" class="btn btn-success">
+                    <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>Add to List
+                </button>
+                <button id="closeAddItemModalBtn" class="btn btn-secondary">Close</button>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="notificationToast" class="notification-toast"></div>
+    <div id="confirmModalBackdrop" class="modal-backdrop"> <div class="modal-dialog"> <p id="confirmModalMessage"></p> <div class="modal-dialog-actions"> <button id="confirmModalYesBtn" class="btn btn-danger">Yes</button> <button id="confirmModalNoBtn" class="btn btn-primary">No</button> </div> </div> </div>
+    <div id="categoryManagerModal" class="modal-backdrop"> <div class="category-manager-content"> <h2>Manage Categories</h2> <div id="categoryListContainer"></div> <div class="add-category-form"> <input type="text" id="newManagedCategoryInput" class="input-field" placeholder="New category name"> <button id="addManagedCategoryBtn" class="btn btn-success"> <svg viewBox="0 0 24 24"><use xlink:href="#icon-add"></use></svg>Add Category </button> </div> <div class="category-manager-actions"> <button id="closeCategoryManagerBtn" class="btn btn-secondary">Close</button> </div> </div> </div>
+    <div class="loading-indicator" id="loadingOverlay"> <div class="spinner"></div></div>
+
+    <script>
+    // Electron and Node.js modules
+    let shell = null, pathModule = null, ipcRenderer = null, electronClipboard = null;
+    try {
+        if (typeof require === 'function' && typeof window !== 'undefined' && window.process && window.process.type === 'renderer') {
+            shell = require('electron').shell; pathModule = require('path'); ipcRenderer = require('electron').ipcRenderer; electronClipboard = require('electron').clipboard;
+            console.log("[Renderer] Electron environment detected.");
+        }
+    } catch (e) { console.warn("[Renderer] Error loading Electron modules.", e); }
+
+    let projectFiles = []; let stagedFilePaths = []; let appCategories = []; let todos = [];
+    let customExtensionMappings = []; 
+    let projectHistory = [];
+    let activeFilePath = null;
+    let openInterval = 0.3; 
+
+    const DOM = {
+        sidebar: document.getElementById('sidebar'), mainContent: document.getElementById('mainContent'),
+        addItemFab: document.getElementById('addItemFab'),
+        addItemModal: document.getElementById('addItemModal'),
+        closeAddItemModalBtn: document.getElementById('closeAddItemModalBtn'),
+        selectFilesButtonModal: document.getElementById('selectFilesButtonModal'),
+        addFolderLinkButtonModal: document.getElementById('addFolderLinkButtonModal'),
+        importFromFolderButtonModal: document.getElementById('importFromFolderButtonModal'),
+        pathInputModal: document.getElementById('pathInputModal'),
+        pastePathButtonModal: document.getElementById('pastePathButtonModal'),
+        addPastedPathButtonModal: document.getElementById('addPastedPathButtonModal'),
+        projectNameInputModal: document.getElementById('projectNameInputModal'),
+        categorySelectInputModal: document.getElementById('categorySelectInputModal'),
+        addItemsButtonModal: document.getElementById('addItemsButtonModal'),
+        selectedFilesDisplayModal: document.getElementById('selectedFilesDisplayModal'),
+        filesDisplayContainer: document.getElementById('itemsDisplayArea'),
+        fileCountDisplay: document.getElementById('fileCount'),
+        openAllBtn: document.getElementById('openAllBtn'),
+        loadingOverlay: document.getElementById('loadingOverlay'), notification: document.getElementById('notificationToast'),
+        confirmModal: document.getElementById('confirmModalBackdrop'), confirmModalMessage: document.getElementById('confirmModalMessage'),
+        confirmModalYesBtn: document.getElementById('confirmModalYesBtn'), confirmModalNoBtn: document.getElementById('confirmModalNoBtn'),
+        manageCategoriesBtn: document.getElementById('manageCategoriesBtn'), 
+        categoryManagerModal: document.getElementById('categoryManagerModal'), categoryListContainer: document.getElementById('categoryListContainer'),
+        newManagedCategoryInput: document.getElementById('newManagedCategoryInput'), addManagedCategoryBtn: document.getElementById('addManagedCategoryBtn'),
+        closeCategoryManagerBtn: document.getElementById('closeCategoryManagerBtn'),
+        todoInput: document.getElementById('todoInput'), addTodoBtn: document.getElementById('addTodoBtn'),
+        todosContainer: document.getElementById('todosContainer'),
+        clearAllDataBtnOptionsPage: document.getElementById('clearAllDataBtnOptionsPage'),
+        newExtensionInput: document.getElementById('newExtensionInput'),
+        newExtensionCategoryNameInput: document.getElementById('newExtensionCategoryNameInput'),
+        addExtensionMappingBtn: document.getElementById('addExtensionMappingBtn'),
+        extensionMappingsContainer: document.getElementById('extensionMappingsContainer'),
+        saveProjectAsBtn: document.getElementById('saveProjectAsBtn'),
+        importProjectBtn: document.getElementById('importProjectBtn'),
+        saveActiveProjectBtn: document.getElementById('saveActiveProjectBtn'),
+        projectHistoryContainer: document.getElementById('projectHistoryContainer'),
+        activeProjectInfo: document.getElementById('activeProjectInfo'),
+        openIntervalInput: document.getElementById('openIntervalInput'),
+        saveOpenIntervalBtn: document.getElementById('saveOpenIntervalBtn'),
+        clearHistoryBtn: document.getElementById('clearHistoryBtn'),
+        checkForUpdatesBtn: document.getElementById('checkForUpdatesBtn'), 
+        updateStatusMessage: document.getElementById('updateStatusMessage') 
+    };
+
+    const STORAGE_ITEMS_KEY = 'projectFileManagerData_v1.7_FinalUI'; 
+    const STORAGE_CATEGORIES_KEY = 'projectFileManagerCategories_v1.7_FinalUI';
+    const STORAGE_TODOS_KEY = 'projectFileManagerTodos_v1.7_FinalUI';
+    const STORAGE_EXTENSION_MAPPINGS_KEY = 'projectFileManagerExtMappings_v1.2_FinalUI';
+    const STORAGE_PROJECT_HISTORY_KEY = 'projectFileManagerHistory_v1.1_FinalUI';
+    const STORAGE_OPEN_INTERVAL_KEY = 'projectFileManagerOpenInterval_v1.0';
+    const DEFAULT_OPEN_INTERVAL = 0.3; 
+    const MAX_HISTORY_ITEMS = 10;
+
+
+    const DEFAULT_CATEGORIES_STRUCTURE = [
+        { key: 'auto_detect', display: '--- Auto-Detect Category ---', isCustom: false, isDefaultOption: true, order: 0, isEditable: false, isDeletable: false },
+        { key: 'photoshop', display: 'Photoshop Projects', isCustom: false, order: 1, isEditable: true, isDeletable: false },
+        { key: 'aftereffects', display: 'After Effects Projects', isCustom: false, order: 2, isEditable: true, isDeletable: false },
+        { key: 'premiere', display: 'Premiere Pro Projects', isCustom: false, order: 3, isEditable: true, isDeletable: false },
+        { key: 'folder', display: 'Folder Links', isCustom: false, order: 4, isEditable: true, isDeletable: false },
+        { key: 'website', display: 'Website Links', isCustom: false, order: 5, isEditable: true, isDeletable: false },
+        { key: 'general', display: 'General Files', isCustom: false, order: 6, isEditable: true, isDeletable: false },
+    ];
+    const FILE_TYPE_TO_DEFAULT_CAT_KEY = { 'photoshop': 'photoshop', 'aftereffects': 'aftereffects', 'premiere': 'premiere', 'folderLink': 'folder', 'websiteLink': 'website' };
+    
+    function toggleSidebar() {
+        if (DOM.sidebar) DOM.sidebar.classList.toggle('collapsed'); 
+        if (DOM.mainContent) DOM.mainContent.classList.toggle('expanded');
+        if (window.innerWidth <= 768 && DOM.sidebar && !DOM.sidebar.classList.contains('collapsed')) { DOM.sidebar.classList.add('show'); } 
+        else if (window.innerWidth <= 768 && DOM.sidebar && DOM.sidebar.classList.contains('collapsed')) { DOM.sidebar.classList.remove('show'); }
+    }
+    function showPage(pageId) {
+        document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+        const targetPage = document.getElementById(pageId); if (targetPage) targetPage.classList.add('active');
+        document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+        const activeLink = document.querySelector(`.nav-link[onclick="showPage('${pageId}')"]`); if (activeLink) activeLink.classList.add('active');
+        if (window.innerWidth <= 768 && DOM.sidebar) { DOM.sidebar.classList.add('collapsed'); DOM.sidebar.classList.remove('show'); if(DOM.mainContent) DOM.mainContent.classList.add('expanded'); }
+    }
+    function handleMinimizeWindow() { if (ipcRenderer) ipcRenderer.send('minimize-window'); else showAppNotification('Minimize feature is available in the desktop app only.', 'warning'); }
+    function handleCloseWindow() { if (ipcRenderer) ipcRenderer.send('close-window'); else showAppCustomConfirm("Are you sure you want to close this tab?", (confirmed) => { if (confirmed) window.close(); }); }
+    function escapeHTML(str) { return typeof str === 'string' ? str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'})[m]) : String(str); }
+    function escapeAttr(str) { return typeof str === 'string' ? str.replace(/"/g, '&quot;') : String(str); }
+    function showAppNotification(message, type = 'success') { const el = DOM.notification; if(el){ el.textContent = message; el.className = `notification-toast ${type} show`; if (el.timeoutId) clearTimeout(el.timeoutId); el.timeoutId = setTimeout(() => el.classList.remove('show'), 3500); } else { console.warn("Notification element not found for:", message); } }
+    function showAppLoading(isLoading) { if(DOM.loadingOverlay) DOM.loadingOverlay.classList.toggle('show', isLoading); }
+    function showAppCustomConfirm(message, callback) {
+        if(!DOM.confirmModal || !DOM.confirmModalMessage || !DOM.confirmModalYesBtn || !DOM.confirmModalNoBtn) {
+            console.error("Confirm modal elements not found.");
+            callback(false); // Assume "No" if modal elements are missing
+            return;
+        }
+        DOM.confirmModalMessage.textContent = message; DOM.confirmModal.classList.add('show');
+        const newYes = DOM.confirmModalYesBtn.cloneNode(true); DOM.confirmModalYesBtn.parentNode.replaceChild(newYes, DOM.confirmModalYesBtn); DOM.confirmModalYesBtn = newYes;
+        const newNo = DOM.confirmModalNoBtn.cloneNode(true); DOM.confirmModalNoBtn.parentNode.replaceChild(newNo, DOM.confirmModalNoBtn); DOM.confirmModalNoBtn = newNo;
+        DOM.confirmModalYesBtn.onclick = () => { DOM.confirmModal.classList.remove('show'); callback(true); };
+        DOM.confirmModalNoBtn.onclick = () => { DOM.confirmModal.classList.remove('show'); callback(false); };
+    }
+    function clearStagedFilesDisplayModal() { stagedFilePaths = []; if(DOM.selectedFilesDisplayModal) DOM.selectedFilesDisplayModal.textContent = ''; }
+    
+    function updateStagedPathsModal(paths, entryType, prefix) { 
+        if (paths && Array.isArray(paths) && paths.length > 0) {
+            stagedFilePaths = paths.map(p => ({ path: p, name: pathModule ? pathModule.basename(p) : p.substring(p.lastIndexOf(/[/\\]/) + 1), entryType }));
+            if(DOM.selectedFilesDisplayModal) DOM.selectedFilesDisplayModal.textContent = `${prefix} ${stagedFilePaths.map(f => f.name).join(', ')}`; 
+            if(DOM.pathInputModal) DOM.pathInputModal.value = ''; 
+        } else if (DOM.pathInputModal && !DOM.pathInputModal.value.trim()) { clearStagedFilesDisplayModal(); }
+    }
+    function populateCategoryDropdown(selectElement = DOM.categorySelectInputModal) { 
+        if (!selectElement) return;
+        selectElement.innerHTML = '';
+        const sortedForDropdown = [...appCategories].sort((a,b) => (a.order ?? Infinity) - (b.order ?? Infinity));
+        sortedForDropdown.forEach(cat => { const option = document.createElement('option'); option.value = cat.key; option.textContent = cat.display; if (cat.isDefaultOption) option.selected = true; selectElement.appendChild(option); });
+    }
+    
+    function getFileType(pathOrName, entryType = 'file') {
+        const lowerPathOrName = typeof pathOrName === 'string' ? pathOrName.toLowerCase() : '';
+        if (lowerPathOrName.startsWith('https://') || lowerPathOrName.startsWith('http://')) return 'websiteLink';
+        const fileExtension = lowerPathOrName.startsWith('.') ? lowerPathOrName : (pathModule ? pathModule.extname(lowerPathOrName) : '.' + lowerPathOrName.split('.').pop());
+        if (fileExtension) {
+            const customMapping = customExtensionMappings.find(m => m.extension.toLowerCase() === fileExtension.toLowerCase());
+            if (customMapping) return customMapping.categoryKey;
+        }
+        if (entryType === 'folderLink') return 'folderLink';
+        if (!pathOrName || typeof pathOrName !== 'string') return 'unknown';
+        const name = pathModule ? pathModule.basename(pathOrName) : pathOrName.substring(pathOrName.lastIndexOf(/[/\\]/) + 1);
+        const ext = name.split('.').pop().toLowerCase();
+        if (ext === 'psd') return 'photoshop'; if (ext === 'aep') return 'aftereffects'; if (ext === 'prproj') return 'premiere';
+        return 'unknown';
+    }
+    function determineItemCategoryKey(fileTypeOrCatKeyFromGetType, chosenCatKey) {
+        if (chosenCatKey && chosenCatKey !== 'auto_detect') return chosenCatKey;
+        if (appCategories.some(cat => cat.key === fileTypeOrCatKeyFromGetType)) return fileTypeOrCatKeyFromGetType;
+        if (FILE_TYPE_TO_DEFAULT_CAT_KEY[fileTypeOrCatKeyFromGetType]) return FILE_TYPE_TO_DEFAULT_CAT_KEY[fileTypeOrCatKeyFromGetType];
+        return 'general';
+    }
+    function getCategoryDisplay(key) { const cat = appCategories.find(c => c.key === key); return cat ? cat.display : (key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ')); }
+    function openCategoryManagerModal() { if(DOM.categoryManagerModal && DOM.newManagedCategoryInput) {renderCategoryManagerList(); DOM.categoryManagerModal.classList.add('show'); DOM.newManagedCategoryInput.value = ''; DOM.newManagedCategoryInput.focus();} else { console.error("Category manager modal elements not found.");}}
+    function closeCategoryManagerModal() { const activeEditInput = DOM.categoryListContainer.querySelector('.category-name-input-inline'); if (activeEditInput) { cancelInlineEdit(activeEditInput.dataset.key, activeEditInput.closest('.category-manager-item')); } if(DOM.categoryManagerModal) DOM.categoryManagerModal.classList.remove('show'); }
+    function renderCategoryManagerList() {
+        if(!DOM.categoryListContainer) return;
+        DOM.categoryListContainer.innerHTML = '';
+        const manageableCategories = appCategories.filter(c => c.key !== 'auto_detect').sort((a,b) => (a.order ?? Infinity) - (b.order ?? Infinity));
+        const orders = manageableCategories.map(c => c.order).filter(o => typeof o === 'number');
+        const minOrder = orders.length > 0 ? Math.min(...orders) : 0; const maxOrder = orders.length > 0 ? Math.max(...orders) : 0;
+        manageableCategories.forEach((cat) => {
+            const itemDiv = document.createElement('div'); itemDiv.className = 'category-manager-item'; itemDiv.dataset.categoryKey = cat.key; 
+            const isMinOrder = cat.order === minOrder; const isMaxOrder = cat.order === maxOrder;
+            const canMoveUp = !isMinOrder && manageableCategories.length > 1; const canMoveDown = !isMaxOrder && manageableCategories.length > 1;
+            itemDiv.innerHTML = `<div class="category-manager-item-name-container"><span class="category-tag ${cat.isCustom ? 'custom' : ''}">${cat.isCustom ? 'Custom' : 'Default'}</span><span class="category-manager-item-name">${escapeHTML(cat.display)}</span></div><div class="category-manager-item-controls"><button class="btn-icon btn-move-managed-category-up" data-key="${escapeAttr(cat.key)}" title="Move Up" ${!canMoveUp ? 'disabled' : ''}><svg viewBox="0 0 24 24"><use xlink:href="#icon-arrow-up"></use></svg></button><button class="btn-icon btn-move-managed-category-down" data-key="${escapeAttr(cat.key)}" title="Move Down" ${!canMoveDown ? 'disabled' : ''}><svg viewBox="0 0 24 24"><use xlink:href="#icon-arrow-down"></use></svg></button><button class="btn-icon btn-edit-managed-category" data-key="${escapeAttr(cat.key)}" title="Edit Name" ${(!cat.isCustom && !cat.isEditable) ? 'disabled' : ''}><svg viewBox="0 0 24 24"><use xlink:href="#icon-edit"></use></svg></button><button class="btn-icon btn-delete-managed-category" data-key="${escapeAttr(cat.key)}" title="Delete Category" ${!cat.isCustom || !cat.isDeletable ? 'disabled' : ''}><svg viewBox="0 0 24 24"><use xlink:href="#icon-delete"></use></svg></button><button class="btn-icon btn-save-inline-edit" data-key="${escapeAttr(cat.key)}" title="Save Changes" style="display:none;"><svg viewBox="0 0 24 24"><use xlink:href="#icon-save"></use></svg></button><button class="btn-icon btn-cancel-inline-edit" data-key="${escapeAttr(cat.key)}" title="Cancel Edit" style="display:none;"><svg viewBox="0 0 24 24"><use xlink:href="#icon-cancel"></use></svg></button></div>`;
+            itemDiv.querySelector('.btn-edit-managed-category').addEventListener('click', (e) => activateInlineEdit(e.currentTarget.dataset.key, itemDiv));
+            itemDiv.querySelector('.btn-delete-managed-category').addEventListener('click', (e) => handleDeleteManagedCategory(e.currentTarget.dataset.key));
+            itemDiv.querySelector('.btn-move-managed-category-up').addEventListener('click', (e) => handleMoveCategory(e.currentTarget.dataset.key, 'up', true));
+            itemDiv.querySelector('.btn-move-managed-category-down').addEventListener('click', (e) => handleMoveCategory(e.currentTarget.dataset.key, 'down', true));
+            itemDiv.querySelector('.btn-save-inline-edit').addEventListener('click', (e) => saveInlineEdit(e.currentTarget.dataset.key, itemDiv));
+            itemDiv.querySelector('.btn-cancel-inline-edit').addEventListener('click', (e) => cancelInlineEdit(e.currentTarget.dataset.key, itemDiv));
+            DOM.categoryListContainer.appendChild(itemDiv);
+        });
+    }
+    function activateInlineEdit(categoryKey, itemDiv) {
+        const currentlyEditing = DOM.categoryListContainer.querySelector('.category-name-input-inline'); 
+        if (currentlyEditing && currentlyEditing.dataset.key !== categoryKey) { cancelInlineEdit(currentlyEditing.dataset.key, currentlyEditing.closest('.category-manager-item'));}
+        const nameContainer = itemDiv.querySelector('.category-manager-item-name-container'); const nameSpan = itemDiv.querySelector('.category-manager-item-name');
+        const category = appCategories.find(c => c.key === categoryKey); if (!nameSpan || !category || (!category.isCustom && !category.isEditable)) return;
+        const currentName = category.display; const tagSpanHTML = nameContainer.querySelector('.category-tag').outerHTML; 
+        nameContainer.innerHTML = `<${tagSpanHTML}<input type="text" class="category-name-input-inline input-field" value="${escapeAttr(currentName)}" data-key="${categoryKey}" data-original-name="${escapeAttr(currentName)}">`;
+        const inputField = nameContainer.querySelector('.category-name-input-inline'); inputField.focus(); inputField.select(); 
+        itemDiv.querySelector('.btn-edit-managed-category').style.display = 'none'; itemDiv.querySelector('.btn-delete-managed-category').style.display = 'none'; 
+        itemDiv.querySelector('.btn-move-managed-category-up').style.display = 'none'; itemDiv.querySelector('.btn-move-managed-category-down').style.display = 'none';
+        itemDiv.querySelector('.btn-save-inline-edit').style.display = 'inline-flex'; itemDiv.querySelector('.btn-cancel-inline-edit').style.display = 'inline-flex';
+        inputField.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); saveInlineEdit(categoryKey, itemDiv); } else if (e.key === 'Escape') { cancelInlineEdit(categoryKey, itemDiv); } });
+    }
+    function saveInlineEdit(categoryKey, itemDiv) {
+        const inputField = itemDiv.querySelector('.category-name-input-inline'); const category = appCategories.find(c => c.key === categoryKey);
+        if (!inputField || !category) return; const newDisplayName = inputField.value.trim(); const originalName = inputField.dataset.originalName;
+        if (!newDisplayName) { showAppNotification("Category name cannot be empty.", "warning"); inputField.focus(); return; }
+        if (newDisplayName !== originalName && appCategories.some(cat => cat.key !== categoryKey && cat.display.toLowerCase() === newDisplayName.toLowerCase())) { showAppNotification(`Category name "${newDisplayName}" already exists.`, 'warning'); inputField.focus(); return; }
+        category.display = newDisplayName; saveCategoriesToStorage(); renderCategoryManagerList(); populateCategoryDropdown(DOM.categorySelectInputModal); renderProjectFilesUI(); showAppNotification("Category name updated.", "success");
+    }
+    function cancelInlineEdit(categoryKey, itemDiv) {
+        const category = appCategories.find(c => c.key === categoryKey); if (!category || !itemDiv) return; 
+        const nameContainer = itemDiv.querySelector('.category-manager-item-name-container');
+        nameContainer.innerHTML = `<span class="category-tag ${category.isCustom ? 'custom' : ''}">${category.isCustom ? 'Custom' : 'Default'}</span><span class="category-manager-item-name">${escapeHTML(category.display)}</span>`;
+        itemDiv.querySelector('.btn-edit-managed-category').style.display = 'inline-flex'; itemDiv.querySelector('.btn-delete-managed-category').style.display = 'inline-flex';
+        itemDiv.querySelector('.btn-move-managed-category-up').style.display = 'inline-flex'; itemDiv.querySelector('.btn-move-managed-category-down').style.display = 'inline-flex';
+        itemDiv.querySelector('.btn-save-inline-edit').style.display = 'none'; itemDiv.querySelector('.btn-cancel-inline-edit').style.display = 'none';
+    }
+    function handleAddManagedCategory() {
+        const displayName = DOM.newManagedCategoryInput.value.trim();
+        if (!displayName) { showAppNotification("Category name cannot be empty.", "warning"); DOM.newManagedCategoryInput.focus(); return; }
+        if (appCategories.some(cat => cat.display.toLowerCase() === displayName.toLowerCase())) { showAppNotification(`Category name "${displayName}" already exists.`, 'warning'); DOM.newManagedCategoryInput.focus(); return; }
+        const nonAutoDetectCategories = appCategories.filter(c => c.key !== 'auto_detect');
+        const orders = nonAutoDetectCategories.map(c => c.order).filter(o => typeof o === 'number');
+        const maxOrder = orders.length > 0 ? Math.max(0, ...orders) : -1; 
+        const newKey = `custom_${displayName.toLowerCase().replace(/\s+/g, '_')}_${Date.now().toString().slice(-5)}`;
+        appCategories.push({ key: newKey, display: displayName, isCustom: true, order: maxOrder + 1, isEditable: true, isDeletable: true });
+        saveCategoriesToStorage(); renderCategoryManagerList(); populateCategoryDropdown(DOM.categorySelectInputModal); 
+        DOM.newManagedCategoryInput.value = ''; DOM.newManagedCategoryInput.focus(); showAppNotification(`Category "${displayName}" added.`, 'success');
+    }
+    function handleDeleteManagedCategory(categoryKey) {
+        const category = appCategories.find(cat => cat.key === categoryKey);
+        if (!category || (!category.isCustom || !category.isDeletable)) { showAppNotification("Only custom, deletable categories can be removed.", "warning"); return; }
+        showAppCustomConfirm(`Are you sure you want to delete category "${category.display}"? Items in this category will be moved to "General Files".`, (confirmed) => {
+            if (confirmed) {
+                projectFiles.forEach(item => { if (item.category === categoryKey) item.category = 'general'; });
+                appCategories = appCategories.filter(cat => cat.key !== categoryKey);
+                let currentOrder = 0; appCategories.filter(c => c.key !== 'auto_detect').sort((a,b) => (a.order || 0) - (b.order || 0)).forEach(c => c.order = currentOrder++);
+                saveItemsToStorage(); saveCategoriesToStorage(); renderCategoryManagerList(); populateCategoryDropdown(DOM.categorySelectInputModal); renderProjectFilesUI();
+                showAppNotification(`Category "${category.display}" deleted.`, "success");
+            }
+        });
+    }
+    function handleMoveCategory(categoryKey, direction, isFromModal = false) {
+        let sortableCats = appCategories.filter(c => c.key !== 'auto_detect'); const catIndexInSortable = sortableCats.findIndex(cat => cat.key === categoryKey);
+        if (catIndexInSortable === -1) return; const targetIndexInSortable = direction === 'up' ? catIndexInSortable - 1 : catIndexInSortable + 1;
+        if (targetIndexInSortable < 0 || targetIndexInSortable >= sortableCats.length) return;
+        const catToMove = sortableCats[catIndexInSortable]; const catToSwapWith = sortableCats[targetIndexInSortable];
+        const appCatToMove = appCategories.find(c => c.key === catToMove.key); const appCatToSwapWith = appCategories.find(c => c.key === catToSwapWith.key);
+        if (appCatToMove && appCatToSwapWith) {
+            const tempOrder = appCatToMove.order; appCatToMove.order = appCatToSwapWith.order; appCatToSwapWith.order = tempOrder;
+            appCategories.sort((a,b) => (a.order ?? Infinity) - (b.order ?? Infinity));
+            saveCategoriesToStorage(); populateCategoryDropdown(DOM.categorySelectInputModal); renderProjectFilesUI();
+            if (isFromModal) { renderCategoryManagerList(); }
+        }
+    }
+    function handleProcessStagedItemsFromModal() { 
+        if (!stagedFilePaths || stagedFilePaths.length === 0) { showAppNotification('Please select or paste items first.', 'warning'); return; }
+        const groupName = DOM.projectNameInputModal.value.trim(); let addedCount = 0;
+        stagedFilePaths.forEach(itemInfo => {
+            const { path, name, entryType = 'file' } = itemInfo; 
+            if (!path || typeof path !== 'string' || projectFiles.some(pf => pf.location.toLowerCase() === path.toLowerCase())) {
+                if (projectFiles.some(pf => pf.location.toLowerCase() === path.toLowerCase())) { showAppNotification(`Item "${name}" already exists.`, 'warning'); } return; 
+            }
+            const itemType = getFileType(path, entryType); 
+            const catKey = determineItemCategoryKey(itemType, DOM.categorySelectInputModal.value); 
+            projectFiles.push({ id: Date.now() + Math.random(), name: groupName ? `${groupName} - ${name}` : name, actualName: name, location: path, type: itemType, category: catKey, entryType, dateAdded: new Date().toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' }) });
+            addedCount++;
+        });
+        if (addedCount > 0) {
+            saveItemsToStorage(); renderProjectFilesUI();
+            showAppNotification(`✨ Added ${addedCount} item(s)!`, 'success');
+        }
+        DOM.projectNameInputModal.value = ''; clearStagedFilesDisplayModal();
+        DOM.categorySelectInputModal.value = 'auto_detect'; 
+        if (addedCount > 0 && DOM.projectNameInputModal) DOM.projectNameInputModal.focus(); 
+        closeAddItemModal(); 
+    }
+    function renderProjectFilesUI() {
+        if(!DOM.fileCountDisplay || !DOM.openAllBtn || !DOM.filesDisplayContainer) {
+            console.warn("Path Manager UI elements not found, skipping render.");
+            return;
+        }
+        DOM.fileCountDisplay.textContent = projectFiles.length; DOM.openAllBtn.disabled = projectFiles.length === 0; DOM.filesDisplayContainer.innerHTML = '';
+        if (projectFiles.length === 0) { DOM.filesDisplayContainer.innerHTML = `<div class="empty-placeholder"><div class="icon"><svg viewBox="0 0 24 24"><use xlink:href="#icon-empty-folder"></use></svg></div><h3>List is empty.</h3><p>Start by adding files, folders, or website links.</p></div>`; return; }
+        const grouped = projectFiles.reduce((acc, item) => { const key = item.category || 'general'; if (!acc[key]) acc[key] = []; acc[key].push(item); return acc; }, {});
+        const sortedKeys = Object.keys(grouped).sort((a, b) => { const catA = appCategories.find(c => c.key === a) || { order: Infinity, display: a }; const catB = appCategories.find(c => c.key === b) || { order: Infinity, display: b }; return (catA.order ?? Infinity) - (catB.order ?? Infinity) || catA.display.localeCompare(catB.display, 'en'); });
+        sortedKeys.forEach(catKey => {
+            const items = grouped[catKey]; const section = document.createElement('div'); section.className = 'category-section collapsed'; section.dataset.categoryKey = catKey;
+            const header = document.createElement('div'); header.className = 'category-header'; const catDisplay = getCategoryDisplay(catKey);
+            const categoryObject = appCategories.find(c => c.key === catKey); const sortableCatsForOrderCheck = appCategories.filter(c => c.key !== 'auto_detect');
+            const orders = sortableCatsForOrderCheck.map(c => c.order).filter(o => typeof o === 'number');
+            const minOrder = orders.length > 0 ? Math.min(...orders) : 0; const maxOrder = orders.length > 0 ? Math.max(...orders) : 0;
+            const isMinOrder = categoryObject && categoryObject.order === minOrder; const isMaxOrder = categoryObject && categoryObject.order === maxOrder;
+            const canMoveUp = categoryObject && categoryObject.key !== 'auto_detect' && !isMinOrder && sortableCatsForOrderCheck.length > 1;
+            const canMoveDown = categoryObject && categoryObject.key !== 'auto_detect' && !isMaxOrder && sortableCatsForOrderCheck.length > 1;
+            const chevronIcon = document.dir === 'rtl' ? '#icon-chevron-left' : '#icon-chevron-right';
+            header.innerHTML = `<div class="category-title-container"><span class="category-toggle-icon"><svg viewBox="0 0 24 24"><use xlink:href="${chevronIcon}"></use></svg></span><h2 class="category-title">${escapeHTML(catDisplay)}</h2><span class="category-item-count">(${items.length})</span></div><div class="category-controls"><button class="btn-icon btn-move-category-up" title="Move Category Up" data-category-key="${escapeAttr(catKey)}" ${!canMoveUp ? 'disabled' : ''}><svg viewBox="0 0 24 24"><use xlink:href="#icon-arrow-up"></use></svg></button><button class="btn-icon btn-move-category-down" title="Move Category Down" data-category-key="${escapeAttr(catKey)}" ${!canMoveDown ? 'disabled' : ''}><svg viewBox="0 0 24 24"><use xlink:href="#icon-arrow-down"></use></svg></button><button class="btn btn-secondary btn-open-all-in-category" data-category-key="${escapeAttr(catKey)}"><svg viewBox="0 0 24 24"><use xlink:href="#icon-folder"></use></svg>Open All in Category</button></div>`;
+            header.querySelector('.category-title-container').addEventListener('click', () => section.classList.toggle('collapsed'));
+            header.querySelector('.btn-open-all-in-category').addEventListener('click', (e) => { e.stopPropagation(); handleOpenAllFilesInCategory(e); });
+            header.querySelector('.btn-move-category-up').addEventListener('click', (e) => { e.stopPropagation(); handleMoveCategory(e.currentTarget.dataset.categoryKey, 'up'); });
+            header.querySelector('.btn-move-category-down').addEventListener('click', (e) => { e.stopPropagation(); handleMoveCategory(e.currentTarget.dataset.categoryKey, 'down'); });
+            const grid = document.createElement('div'); grid.className = 'items-grid';
+            items.forEach((item, idx) => { const cardHTML = createFileCardHTML(item, idx); const tempDiv = document.createElement('div'); tempDiv.innerHTML = cardHTML.trim(); const cardElement = tempDiv.firstChild; if (cardElement) { cardElement.classList.add('fade-in-item'); grid.appendChild(cardElement); } });
+            section.appendChild(header); section.appendChild(grid); DOM.filesDisplayContainer.appendChild(section);
+        });
+        DOM.filesDisplayContainer.querySelectorAll('.path-card-options-btn, .item-card-direct-open').forEach(btn => btn.addEventListener('click', handleItemCardButton));
+    }
+    
+    function handleItemCardButton(event) {
+        const button = event.currentTarget;
+        const action = button.dataset.action;
+        const itemId = button.dataset.itemId || button.closest('.item-card').querySelector('.path-card-options-btn')?.dataset.itemId; 
+        
+        if (!itemId) return;
+
+        const item = projectFiles.find(pf => pf.id === parseFloat(itemId));
+        if (!item) { console.warn(`Item with id ${itemId} not found`); showAppNotification('Error: Item not found.', 'error'); return; }
+
+        if (action === 'options') {
+            handleOptionsMenu(event);
+        } else if (action === 'open') {
+            openItem(item.location, item.entryType, item.type);
+        } else if (action === 'show-location') {
+            showItemInFolder(item.location, item.entryType);
+        } else if (action === 'delete') {
+            deleteItemEntry(item.id);
+        }
+        if (action !== 'options') {
+            const menu = button.closest('.item-actions-menu');
+            if (menu) menu.classList.remove('show');
+            else { 
+                const optionsMenu = document.getElementById(`options-menu-${itemId}`);
+                if (optionsMenu) optionsMenu.classList.remove('show');
+            }
+        }
+    }
+
+
+    function handleOptionsMenu(event) { 
+        event.stopPropagation(); 
+        const itemId = event.currentTarget.dataset.itemId; const menuId = `options-menu-${itemId}`; 
+        const currentMenu = document.getElementById(menuId);
+        document.querySelectorAll('.item-actions-menu.show').forEach(m => { if (m.id !== menuId) { m.classList.remove('show'); } });
+        if (currentMenu) {
+            currentMenu.classList.toggle('show'); 
+            if (currentMenu.classList.contains('show')) { 
+                const btnRect = event.currentTarget.getBoundingClientRect(); let top = btnRect.height + 5; 
+                let positionProp = document.dir === 'rtl' ? 'right' : 'left'; let oppositeProp = document.dir === 'rtl' ? 'left' : 'right';
+                currentMenu.style[positionProp] = '0px'; currentMenu.style[oppositeProp] = 'auto'; currentMenu.style.top = `${top}px`;
+                const menuRect = currentMenu.getBoundingClientRect(); const viewportWidth = window.innerWidth; const viewportHeight = window.innerHeight;
+                if (document.dir === 'rtl') { if (menuRect.left < 10) { currentMenu.style.right = 'auto'; currentMenu.style.left = '0px'; } } 
+                else { if (menuRect.right > viewportWidth - 10) { currentMenu.style.left = 'auto'; currentMenu.style.right = '0px'; } }
+                if (menuRect.bottom > viewportHeight - 10) { currentMenu.style.top = `-${currentMenu.offsetHeight + 5}px`; }
+                if (menuRect.top < 10 && currentMenu.style.top.startsWith('-')) { currentMenu.style.top = `${btnRect.height + 5}px`; }
+            }
+        }
+    }
+    document.addEventListener('click', e => { if (!e.target.closest('.path-card-options-btn') && !e.target.closest('.item-actions-menu') && !e.target.closest('.item-card-direct-open')) { document.querySelectorAll('.item-actions-menu.show').forEach(m => m.classList.remove('show')); } });
+    
+    function createFileCardHTML(item, index) {
+        let typeDisplay = 'File'; let iconId = 'icon-file';
+        if (item.entryType === 'folderLink') { typeDisplay = 'Folder Link'; iconId = 'icon-folder'; } 
+        else if (item.type === 'websiteLink') { typeDisplay = 'Website Link'; iconId = 'icon-website'; } 
+        else if (FILE_TYPE_TO_DEFAULT_CAT_KEY[item.type]) { typeDisplay = getCategoryDisplay(FILE_TYPE_TO_DEFAULT_CAT_KEY[item.type]); if (item.type === 'photoshop') iconId = 'icon-photoshop'; else if (item.type === 'aftereffects') iconId = 'icon-aftereffects'; else if (item.type === 'premiere') iconId = 'icon-premiere'; }
+        const openActionText = item.type === 'websiteLink' ? 'Open Website' : 'Open';
+        const openIcon = item.type === 'websiteLink' ? 'icon-website' : (item.entryType === 'folderLink' ? 'icon-folder' : 'icon-open');
+        return `<div class="item-card" style="--card-index: ${index};"><div class="item-card-main"><span class="item-card-icon"><svg viewBox="0 0 24 24"><use xlink:href="#${iconId}"></use></svg></span><div class="item-card-info"><div class="item-card-name" title="${escapeAttr(item.name)}">${escapeHTML(item.name)}</div><div class="item-card-filetype">${escapeHTML(typeDisplay)}</div></div><button class="btn btn-icon item-card-direct-open" data-action="open" data-item-id="${item.id}" title="${openActionText}"><svg viewBox="0 0 24 24"><use xlink:href="#${openIcon}"></use></svg></button></div><div class="item-card-path" title="${escapeAttr(item.location)}">${escapeHTML(item.location)}</div><div class="item-card-footer"><span class="item-card-date">Added: ${item.dateAdded}</span><button class="btn btn-icon path-card-options-btn" data-action="options" data-item-id="${item.id}" title="Options"><svg viewBox="0 0 24 24"><use xlink:href="#icon-options"></use></svg></button></div><div class="item-actions-menu" id="options-menu-${item.id}">${item.type !== 'websiteLink' ? `<button data-action="show-location" data-id="${item.id}"><svg viewBox="0 0 24 24"><use xlink:href="#icon-show-location"></use></svg>Open File Location</button>` : ''}<button data-action="delete" data-id="${item.id}"><svg viewBox="0 0 24 24"><use xlink:href="#icon-delete"></use></svg>Delete from List</button></div></div>`;
+    }
+
+    function openItem(location, entryType = 'file', itemType = 'unknown') {
+        if (!shell && itemType !== 'websiteLink') { showAppNotification('This feature is available in the desktop app only.', 'warning'); return; }
+        if (!location || typeof location !== 'string') { showAppNotification('❌ Invalid path/URL.', 'error'); return; }
+        if (itemType === 'websiteLink') { try { if (shell && shell.openExternal) { shell.openExternal(location); } else { window.open(location, '_blank', 'noopener,noreferrer'); } showAppNotification(`✅ Opening website...`, 'success'); } catch (e) { showAppNotification(`❌ Error opening website: ${e.message}`, 'error'); } return; }
+        showAppLoading(true);
+        shell.openPath(location).then(errMessage => { showAppLoading(false); if (errMessage) { showAppNotification(`❌ Error opening ${entryType === 'folderLink' ? 'folder' : 'file'}: ${errMessage.split('\n')[0]}`, 'error');  } else { showAppNotification(`✅ Opened ${entryType === 'folderLink' ? 'folder' : 'file'}.`, 'success'); } }).catch(e => { showAppLoading(false); showAppNotification(`❌ Exception opening item: ${e.message}`, 'error'); });
+    }
+    function showItemInFolder(itemPath, entryType = 'file') {
+        if (entryType === 'websiteLink') { showAppNotification('This action is not applicable to website links.', 'info'); return; }
+        if (!shell || !pathModule) { showAppNotification('This feature is available in the desktop app only.', 'warning'); return; }
+        if (!itemPath || typeof itemPath !== 'string') { showAppNotification('❌ Invalid path.', 'error'); return; }
+        showAppLoading(true);
+        setTimeout(() => { try { if (entryType === 'folderLink') { shell.openPath(itemPath).then(errMessage => { if (errMessage) showAppNotification('❌ Error opening folder location: ' + errMessage.split('\n')[0], 'error'); else showAppNotification('✅ Opened folder location.', 'success'); }).catch(e => showAppNotification('❌ Exception opening folder location: ' + e.message, 'error')); } else { shell.showItemInFolder(itemPath); showAppNotification('✅ Shown file in folder.', 'success'); } } catch (e) { try { shell.openPath(pathModule.dirname(itemPath)).then(errMessage => { if (errMessage) showAppNotification('❌ Error opening containing folder: ' + errMessage.split('\n')[0], 'error'); else showAppNotification('✅ Opened containing folder.', 'success'); }).catch(e2 => showAppNotification('❌ Exception opening containing folder: ' + e2.message, 'error')); } catch (e2) { showAppNotification('❌ Critical error opening location.', 'error');} } showAppLoading(false); }, 100);
+    }
+    function deleteItemEntry(id) { showAppCustomConfirm('Are you sure you want to remove this entry from the list? (The actual file/folder/website will NOT be deleted).', conf => { if (conf) { projectFiles = projectFiles.filter(i => i.id !== id); saveItemsToStorage(); renderProjectFilesUI(); showAppNotification('🗑️ Entry removed from list.', 'success'); } }); }
+    function clearAllData() { showAppCustomConfirm('Are you sure you want to delete all data (all listed items, custom categories, tasks and history)? This action cannot be undone.', conf => { if (conf) { projectFiles = []; appCategories = DEFAULT_CATEGORIES_STRUCTURE.map(cat => ({...cat})); todos = []; customExtensionMappings = []; projectHistory = []; activeFilePath = null; updateActiveProjectInfo(); saveItemsToStorage(); saveCategoriesToStorage(); saveTodos(); saveCustomExtensionMappings(); saveProjectHistory(); populateCategoryDropdown(DOM.categorySelectInputModal); renderProjectFilesUI(); renderTodos(); renderCustomExtensionMappingsUI(); renderProjectHistoryUI(); clearStagedFilesDisplayModal(); if(DOM.pathInputModal) DOM.pathInputModal.value = ''; showAppNotification('🗑️ All data has been cleared.', 'success'); } }); }
+    function openMultiple(itemsToOpen, itemEntryType, context) {
+        if (!shell && itemEntryType !== 'websiteLink') { showAppNotification('This feature is available in the desktop app only.', 'warning'); return; }
+        const validItems = itemsToOpen.filter(i => { if (i.entryType === 'websiteLink') return i.location && typeof i.location === 'string' && (i.location.startsWith('https://') || i.location.startsWith('http://')); return i.entryType === itemEntryType && i.location && typeof i.location === 'string'; });
+        if (validItems.length === 0) { if (context !== 'All Files' && context !== 'All Folder Links' && context !== 'All Website Links') { } return; }
+        showAppLoading(true); let successCount = 0, failureCount = 0;
+        const delayBetweenOpens = openInterval * 1000; // Use configured interval
+        const openPromises = validItems.map((item, i) => new Promise(resolve => setTimeout(() => { if (item.entryType === 'websiteLink') { try { if (shell && shell.openExternal) shell.openExternal(item.location); else window.open(item.location, '_blank', 'noopener,noreferrer'); successCount++; } catch (e) { failureCount++; } resolve(); } else if (shell) { shell.openPath(item.location).then(errMessage => { if (errMessage) failureCount++; else successCount++; resolve(); }).catch(() => { failureCount++; resolve(); }); } else { failureCount++; resolve(); } }, i * delayBetweenOpens)));
+        Promise.all(openPromises).then(() => { showAppLoading(false); let message = ''; const typeString = itemEntryType === 'file' ? 'file(s)' : itemEntryType === 'folderLink' ? 'folder(s)' : 'website(s)'; if (successCount > 0) message += `✅ Attempted to open ${successCount} ${typeString}. `; if (failureCount > 0) message += `❌ Failed to open ${failureCount} ${typeString}. `; if (message.trim()) { showAppNotification(message.trim(), failureCount > 0 && successCount === 0 ? 'error' : failureCount > 0 ? 'warning' : 'success'); } });
+    }
+    function handleOpenAllClick() {
+        if (projectFiles.length === 0) { showAppNotification("The list is empty. Nothing to open.", "info"); return; }
+        const delayBetweenTypes = openInterval * 1000 * 2; // Add a bit more delay between types of items
+        openMultiple(projectFiles.filter(i => i.entryType === 'file'), 'file', 'All Files');
+        let nextDelay = projectFiles.filter(i => i.entryType === 'file').length * (openInterval * 1000) + delayBetweenTypes;
+        setTimeout(() => { openMultiple(projectFiles.filter(i => i.entryType === 'folderLink'), 'folderLink', 'All Folder Links'); }, nextDelay);
+        nextDelay += projectFiles.filter(i => i.entryType === 'folderLink').length * (openInterval * 1000) + delayBetweenTypes;
+        setTimeout(() => { openMultiple(projectFiles.filter(i => i.entryType === 'websiteLink'), 'websiteLink', 'All Website Links'); }, nextDelay);
+    }
+    function handleOpenAllFilesInCategory(event) {
+        const key = event.currentTarget.dataset.categoryKey; const itemsInCategory = projectFiles.filter(i => i.category === key); const categoryDisplay = getCategoryDisplay(key);
+        if (itemsInCategory.length === 0) { showAppNotification(`No items to open in category "${categoryDisplay}".`, "info"); return; }
+        const delayBetweenTypes = openInterval * 1000 * 2;
+        openMultiple(itemsInCategory.filter(i => i.entryType === 'file'), 'file', categoryDisplay);
+        let nextDelay = itemsInCategory.filter(i => i.entryType === 'file').length * (openInterval * 1000) + delayBetweenTypes;
+        setTimeout(() => { openMultiple(itemsInCategory.filter(i => i.entryType === 'folderLink'), 'folderLink', categoryDisplay); }, nextDelay);
+        nextDelay += itemsInCategory.filter(i => i.entryType === 'folderLink').length * (openInterval * 1000) + delayBetweenTypes;
+        setTimeout(() => { openMultiple(itemsInCategory.filter(i => i.entryType === 'websiteLink'), 'websiteLink', categoryDisplay); }, nextDelay);
+    }
+    function loadTodos() { try { const storedTodos = localStorage.getItem(STORAGE_TODOS_KEY); todos = storedTodos ? JSON.parse(storedTodos) : []; } catch (e) { todos = []; console.error("[Renderer] Error parsing todos from LS", e); localStorage.removeItem(STORAGE_TODOS_KEY); } renderTodos(); }
+    function saveTodos() { try { localStorage.setItem(STORAGE_TODOS_KEY, JSON.stringify(todos)); } catch (e) { console.error('[Renderer] Error saving todos:', e); showAppNotification('Error saving to-do list!', 'error');} }
+    function renderTodos() {
+        if (!DOM.todosContainer) return; DOM.todosContainer.innerHTML = '';
+        if (todos.length === 0) { DOM.todosContainer.innerHTML = `<p style="text-align:center; color: #90a4ae;">No tasks yet. Add one above!</p>`; return; }
+        todos.forEach(todo => {
+            const todoItemDiv = document.createElement('div'); todoItemDiv.className = `todo-item ${todo.completed ? 'completed' : ''}`; todoItemDiv.dataset.id = todo.id;
+            todoItemDiv.innerHTML = `
+                <div class="todo-item-left">
+                    <span class="todo-checkbox" onclick="toggleTodoComplete(${todo.id})">
+                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-check"></use></svg>
+                    </span>
+                    <span class="todo-text" id="todo-text-${todo.id}">${escapeHTML(todo.text)}</span>
+                    <input type="text" class="todo-text-edit-input input-field" id="todo-edit-input-${todo.id}" value="${escapeAttr(todo.text)}" style="display:none;">
+                </div>
+                <div class="todo-item-actions">
+                    <span class="todo-date">${todo.dateAdded}</span>
+                    <button class="btn-icon btn-edit-todo" id="btn-edit-todo-${todo.id}" onclick="handleEditTodo(${todo.id})" title="Edit Task">
+                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-edit"></use></svg>
+                    </button>
+                    <button class="btn-icon btn-save-todo" id="btn-save-todo-${todo.id}" onclick="saveEditedTodo(${todo.id})" title="Save Task" style="display:none;">
+                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-save"></use></svg>
+                    </button>
+                     <button class="btn-icon btn-cancel-todo-edit" id="btn-cancel-todo-${todo.id}" onclick="cancelEditTodo(${todo.id})" title="Cancel Edit" style="display:none;">
+                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-cancel"></use></svg>
+                    </button>
+                    <button class="btn-icon btn-delete-todo" onclick="deleteTodo(${todo.id})" title="Delete Task">
+                        <svg viewBox="0 0 24 24"><use xlink:href="#icon-delete"></use></svg>
+                    </button>
+                </div>`;
+            DOM.todosContainer.appendChild(todoItemDiv);
+            const editInput = todoItemDiv.querySelector(`#todo-edit-input-${todo.id}`);
+            editInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { saveEditedTodo(todo.id); } else if (e.key === 'Escape') { cancelEditTodo(todo.id); } });
+        });
+    }
+    function addTodo() {
+        if (!DOM.todoInput) return; const text = DOM.todoInput.value.trim();
+        if (!text) { showAppNotification('Task cannot be empty.', 'warning'); return; }
+        todos.push({ id: Date.now(), text: text, completed: false, dateAdded: new Date().toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'short' }) });
+        DOM.todoInput.value = ''; saveTodos(); renderTodos(); showAppNotification('Task added!', 'success');
+    }
+    function toggleTodoComplete(id) { const todo = todos.find(t => t.id === id); if (todo) { todo.completed = !todo.completed; saveTodos(); renderTodos(); } }
+    function deleteTodo(id) { showAppCustomConfirm('Are you sure you want to delete this task?', (confirmed) => { if (confirmed) { todos = todos.filter(t => t.id !== id); saveTodos(); renderTodos(); showAppNotification('Task deleted.', 'success'); } }); }
+    
+    function handleEditTodo(id) {
+        const textSpan = document.getElementById(`todo-text-${id}`); const editInput = document.getElementById(`todo-edit-input-${id}`);
+        const editBtn = document.getElementById(`btn-edit-todo-${id}`); const saveBtn = document.getElementById(`btn-save-todo-${id}`);
+        const cancelBtn = document.getElementById(`btn-cancel-todo-${id}`); const deleteBtn = textSpan.closest('.todo-item').querySelector('.btn-delete-todo');
+        if (textSpan && editInput && editBtn && saveBtn && cancelBtn && deleteBtn) {
+            textSpan.style.display = 'none'; editInput.style.display = 'block'; editInput.value = textSpan.textContent; editInput.focus(); editInput.select();
+            editBtn.style.display = 'none'; deleteBtn.style.display = 'none'; saveBtn.style.display = 'inline-flex'; cancelBtn.style.display = 'inline-flex';
+        }
+    }
+    function saveEditedTodo(id) {
+        const editInput = document.getElementById(`todo-edit-input-${id}`); const newText = editInput.value.trim();
+        if (!newText) { showAppNotification('Task text cannot be empty.', 'warning'); editInput.focus(); return; }
+        const todo = todos.find(t => t.id === id); if (todo) { todo.text = newText; saveTodos(); renderTodos(); showAppNotification('Task updated!', 'success'); }
+    }
+    function cancelEditTodo(id) { renderTodos(); }
+
+    function loadCustomExtensionMappings() { try { const storedMappings = localStorage.getItem(STORAGE_EXTENSION_MAPPINGS_KEY); customExtensionMappings = storedMappings ? JSON.parse(storedMappings) : []; } catch (e) { customExtensionMappings = []; console.error("[Renderer] Error parsing custom extension mappings from LS", e); localStorage.removeItem(STORAGE_EXTENSION_MAPPINGS_KEY); } renderCustomExtensionMappingsUI(); }
+    function saveCustomExtensionMappings() { try { localStorage.setItem(STORAGE_EXTENSION_MAPPINGS_KEY, JSON.stringify(customExtensionMappings)); } catch (e) { console.error('[Renderer] Error saving custom extension mappings:', e); showAppNotification('Error saving extension mappings!', 'error');} }
+    function renderCustomExtensionMappingsUI() {
+        if (!DOM.extensionMappingsContainer) return; DOM.extensionMappingsContainer.innerHTML = '';
+        if (customExtensionMappings.length === 0) { DOM.extensionMappingsContainer.innerHTML = `<p style="font-size:0.85rem; color:#90a4ae;">No custom extension mappings defined yet.</p>`; return; }
+        customExtensionMappings.forEach((mapping, index) => {
+            const catDisplay = getCategoryDisplay(mapping.categoryKey) || 'Unknown Category';
+            const itemDiv = document.createElement('div'); itemDiv.className = 'extension-mapping-item';
+            itemDiv.innerHTML = `<span><strong>${escapeHTML(mapping.extension)}</strong> &rarr; ${escapeHTML(catDisplay)}</span><button class="btn-icon" onclick="handleDeleteCustomExtensionMapping(${index})" title="Delete Mapping"><svg viewBox="0 0 24 24"><use xlink:href="#icon-delete"></use></svg></button>`;
+            DOM.extensionMappingsContainer.appendChild(itemDiv);
+        });
+    }
+    function handleAddCustomExtensionMapping() {
+        const extension = DOM.newExtensionInput.value.trim().toLowerCase(); const categoryDisplayName = DOM.newExtensionCategoryNameInput.value.trim();
+        if (!extension || !categoryDisplayName) { showAppNotification('Extension and Category Name cannot be empty.', 'warning'); return; }
+        if (!extension.startsWith('.')) { showAppNotification('Extension must start with a dot (e.g., .txt).', 'warning'); DOM.newExtensionInput.focus(); return; }
+        if (customExtensionMappings.some(m => m.extension === extension)) { showAppNotification(`Mapping for extension "${extension}" already exists. Delete the old one first.`, 'warning'); return; }
+        let categoryKey = ''; const existingCategory = appCategories.find(cat => cat.display.toLowerCase() === categoryDisplayName.toLowerCase());
+        if (existingCategory) { categoryKey = existingCategory.key; } 
+        else { const nonAutoDetectCategories = appCategories.filter(c => c.key !== 'auto_detect'); const orders = nonAutoDetectCategories.map(c => c.order).filter(o => typeof o === 'number'); const maxOrder = orders.length > 0 ? Math.max(0, ...orders) : -1; categoryKey = `custom_${categoryDisplayName.toLowerCase().replace(/\s+/g, '_')}_${Date.now().toString().slice(-5)}`; appCategories.push({ key: categoryKey, display: categoryDisplayName, isCustom: true, order: maxOrder + 1, isEditable: true, isDeletable: true }); saveCategoriesToStorage(); populateCategoryDropdown(DOM.categorySelectInputModal); if(document.getElementById('categoryManagerModal').classList.contains('show')) renderCategoryManagerList(); showAppNotification(`New category "${categoryDisplayName}" created.`, 'info'); }
+        customExtensionMappings.push({ extension: extension, categoryKey: categoryKey });
+        saveCustomExtensionMappings(); renderCustomExtensionMappingsUI(); DOM.newExtensionInput.value = ''; DOM.newExtensionCategoryNameInput.value = '';
+        showAppNotification(`Mapping for "${extension}" to "${categoryDisplayName}" added.`, 'success');
+    }
+    function handleDeleteCustomExtensionMapping(index) { if (index >= 0 && index < customExtensionMappings.length) { const mapping = customExtensionMappings[index]; showAppCustomConfirm(`Are you sure you want to delete the mapping for "${mapping.extension}"?`, (confirmed) => { if (confirmed) { customExtensionMappings.splice(index, 1); saveCustomExtensionMappings(); renderCustomExtensionMappingsUI(); showAppNotification(`Mapping for "${mapping.extension}" deleted.`, 'success'); } }); } }
+
+    const MAX_HISTORY_ITEMS_COUNT = 10; 
+    function loadProjectHistory() { try { const storedHistory = localStorage.getItem(STORAGE_PROJECT_HISTORY_KEY); projectHistory = storedHistory ? JSON.parse(storedHistory) : []; } catch (e) { projectHistory = []; console.error("[Renderer] Error parsing project history from LS", e); localStorage.removeItem(STORAGE_PROJECT_HISTORY_KEY); } renderProjectHistoryUI(); }
+    function saveProjectHistory() { try { localStorage.setItem(STORAGE_PROJECT_HISTORY_KEY, JSON.stringify(projectHistory)); } catch (e) { console.error('[Renderer] Error saving project history:', e); } }
+    function addToProjectHistory(filePath, projectName = null) {
+        const now = new Date(); const entry = { path: filePath, name: projectName || (pathModule ? pathModule.basename(filePath) : filePath.split(/[/\\]/).pop()), timestamp: now.toISOString(), displayDate: now.toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }) };
+        projectHistory = projectHistory.filter(item => item.path !== filePath); projectHistory.unshift(entry); 
+        if (projectHistory.length > MAX_HISTORY_ITEMS_COUNT) { projectHistory.length = MAX_HISTORY_ITEMS_COUNT; }
+        saveProjectHistory(); renderProjectHistoryUI();
+    }
+    function renderProjectHistoryUI() {
+        if (!DOM.projectHistoryContainer) return; DOM.projectHistoryContainer.innerHTML = '';
+        if (projectHistory.length === 0) { 
+            DOM.projectHistoryContainer.innerHTML = `<div class="empty-history-message"><svg viewBox="0 0 24 24"><use xlink:href="#icon-empty-history"></use></svg><span>No recent project files.</span></div>`; 
+            return; 
+        }
+        projectHistory.forEach((item, index) => { // Added index for delete
+            const itemDiv = document.createElement('div'); itemDiv.className = 'extension-mapping-item'; // Re-use style
+            itemDiv.innerHTML = `
+                <span style="flex-grow:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:pointer;" title="Open: ${item.path}" onclick="handleLoadProjectFromPath('${item.path.replace(/\\/g, '\\\\')}')">
+                    <strong>${escapeHTML(item.name)}</strong><br><small style="color:#78828c;">${item.displayDate}</small>
+                </span>
+                <button class="btn-icon" onclick="handleDeleteHistoryItem('${item.path.replace(/\\/g, '\\\\')}', event)" title="Delete from History">
+                    <svg viewBox="0 0 24 24"><use xlink:href="#icon-delete"></use></svg>
+                </button>
+            `;
+            DOM.projectHistoryContainer.appendChild(itemDiv);
+        });
+    }
+    function handleDeleteHistoryItem(filePath, event) {
+        if (event) event.stopPropagation(); // Prevent click on parent if button is inside
+        projectHistory = projectHistory.filter(item => item.path !== filePath);
+        saveProjectHistory();
+        renderProjectHistoryUI();
+        showAppNotification('History item removed.', 'success');
+    }
+    function handleClearHistory() {
+        showAppCustomConfirm('Are you sure you want to clear all project history?', (confirmed) => {
+            if (confirmed) {
+                projectHistory = [];
+                saveProjectHistory();
+                renderProjectHistoryUI();
+                showAppNotification('Project history cleared.', 'success');
+            }
+        });
+    }
+
+
+    function updateActiveProjectInfo() {
+        if (DOM.activeProjectInfo) {
+            if (activeFilePath) { const fileName = pathModule ? pathModule.basename(activeFilePath) : activeFilePath.split(/[/\\]/).pop(); DOM.activeProjectInfo.textContent = `Active Project: ${fileName}`; DOM.saveActiveProjectBtn.disabled = false; } 
+            else { DOM.activeProjectInfo.textContent = 'No active project file.'; DOM.saveActiveProjectBtn.disabled = true; }
+        }
+    }
+    async function handleSaveProjectAs() {
+        if (!ipcRenderer) { showAppNotification('File operations are available in the desktop app only.', 'warning'); return; }
+        const projectData = { projectFiles, appCategories, todos, customExtensionMappings, openInterval, version: "1.0" };
+        try {
+            const filePath = await ipcRenderer.invoke('save-dialog', JSON.stringify(projectData));
+            if (filePath) { activeFilePath = filePath; addToProjectHistory(filePath); updateActiveProjectInfo(); showAppNotification(`Project saved to: ${pathModule ? pathModule.basename(filePath) : filePath}`, 'success'); }
+        } catch (error) { console.error('Error saving project:', error); showAppNotification(`Error saving project: ${error.message}`, 'error'); }
+    }
+    async function handleSaveActiveProject(showNotification = true) {
+        if (!activeFilePath) { if (showNotification) showAppNotification('No active project to save. Use "Save Project As..." first.', 'warning'); return; }
+        if (!ipcRenderer) { showAppNotification('File operations are available in the desktop app only.', 'warning'); return; }
+        const projectData = { projectFiles, appCategories, todos, customExtensionMappings, openInterval, version: "1.0" };
+        try {
+            await ipcRenderer.invoke('save-file', {filePath: activeFilePath, data: JSON.stringify(projectData) });
+            if (showNotification) showAppNotification(`Project "${pathModule ? pathModule.basename(activeFilePath) : activeFilePath}" saved.`, 'success');
+            addToProjectHistory(activeFilePath); 
+        } catch (error) { console.error('Error saving active project:', error); if (showNotification) showAppNotification(`Error saving project: ${error.message}`, 'error'); }
+    }
+    async function handleImportProject() {
+        if (!ipcRenderer) { showAppNotification('File operations are available in the desktop app only.', 'warning'); return; }
+        try {
+            const result = await ipcRenderer.invoke('open-dialog-for-hpmt');
+            if (result && result.filePath && result.content) {
+                loadProjectData(JSON.parse(result.content));
+                activeFilePath = result.filePath; addToProjectHistory(result.filePath); updateActiveProjectInfo();
+                showAppNotification(`Project "${pathModule ? pathModule.basename(result.filePath) : result.filePath}" imported successfully!`, 'success');
+            }
+        } catch (error) { console.error('Error importing project:', error); showAppNotification(`Error importing project: ${error.message}`, 'error'); }
+    }
+    async function handleLoadProjectFromPath(filePath) {
+        if (!ipcRenderer) { showAppNotification('File operations are available in the desktop app only.', 'warning'); return; }
+        try {
+            const content = await ipcRenderer.invoke('read-file', filePath);
+            if (content) {
+                loadProjectData(JSON.parse(content)); activeFilePath = filePath; addToProjectHistory(filePath); 
+                updateActiveProjectInfo(); showAppNotification(`Project "${pathModule ? pathModule.basename(filePath) : filePath}" loaded.`, 'success');
+                showPage('pathsPage'); 
+            }
+        } catch (error) { console.error(`Error loading project from path "${filePath}":`, error); showAppNotification(`Error loading project: ${error.message}`, 'error'); projectHistory = projectHistory.filter(item => item.path !== filePath); saveProjectHistory(); renderProjectHistoryUI(); }
+    }
+    function loadProjectData(data) {
+        if (!data || typeof data !== 'object') { showAppNotification('Invalid project file format.', 'error'); return; }
+        projectFiles = Array.isArray(data.projectFiles) ? data.projectFiles : [];
+        if (Array.isArray(data.appCategories)) {
+            const loadedCats = data.appCategories;
+            const mergedCategories = DEFAULT_CATEGORIES_STRUCTURE.map(defaultCat => { const savedCat = loadedCats.find(sc => sc.key === defaultCat.key && !sc.isCustom); if (savedCat) return { ...defaultCat, ...savedCat, isCustom: false }; return {...defaultCat}; });
+            loadedCats.forEach(savedCat => { if (savedCat.isCustom && !mergedCategories.some(mc => mc.key === savedCat.key)) { mergedCategories.push(savedCat); } });
+            appCategories = mergedCategories.sort((a,b) => (a.order ?? Infinity) - (b.order ?? Infinity));
+        } else { appCategories = DEFAULT_CATEGORIES_STRUCTURE.map(cat => ({...cat})); }
+        todos = Array.isArray(data.todos) ? data.todos : [];
+        customExtensionMappings = Array.isArray(data.customExtensionMappings) ? data.customExtensionMappings : [];
+        openInterval = typeof data.openInterval === 'number' ? data.openInterval : DEFAULT_OPEN_INTERVAL;
+        if(DOM.openIntervalInput) DOM.openIntervalInput.value = openInterval;
+
+        populateCategoryDropdown(DOM.categorySelectInputModal);
+        renderProjectFilesUI(); renderTodos(); renderCustomExtensionMappingsUI();
+        if (document.getElementById('categoryManagerModal') && document.getElementById('categoryManagerModal').classList.contains('show')) { renderCategoryManagerList(); }
+    }
+    function saveItemsToStorage() { try { localStorage.setItem(STORAGE_ITEMS_KEY, JSON.stringify(projectFiles)); } catch (e) { console.error('[Renderer] Error saving items:', e); showAppNotification('Error saving items!', 'error');} }
+    function saveCategoriesToStorage() { try { localStorage.setItem(STORAGE_CATEGORIES_KEY, JSON.stringify(appCategories)); } catch (e) { console.error('[Renderer] Error saving categories:', e); showAppNotification('Error saving categories!', 'error');} }
+    
+    function loadOpenInterval() {
+        const storedInterval = localStorage.getItem(STORAGE_OPEN_INTERVAL_KEY);
+        openInterval = storedInterval ? parseFloat(storedInterval) : DEFAULT_OPEN_INTERVAL;
+        if (DOM.openIntervalInput) DOM.openIntervalInput.value = openInterval;
+    }
+    function saveOpenInterval() {
+        if (DOM.openIntervalInput) {
+            const newInterval = parseFloat(DOM.openIntervalInput.value);
+            if (!isNaN(newInterval) && newInterval >= 0.05) {
+                openInterval = newInterval;
+                localStorage.setItem(STORAGE_OPEN_INTERVAL_KEY, openInterval.toString());
+                showAppNotification('Open interval saved!', 'success');
+            } else {
+                showAppNotification('Invalid interval value. Must be at least 0.05.', 'warning');
+                DOM.openIntervalInput.value = openInterval; 
+            }
+        }
+    }
+
+
+    function loadData() {
+        try { const storedItems = localStorage.getItem(STORAGE_ITEMS_KEY); projectFiles = storedItems ? JSON.parse(storedItems).filter(i => i.location && i.name && i.id) : []; } catch (e) { projectFiles = []; console.error("[Renderer] Error parsing items from LS", e); localStorage.removeItem(STORAGE_ITEMS_KEY); }
+        try {
+            const storedCategories = localStorage.getItem(STORAGE_CATEGORIES_KEY);
+            if (storedCategories) {
+                const parsedCats = JSON.parse(storedCategories);
+                const mergedCategories = DEFAULT_CATEGORIES_STRUCTURE.map(defaultCat => { const savedCat = parsedCats.find(sc => sc.key === defaultCat.key); if (savedCat) { return { ...defaultCat, display: (savedCat.isCustom || (savedCat.isEditable && savedCat.display)) ? savedCat.display : defaultCat.display, order: typeof savedCat.order === 'number' ? savedCat.order : defaultCat.order, isCustom: savedCat.isCustom ?? defaultCat.isCustom, isEditable: savedCat.isEditable ?? defaultCat.isEditable, isDeletable: savedCat.isDeletable ?? defaultCat.isDeletable, }; } return {...defaultCat}; });
+                parsedCats.forEach(savedCat => { if (savedCat.isCustom && !mergedCategories.some(mc => mc.key === savedCat.key)) { mergedCategories.push(savedCat); } });
+                appCategories = mergedCategories.sort((a,b) => (a.order ?? Infinity) - (b.order ?? Infinity));
+            } else { appCategories = DEFAULT_CATEGORIES_STRUCTURE.map(cat => ({...cat})); }
+        } catch (e) { appCategories = DEFAULT_CATEGORIES_STRUCTURE.map(cat => ({...cat})); console.error("[Renderer] Error parsing categories from LS", e); localStorage.removeItem(STORAGE_CATEGORIES_KEY); }
+        if (!Array.isArray(appCategories) || appCategories.length === 0 || !appCategories.find(c => c.key === 'auto_detect')) { appCategories = DEFAULT_CATEGORIES_STRUCTURE.map(cat => ({...cat})); }
+        
+        loadTodos(); 
+        loadCustomExtensionMappings();
+        loadProjectHistory();
+        loadOpenInterval();
+        updateActiveProjectInfo();
+        populateCategoryDropdown(DOM.categorySelectInputModal); 
+        renderProjectFilesUI();
+    }
+    
+    function setupIpcListeners() {
+        if (!ipcRenderer) {
+            console.warn("[Renderer] ipcRenderer not available. File and Electron-specific features will be disabled.");
+            // Disable buttons that rely on Electron IPC
+            const electronOnlyButtons = [
+                DOM.selectFilesButtonModal, DOM.addFolderLinkButtonModal, DOM.importFromFolderButtonModal,
+                // DOM.pastePathButtonModal, // Paste can work via browser API for text
+                // DOM.addPastedPathButtonModal, // Logic inside handles non-ipc path for URLs
+                DOM.saveProjectAsBtn, DOM.importProjectBtn, DOM.saveActiveProjectBtn,
+                DOM.checkForUpdatesBtn
+            ];
+            electronOnlyButtons.forEach(btn => { 
+                if(btn) { 
+                    btn.disabled = true; 
+                    btn.title = (btn.title || btn.textContent || btn.id) + ' (Desktop app feature only)'; 
+                    if (btn.style) { // Ensure style property exists
+                        btn.style.opacity = "0.5"; 
+                        btn.style.cursor = "not-allowed";
+                    }
+                } 
+            });
+            // For paste button, if clipboard API is not available, it might also be limited.
+            // The paste logic itself has fallbacks/checks.
+            return;
+        }
+
+        ipcRenderer.on('selected-files-for-files', (event, paths) => updateStagedPathsModal(paths, 'file', 'Files ready: '));
+        ipcRenderer.on('selected-folder-for-link', (event, paths) => updateStagedPathsModal(paths, 'folderLink', 'Folder links ready: '));
+        ipcRenderer.on('selected-folder-for-import', (event, contents) => { if (contents && Array.isArray(contents) && contents.length > 0) { stagedFilePaths = contents.map(item => ({ ...item, entryType: 'file' })); let baseName = "Selected folder"; if (pathModule && contents[0].path) { const parentDir = pathModule.dirname(contents[0].path); baseName = pathModule.basename(parentDir); if (!baseName && parentDir) baseName = parentDir; } if(DOM.selectedFilesDisplayModal) DOM.selectedFilesDisplayModal.textContent = `Files to import from "${baseName}" (${stagedFilePaths.length})`; if(DOM.pathInputModal) DOM.pathInputModal.value = ''; } else if (DOM.pathInputModal && !DOM.pathInputModal.value.trim()) clearStagedFilesDisplayModal(); });
+        ipcRenderer.on('pasted-path-processed', (event, { items, originalPath }) => { 
+            if (items && Array.isArray(items) && items.length > 0) {
+                 if (items[0].entryType === 'websiteLink') { updateStagedPathsModal(items.map(i => i.path), 'websiteLink', 'Website link ready: '); } 
+                 else { stagedFilePaths = items; if(DOM.selectedFilesDisplayModal) DOM.selectedFilesDisplayModal.textContent = `Processed path. Ready to add: ${items.map(f => f.name).join(', ')}`;}
+            } else { 
+                clearStagedFilesDisplayModal(); 
+                const name = (pathModule && originalPath) ? pathModule.basename(originalPath) : "Pasted path"; 
+                showAppNotification(`Path "${name}" is invalid, empty, or inaccessible.`, 'error'); 
+            } 
+        });
+        ipcRenderer.on('pasted-path-error', (event, { message, originalPath }) => { const name = (pathModule && originalPath) ? pathModule.basename(originalPath) : "Pasted path"; showAppNotification(`Error processing "${name}": ${message}`, 'error'); clearStagedFilesDisplayModal(); });
+        
+        // Listener for update status messages from main process
+        ipcRenderer.on('update-status-message', (event, message) => {
+            if (DOM.updateStatusMessage) {
+                DOM.updateStatusMessage.textContent = message;
+            }
+            showAppNotification(message, 'info'); // Also show as a toast
+        });
+
+    }
+    
+    // --- Add Item Modal Logic ---
+    function openAddItemModal() {
+        if(DOM.categorySelectInputModal) populateCategoryDropdown(DOM.categorySelectInputModal); 
+        // Do not clear stagedFilePaths here if it was populated by drag-drop
+        // clearStagedFilesDisplayModal(); // Only clear if not from drag-drop or if explicitly needed
+        if(DOM.projectNameInputModal) DOM.projectNameInputModal.value = ''; 
+        // if(DOM.pathInputModal) DOM.pathInputModal.value = ''; // Also might be populated by paste
+        if(DOM.addItemModal) DOM.addItemModal.classList.add('show');
+    }
+    function closeAddItemModal() {
+        if(DOM.addItemModal) DOM.addItemModal.classList.remove('show');
+        clearStagedFilesDisplayModal(); // Clear staged files when modal is closed
+        if(DOM.pathInputModal) DOM.pathInputModal.value = ''; // Clear path input
+    }
+
+    // --- Drag and Drop Handlers ---
+    function handleDragOver(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        // Add class for visual feedback if CSS is present
+        // if (DOM.mainContent) DOM.mainContent.classList.add('dragover'); 
+        event.dataTransfer.dropEffect = 'copy';
+    }
+
+    function handleDragLeave(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        // Remove class for visual feedback if CSS is present
+        // if (DOM.mainContent) DOM.mainContent.classList.remove('dragover');
+    }
+
+    async function handleDrop(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        // if (DOM.mainContent) DOM.mainContent.classList.remove('dragover');
+        showAppLoading(true);
+
+        const files = event.dataTransfer.files;
+        const items = event.dataTransfer.items;
+        let hpmtFileToProcess = null; // {fileObject: File, pathForReading: string | null}
+        const otherItemsForModal = []; // {path: string, name: string, entryType: string, fileObject?: File}
+
+        // 1. Process dropped files
+        if (files.length > 0) {
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const filePath = file.path; // Electron-specific, undefined in browser
+
+                if (file.name.toLowerCase().endsWith('.hpmt') && !hpmtFileToProcess) {
+                    hpmtFileToProcess = { fileObject: file, pathForReading: filePath };
+                } else {
+                    let entryType = 'file';
+                    // Basic folder heuristic for Electron (not very reliable without fs.stat)
+                    // A file object for a folder might have an empty type and a path.
+                    if (ipcRenderer && filePath && !file.type && file.size === 0) { // Heuristic
+                         // To be more certain, an IPC call to main process to check fs.stat(filePath).isDirectory() would be needed.
+                         // For now, we'll assume it's a file unless explicitly known otherwise.
+                         // If you have an IPC call like 'check-path-type', you could use it here.
+                         // For this implementation, we'll keep it simple and mostly treat as files.
+                         // If it's a directory, true handling requires listing its contents, which is complex for drag-drop.
+                         // So, we'll add it as a 'folderLink' if it seems like a directory path from Electron.
+                         // This is still a guess.
+                         // entryType = 'folderLink'; // Example if we were more certain
+                    }
+                    otherItemsForModal.push({
+                        path: filePath || file.name,
+                        name: file.name,
+                        entryType: entryType, // Primarily 'file' for now
+                        fileObject: filePath ? null : file // Keep file object for browser reading
+                    });
+                }
+            }
+        }
+
+        // 2. Process .hpmt file if found (takes precedence)
+        if (hpmtFileToProcess) {
+            showAppNotification('Processing .hpmt file...', 'info');
+            const { fileObject, pathForReading } = hpmtFileToProcess;
+
+            if (pathForReading && ipcRenderer) { // Electron: read by path
+                try {
+                    const content = await ipcRenderer.invoke('read-file', pathForReading);
+                    loadProjectData(JSON.parse(content));
+                    activeFilePath = pathForReading;
+                    addToProjectHistory(activeFilePath, pathModule.basename(activeFilePath));
+                    updateActiveProjectInfo();
+                    showAppNotification(`Project "${pathModule.basename(activeFilePath)}" loaded from drop.`, 'success');
+                    showPage('pathsPage');
+                } catch (error) {
+                    showAppNotification(`Error loading .hpmt by path: ${error.message}`, 'error');
+                }
+            } else { // Browser or Electron without path: read File object
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        loadProjectData(JSON.parse(e.target.result));
+                        activeFilePath = fileObject.name; // No full path in browser
+                        addToProjectHistory(activeFilePath); // Add by name
+                        updateActiveProjectInfo();
+                        showAppNotification(`Project "${fileObject.name}" loaded from drop.`, 'success');
+                        showPage('pathsPage');
+                    } catch (error) {
+                        showAppNotification(`Error parsing dropped .hpmt: ${error.message}`, 'error');
+                    }
+                };
+                reader.onerror = () => showAppNotification('Error reading .hpmt file.', 'error');
+                reader.readAsText(fileObject);
+            }
+            showAppLoading(false);
+            return; // HPMT processed
+        }
+
+        // 3. If no .hpmt, process other files and try to get a dragged URL
+        stagedFilePaths = [...otherItemsForModal]; // Initialize with files/folders
+
+        let draggedUrl = null;
+        if (items && items.length > 0) {
+            for (const item of items) {
+                if (item.kind === 'string' && (item.type.includes('text/uri-list'))) {
+                    const urlString = await new Promise(resolve => item.getAsString(s => resolve(s)));
+                    if (urlString) {
+                        const firstUrl = urlString.split(/\r?\n/)[0].trim(); // Get the first URL
+                        if (firstUrl.toLowerCase().startsWith('http://') || firstUrl.toLowerCase().startsWith('https://')) {
+                            draggedUrl = firstUrl;
+                            break; 
+                        }
+                    }
+                }
+            }
+        }
+        if (!draggedUrl) { // Fallback for plain text URLs
+            const plainText = event.dataTransfer.getData('text/plain');
+            if (plainText) {
+                const potentialUrl = plainText.split(/\s/)[0].trim(); // Get first "word"
+                 if (potentialUrl.toLowerCase().startsWith('http://') || potentialUrl.toLowerCase().startsWith('https://')) {
+                    draggedUrl = potentialUrl;
+                }
+            }
+        }
+        
+        if (draggedUrl) {
+            // Avoid adding if it's already represented by a file (e.g., a .url file)
+            if (!stagedFilePaths.some(item => item.path === draggedUrl || item.name === draggedUrl)) {
+                stagedFilePaths.push({ path: draggedUrl, name: draggedUrl, entryType: 'websiteLink' });
+            }
+        }
+
+        // 4. Open modal if there are items to stage
+        if (stagedFilePaths.length > 0) {
+            if(DOM.selectedFilesDisplayModal) {
+                DOM.selectedFilesDisplayModal.textContent = `Dropped: ${stagedFilePaths.map(f => f.name).join(', ')}`;
+            }
+            if(DOM.pathInputModal) DOM.pathInputModal.value = ''; // Clear path input in modal
+            openAddItemModal(); // This will also populate categories
+            if(DOM.projectNameInputModal) DOM.projectNameInputModal.value = ''; // Clear name field
+        } else {
+            showAppNotification('No compatible files or URLs found in drop.', 'info');
+        }
+        showAppLoading(false);
+    }
+
+
+    // --- Event Listeners for Modal ---
+    if(DOM.addItemFab) DOM.addItemFab.addEventListener('click', () => {
+        clearStagedFilesDisplayModal(); // Clear any previous staged files when opening via FAB
+        if(DOM.pathInputModal) DOM.pathInputModal.value = '';
+        openAddItemModal();
+    });
+    if(DOM.closeAddItemModalBtn) DOM.closeAddItemModalBtn.addEventListener('click', closeAddItemModal);
+    if(DOM.selectFilesButtonModal) DOM.selectFilesButtonModal.addEventListener('click', () => { if (ipcRenderer) ipcRenderer.send('open-file-dialog-for-files'); else showAppNotification('This feature is available in the desktop app only.', 'warning'); });
+    if(DOM.addFolderLinkButtonModal) DOM.addFolderLinkButtonModal.addEventListener('click', () => { if (ipcRenderer) ipcRenderer.send('open-folder-dialog-for-link'); else showAppNotification('This feature is available in the desktop app only.', 'warning'); });
+    if(DOM.importFromFolderButtonModal) DOM.importFromFolderButtonModal.addEventListener('click', () => { if (ipcRenderer) ipcRenderer.send('open-folder-dialog-for-import'); else showAppNotification('This feature is available in the desktop app only.', 'warning'); });
+    if(DOM.pastePathButtonModal) DOM.pastePathButtonModal.addEventListener('click', async () => {
+        let clipboardText = '';
+        try { if (electronClipboard) { clipboardText = electronClipboard.readText(); } else if (navigator.clipboard && navigator.clipboard.readText) { clipboardText = await navigator.clipboard.readText(); } else { showAppNotification('Clipboard API not available.', 'warning'); return; } if(DOM.pathInputModal) DOM.pathInputModal.value = clipboardText; showAppNotification(clipboardText ? 'Path pasted.' : 'Clipboard is empty.', clipboardText ? 'success' : 'warning');
+        } catch (err) { console.error('[Renderer] Failed to read clipboard: ', err); showAppNotification('Failed to paste from clipboard. Ensure permission if prompted.', 'error'); }
+    });
+    if(DOM.addPastedPathButtonModal) DOM.addPastedPathButtonModal.addEventListener('click', () => {
+        const pathValue = DOM.pathInputModal.value.trim(); if (!pathValue) { showAppNotification('Please enter or paste a path first.', 'warning'); return; }
+        if (pathValue.toLowerCase().startsWith('http://') || pathValue.toLowerCase().startsWith('https://')) { 
+            updateStagedPathsModal([pathValue], 'websiteLink', 'Website link ready: '); 
+        }
+        else if (ipcRenderer) { stagedFilePaths = []; if(DOM.selectedFilesDisplayModal) DOM.selectedFilesDisplayModal.textContent = `Processing: ${pathValue.substring(pathValue.lastIndexOf(/[/\\]/) + 1)}`; ipcRenderer.send('process-pasted-path', pathValue); } 
+        else { showAppNotification('Adding local paths is available in the desktop app only.', 'warning'); }
+    });
+    if(DOM.addItemsButtonModal) DOM.addItemsButtonModal.addEventListener('click', handleProcessStagedItemsFromModal);
+    if(DOM.projectNameInputModal) DOM.projectNameInputModal.addEventListener('keydown', e => { if (e.key === 'Enter' && stagedFilePaths.length > 0) handleProcessStagedItemsFromModal(); });
+    if(DOM.pathInputModal) DOM.pathInputModal.addEventListener('keydown', e => { if (e.key === 'Enter' && DOM.addPastedPathButtonModal) DOM.addPastedPathButtonModal.click(); });
+
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        document.documentElement.dir = 'ltr'; document.documentElement.lang = 'en';
+        setupIpcListeners(); loadData(); showPage('pathsPage'); 
+        if (window.innerWidth > 768) { if(DOM.sidebar) DOM.sidebar.classList.remove('collapsed'); if(DOM.mainContent) DOM.mainContent.classList.remove('expanded'); } 
+        else { if(DOM.sidebar) DOM.sidebar.classList.add('collapsed'); if(DOM.mainContent) DOM.mainContent.classList.add('expanded'); }
+        
+        if(DOM.openAllBtn) DOM.openAllBtn.addEventListener('click', handleOpenAllClick);
+        
+        if(DOM.manageCategoriesBtn) DOM.manageCategoriesBtn.addEventListener('click', openCategoryManagerModal);
+        if(DOM.closeCategoryManagerBtn) DOM.closeCategoryManagerBtn.addEventListener('click', closeCategoryManagerModal);
+        if(DOM.addManagedCategoryBtn) DOM.addManagedCategoryBtn.addEventListener('click', handleAddManagedCategory);
+        if(DOM.addTodoBtn) DOM.addTodoBtn.addEventListener('click', addTodo);
+        if(DOM.todoInput) DOM.todoInput.addEventListener('keydown', e => { if (e.key === 'Enter') addTodo(); });
+        if(DOM.clearAllDataBtnOptionsPage) DOM.clearAllDataBtnOptionsPage.addEventListener('click', clearAllData);
+        if(DOM.addExtensionMappingBtn) DOM.addExtensionMappingBtn.addEventListener('click', handleAddCustomExtensionMapping);
+        if(DOM.saveProjectAsBtn) DOM.saveProjectAsBtn.addEventListener('click', handleSaveProjectAs);
+        if(DOM.importProjectBtn) DOM.importProjectBtn.addEventListener('click', handleImportProject);
+        if(DOM.saveActiveProjectBtn) DOM.saveActiveProjectBtn.addEventListener('click', () => handleSaveActiveProject(true));
+        if(DOM.saveOpenIntervalBtn) DOM.saveOpenIntervalBtn.addEventListener('click', saveOpenInterval);
+        if(DOM.clearHistoryBtn) DOM.clearHistoryBtn.addEventListener('click', handleClearHistory);
+        if(DOM.checkForUpdatesBtn) DOM.checkForUpdatesBtn.addEventListener('click', () => {
+            if (ipcRenderer) {
+                ipcRenderer.send('check-for-updates');
+                if(DOM.updateStatusMessage) DOM.updateStatusMessage.textContent = 'Checking for updates...';
+            } else {
+                showAppNotification('Update checking is available in the desktop app only.', 'warning');
+            }
+        });
+
+
+        if(DOM.filesDisplayContainer) DOM.filesDisplayContainer.addEventListener('click', e => {
+            const button = e.target.closest('.item-actions-menu button[data-action], .item-card-direct-open[data-action]');
+            if (button) {
+                const id = parseFloat(button.dataset.id || button.closest('.item-card').querySelector('.path-card-options-btn')?.dataset.itemId);
+                const action = button.dataset.action;
+                const item = projectFiles.find(pf => pf.id === id); 
+                if (!item) { console.warn(`Item with id ${id} not found`); showAppNotification('Error: Item not found.', 'error'); return; }
+                
+                if (action === 'options') { handleOptionsMenu(e); } 
+                else { 
+                    const menu = button.closest('.item-actions-menu'); 
+                    if(menu) menu.classList.remove('show'); 
+                    else { const optionsMenu = document.getElementById(`options-menu-${id}`); if (optionsMenu) optionsMenu.classList.remove('show'); }
+                    if (action === 'open') openItem(item.location, item.entryType, item.type);
+                    else if (action === 'show-location') showItemInFolder(item.location, item.entryType);
+                    else if (action === 'delete') deleteItemEntry(item.id);
+                }
+            }
+        });
+        if(DOM.newManagedCategoryInput) DOM.newManagedCategoryInput.addEventListener('keydown', e => { if (e.key === 'Enter' && DOM.addManagedCategoryBtn) DOM.addManagedCategoryBtn.click(); }); 
+        
+        // Add Drag and Drop listeners to main content area
+        if (DOM.mainContent) {
+            DOM.mainContent.addEventListener('dragover', handleDragOver);
+            DOM.mainContent.addEventListener('dragleave', handleDragLeave);
+            DOM.mainContent.addEventListener('drop', handleDrop); // Use the new handleDrop
+        }
+    });
+    window.addEventListener('error', e => { console.error('[Renderer] Unhandled Error:', e); showAppNotification('An unexpected error occurred!', 'error'); });
+    window.addEventListener('unhandledrejection', event => { console.error('[Renderer] Unhandled Rejection:', event.reason); showAppNotification('An unexpected async error occurred!', 'error'); });
+    </script>
+</body>
+</html>
